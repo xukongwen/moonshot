@@ -4,12 +4,13 @@
 import * as THREE from 'three/webgpu';
 import { uniform } from 'three/tsl';
 import {
-  BODIES, getBodyState, PAD_DIR, PAD_ALTITUDE, fmtDist,
+  BODIES, getBodyState, getRelativeState, childrenOf, PAD_DIR, PAD_ALTITUDE, fmtDist,
 } from './constants.js';
 import { density, pressureAtm } from './aero.js';
 import {
   elementsFromState, propagate, timeToApoapsis, timeToPeriapsis,
-  findMunEncounter, munTransferPhase,
+  findMunEncounter, findEncounter, munTransferPhase,
+  planetPhaseDeg, hohmannTransfer,
 } from './orbits.js';
 import { physicsStep, checkSOI, stepDebris } from './physics.js';
 import { buildVesselParts, buildStagePlan, stackGeometry, computeSections, massProps, partY } from './vessel.js';
@@ -38,7 +39,7 @@ export class Flight {
 
   async init() {
     this.scene = new THREE.Scene();
-    this.camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.3, 4e9);
+    this.camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.3, 1e12);
     this.camCtl = { az: 0.5, el: 0.25, dist: 28 };
 
     this.scene.add(new THREE.AmbientLight(0x445566, 0.5));
@@ -49,18 +50,37 @@ export class Flight {
     this.planetTex = {
       kerbin: makePlanetTexture('kerbin', 1024, 512),
       mun: makePlanetTexture('mun', 1024, 512),
+      minmus: makePlanetTexture('minmus', 1024, 512),
+      duna: makePlanetTexture('duna', 1024, 512),
     };
 
-    this.kerbinMesh = new THREE.Mesh(
-      // slightly under datum so the local terrain patch always wins up close
-      new THREE.SphereGeometry(BODIES.kerbin.radius - 400, 128, 64),
-      new THREE.MeshStandardNodeMaterial({ map: this.planetTex.kerbin, roughness: 0.9 }),
-    );
-    this.munMesh = new THREE.Mesh(
-      new THREE.SphereGeometry(BODIES.mun.radius - 250, 96, 48),
-      new THREE.MeshStandardNodeMaterial({ map: this.planetTex.mun, roughness: 1 }),
-    );
-    this.scene.add(this.kerbinMesh, this.munMesh);
+    this.bodyMeshes = {};
+    const meshSpec = {
+      kerbol: { shrink: 0, seg: [48, 24], basic: true },
+      kerbin: { shrink: 400, seg: [128, 64], rough: 0.9 },
+      mun: { shrink: 250, seg: [96, 48], rough: 1 },
+      minmus: { shrink: 80, seg: [64, 32], rough: 1 },
+      duna: { shrink: 200, seg: [96, 48], rough: 0.95 },
+    };
+    for (const [k, b] of Object.entries(BODIES)) {
+      const spec = meshSpec[k] ?? { shrink: 100, seg: [48, 24], rough: 1 };
+      let mat;
+      if (spec.basic) {
+        mat = new THREE.MeshBasicMaterial({ color: b.color ?? 0xffee66 });
+      } else if (this.planetTex[k]) {
+        mat = new THREE.MeshStandardNodeMaterial({ map: this.planetTex[k], roughness: spec.rough });
+      } else {
+        mat = new THREE.MeshStandardNodeMaterial({ color: b.color ?? 0x888888, roughness: spec.rough });
+      }
+      const mesh = new THREE.Mesh(
+        new THREE.SphereGeometry(Math.max(1, b.radius - spec.shrink), spec.seg[0], spec.seg[1]),
+        mat,
+      );
+      this.bodyMeshes[k] = mesh;
+      this.scene.add(mesh);
+    }
+    this.kerbinMesh = this.bodyMeshes.kerbin;
+    this.munMesh = this.bodyMeshes.mun;
 
     this.sunDirU = uniform(SUNDIR.clone());
     this.atmoCenterU = uniform(new THREE.Vector3());
@@ -72,7 +92,7 @@ export class Flight {
     const stars = makeStars();
     this.stars = stars.points;
     this.starsFade = stars.fadeU;
-    this.stars.scale.setScalar(2e9);
+    this.stars.scale.setScalar(8e10);
     this.scene.add(this.stars);
 
     // launch pad
@@ -149,6 +169,144 @@ export class Flight {
     HUD.msg(`${design.name} on the pad. SPACE to ignite. H for controls.`);
     HUD.setSituation('PRELAUNCH — KERBIN');
     HUD.stages(this.plan, 0, this.st.parts, this.st.sections);
+  }
+
+  /**
+   * Replay a headless snapshot (logs/snapshots/*.json) onto the live Flight.
+   * Matches parts by stackIndex + stack/radial (VAB rebuilds keys).
+   */
+  applySnapshot(json) {
+    const snap = typeof json === 'string' ? JSON.parse(json) : json;
+    if (!snap) return false;
+    if (!this.st) {
+      if (!this.design) return false;
+      this.start(this.design);
+    }
+    HUD.hideEndcard();
+    this.debris?.forEach((d) => this.scene.remove(d.group));
+    this.debris = [];
+
+    const st = this.st;
+    st.t = Number(snap.t) || 0;
+    st.met = st.t;
+    st.body = snap.body || 'kerbin';
+    st.pos.set(snap.pos[0], snap.pos[1], snap.pos[2]);
+    st.vel.set(snap.vel[0], snap.vel[1], snap.vel[2]);
+    st.quat.set(snap.quat[0], snap.quat[1], snap.quat[2], snap.quat[3]);
+    st.angVel.set(0, 0, 0);
+    st.throttle = snap.throttle ?? 0;
+    st.landed = !!snap.landed;
+    st.dead = !!snap.dead;
+    st.sas = true;
+    st.sasMode = 'hold';
+    st.sasTarget.copy(st.quat);
+    st.controls = { pitch: 0, yaw: 0, roll: 0 };
+
+    if (this.design) {
+      st.parts = buildVesselParts(this.design);
+      this.plan = buildStagePlan(st.parts);
+    }
+
+    const used = new Set();
+    const keep = [];
+    for (const sp of snap.parts ?? []) {
+      const radial = String(sp.key || '').startsWith('r');
+      const cands = st.parts.filter((p) =>
+        !used.has(p.key) &&
+        p.stackIndex === sp.stackIndex &&
+        (radial ? p.kind === 'radial' : p.kind === 'stack'));
+      const p = cands.find((q) => q.key === sp.key) || cands[0];
+      if (!p) continue;
+      used.add(p.key);
+      if (sp.fuel != null) p.fuel = sp.fuel;
+      p.ignited = !!sp.ignited;
+      if (sp.chuteState != null) p.chuteState = sp.chuteState;
+      if (sp.legsDown != null) p.legsDown = sp.legsDown;
+      p.alive = sp.alive !== false;
+      keep.push(p);
+    }
+    st.parts = keep;
+    st.geom = stackGeometry(st.parts);
+    st.sections = computeSections(st.parts);
+    st.massProps = massProps(st.parts, st.geom);
+
+    this.legsDeployed = st.parts.some((p) => p.legsDown);
+    this.warpIdx = 0;
+    this.rails = false;
+    this.encounter = null;
+    this.encTimer = 0;
+    this.inferStageIndex();
+
+    const alt = st.pos.length() - BODIES[st.body].radius;
+    this.flags.liftoff = !st.landed || st.t > 1;
+    this.flags.space = alt > (BODIES[st.body].atmoHeight || 0);
+    this.flags.orbit = !st.landed && this.flags.space;
+    this.flags.munSoi = st.body === 'mun';
+    this.flags.munLanded = st.body === 'mun' && st.landed;
+
+    this.lastInfo = {
+      alt, agl: alt, speed: st.vel.length(), accelG: 0, maxTempFrac: 0,
+      thrust: 0, perEngine: new Map(),
+      rho: density(st.body, alt), press: pressureAtm(st.body, alt),
+      qDyn: 0, flux: 0, plasma: 0, terrainH: 0,
+    };
+
+    if (st.landed) {
+      this.camCtl.dist = Math.max(20, (st.geom.totalLength || 12) * 2.2);
+      this.camCtl.el = 0.28;
+      this.camCtl.az = 0.55;
+    } else if (st.body === 'mun') {
+      this.camCtl.dist = Math.min(2400, Math.max(500, alt * 0.0009));
+      this.camCtl.el = -0.55;
+      this.camCtl.az = 0.75;
+    } else if (alt > 500_000) {
+      this.camCtl.dist = 420;
+      this.camCtl.el = -0.45;
+      this.camCtl.az = 1.0;
+    } else {
+      this.camCtl.dist = 180;
+      this.camCtl.el = -0.55;
+      this.camCtl.az = 0.85;
+    }
+
+    this.refreshViz();
+    this.active = true;
+    $('flight-ui').classList.remove('hidden');
+    this.hudTimer = 0;
+    this.hudTick(1);
+    HUD.msg(`Snapshot ${snap.tag || ''} @ T+${st.t.toFixed(0)}s`);
+    if (this.mapOpen) this.refreshMapNow();
+    return true;
+  }
+
+  inferStageIndex() {
+    if (!this.plan?.length) { this.stageIndex = 0; return; }
+    this.stageIndex = 0;
+    for (let i = 0; i < this.plan.length; i++) {
+      const ev = this.plan[i];
+      let spent = false;
+      if (ev.decouple !== null) {
+        const still = this.st.parts.some((p) => p.kind === 'stack' && p.stackIndex >= ev.decouple && p.alive);
+        if (!still) spent = true;
+      }
+      if (ev.dropRadials.length) {
+        const still = ev.dropRadials.some((k) => this.st.parts.some((p) => p.key === k && p.alive));
+        if (!still) spent = true;
+      }
+      if (ev.ignite.length) {
+        const allLit = ev.ignite.every((k) => {
+          const p = this.st.parts.find((q) => q.key === k);
+          return !p || p.ignited;
+        });
+        if (allLit) spent = true;
+      }
+      if (ev.chutes) {
+        const armed = this.st.parts.some((p) => p.def.chute && p.chuteState && p.chuteState !== 'stowed');
+        if (armed) spent = true;
+      }
+      if (spent) this.stageIndex = i + 1;
+      else break;
+    }
   }
 
   stop() {
@@ -286,8 +444,9 @@ export class Flight {
     idx = THREE.MathUtils.clamp(idx, 0, WARP_LEVELS.length - 1);
     const st = this.st;
     if (idx > 3) {
-      const inAtmo = st.body === 'kerbin' &&
-        st.pos.length() - BODIES.kerbin.radius < BODIES.kerbin.atmoHeight + 2000;
+      const focus = BODIES[st.body];
+      const inAtmo = focus.atmoHeight &&
+        st.pos.length() - focus.radius < focus.atmoHeight + 2000;
       if (!st.landed && (inAtmo || this.enginesLit())) {
         HUD.msg('Rails warp needs engines off and clear of the atmosphere', 'warn');
         idx = Math.min(idx, 3);
@@ -478,7 +637,7 @@ export class Flight {
         this.processEvents(events);
       }
       const alt = st.pos.length() - BODIES[st.body].radius;
-      if (st.body === 'kerbin' && alt < BODIES.kerbin.atmoHeight + 1000) {
+      if (BODIES[st.body].atmoHeight && alt < BODIES[st.body].atmoHeight + 1000) {
         this.setWarp(0);
         HUD.msg('Atmosphere ahead — dropping out of warp', 'warn');
       }
@@ -563,8 +722,10 @@ export class Flight {
           if (ev.body === 'mun') {
             this.flags.munSoi = true;
             HUD.banner('ENTERING MUN SPHERE OF INFLUENCE');
-          } else {
+          } else if (ev.body === 'kerbin') {
             HUD.msg('Back in Kerbin space');
+          } else {
+            HUD.banner(`ENTERED ${BODIES[ev.body].name.toUpperCase()} SOI`);
           }
           this.encounter = null;
           if (this.mapOpen) this.refreshMapNow();
@@ -598,16 +759,19 @@ export class Flight {
   updateScene(dt) {
     const st = this.st;
     const origin = st.pos;
-    const munPos = getBodyState('mun', st.t).pos;
-    const kc = st.body === 'kerbin' ? new THREE.Vector3() : munPos.clone().negate();
-    const mc = st.body === 'kerbin' ? munPos.clone() : new THREE.Vector3();
-
-    this.kerbinMesh.position.copy(kc).sub(origin);
+    const far = this.camera.far * 0.9;
+    for (const [name, mesh] of Object.entries(this.bodyMeshes)) {
+      const rel = getRelativeState(name, st.body, st.t);
+      mesh.position.copy(rel.pos).sub(origin);
+      mesh.visible = mesh.position.length() < far;
+    }
     this.atmoMesh.position.copy(this.kerbinMesh.position);
     this.atmoCenterU.value.copy(this.atmoMesh.position);
-    this.munMesh.position.copy(mc).sub(origin);
+    this.atmoMesh.visible = this.kerbinMesh.visible;
 
-    const padPos = PAD_DIR.clone().multiplyScalar(BODIES.kerbin.radius + PAD_ALTITUDE + 0.25).add(kc).sub(origin);
+    const kerbinRel = getRelativeState('kerbin', st.body, st.t);
+    const padPos = PAD_DIR.clone().multiplyScalar(BODIES.kerbin.radius + PAD_ALTITUDE + 0.25)
+      .add(kerbinRel.pos).sub(origin);
     this.pad.position.copy(padPos);
     this.pad.visible = padPos.length() < 2.5e5;
 
@@ -670,10 +834,8 @@ export class Flight {
 
     // debris
     for (const d of this.debris) {
-      let rel;
-      if (d.body === st.body) rel = d.pos.clone().sub(origin);
-      else if (d.body === 'kerbin' && st.body === 'mun') rel = d.pos.clone().sub(munPos).sub(origin);
-      else rel = d.pos.clone().add(munPos).sub(origin);
+      const frame = getRelativeState(d.body, st.body, st.t);
+      const rel = d.pos.clone().add(frame.pos).sub(origin);
       d.group.position.copy(rel).addScaledVector(new THREE.Vector3(0, 1, 0).applyQuaternion(d.quat), -d.comOffset);
       d.group.quaternion.copy(d.quat);
       d.group.quaternion.multiply(new THREE.Quaternion().setFromAxisAngle(d.axis, d.spin * 0.6));
@@ -735,14 +897,22 @@ export class Flight {
     this.encTimer -= dt + 0.12;
     if (this.encTimer <= 0) {
       this.encTimer = 1;
-      if (this.curEls && st.body === 'kerbin' && this.curEls.a > 0 &&
-          this.curEls.ra > BODIES.mun.orbitRadius - BODIES.mun.soi &&
-          !st.landed) {
-        this.encounter = findMunEncounter(this.curEls, st.t, this.curEls.period ?? 200000);
-      } else if (st.body === 'mun') {
-        this.encounter = null;
-      } else {
-        this.encounter = null;
+      this.encounter = null;
+      if (this.curEls && !st.landed && this.curEls.a > 0) {
+        const kids = childrenOf(st.body);
+        const ordered = [...kids].sort((a, b) => (a === 'mun' ? -1 : b === 'mun' ? 1 : 0));
+        let best = null;
+        for (const kid of ordered) {
+          const child = BODIES[kid];
+          if (this.curEls.ra > child.orbitRadius - child.soi) {
+            const enc = findEncounter(this.curEls, st.t, this.curEls.period ?? 200000, kid);
+            if (enc) {
+              if (kid === 'mun') { best = enc; break; }
+              if (!best || enc.tEnter < best.tEnter) best = enc;
+            }
+          }
+        }
+        this.encounter = best;
       }
       if (this.mapOpen) this.refreshMapNow();
       HUD.stages(this.plan, this.stageIndex, st.parts, st.sections ?? computeSections(st.parts));
@@ -750,6 +920,9 @@ export class Flight {
 
     // orbit panel
     let phase = null, transferPhase = 0;
+    let dunaPhase = null, dunaTarget = 0, vesselDunaPhase = null;
+    const dunaXfer = hohmannTransfer('kerbin', 'duna');
+    dunaTarget = dunaXfer.phaseDeg;
     if (st.body === 'kerbin') {
       const munPos = getBodyState('mun', st.t).pos;
       const rv = st.pos.clone().normalize(), rm = munPos.clone().normalize();
@@ -758,11 +931,21 @@ export class Flight {
       if (a < 0) a += 360;
       phase = a;
       transferPhase = munTransferPhase(st.pos.length());
+      dunaPhase = planetPhaseDeg('kerbin', 'duna', st.t);
+    } else if (st.body === 'kerbol') {
+      dunaPhase = planetPhaseDeg('kerbin', 'duna', st.t);
+      const dv = st.pos.clone().normalize();
+      const dm = getBodyState('duna', st.t).pos.clone().normalize();
+      const cr = new THREE.Vector3().crossVectors(dv, dm);
+      let va = Math.atan2(cr.y, dv.dot(dm)) * 180 / Math.PI;
+      if (va < 0) va += 360;
+      vesselDunaPhase = va;
     }
     HUD.orbit(st, this.curEls, {
       tAp: this.curEls ? timeToApoapsis(this.curEls, st.t) : null,
       tPe: this.curEls ? timeToPeriapsis(this.curEls, st.t) : Infinity,
       phase, transferPhase,
+      dunaPhase, dunaTarget, vesselDunaPhase,
       encounter: this.encounter,
     });
   }

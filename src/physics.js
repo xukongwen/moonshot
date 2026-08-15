@@ -3,7 +3,7 @@
 // flight state owned by flight.js.
 
 import * as THREE from 'three/webgpu';
-import { BODIES, getBodyState } from './constants.js';
+import { BODIES, getBodyState, childrenOf } from './constants.js';
 import { density, pressureAtm, heatingFlux, coolingRate } from './aero.js';
 import { heightAt } from './terrain.js';
 import {
@@ -240,22 +240,25 @@ function rk4(pos, vel, mu, aExt, dt) {
 }
 
 export function checkSOI(st, events) {
-  if (st.body === 'kerbin') {
-    const mun = getBodyState('mun', st.t);
-    if (st.pos.distanceTo(mun.pos) < BODIES.mun.soi) {
-      st.pos.sub(mun.pos);
-      st.vel.sub(mun.vel);
-      st.body = 'mun';
-      events.push({ type: 'soi', body: 'mun' });
+  const cur = BODIES[st.body];
+  // enter a child: child state is parent-relative and parent === st.body
+  for (const kid of childrenOf(st.body)) {
+    const rel = getBodyState(kid, st.t);
+    if (st.pos.distanceTo(rel.pos) < BODIES[kid].soi) {
+      st.pos.sub(rel.pos);
+      st.vel.sub(rel.vel);
+      st.body = kid;
+      events.push({ type: 'soi', body: kid });
+      return; // one transition per step
     }
-  } else if (st.body === 'mun') {
-    if (st.pos.length() > BODIES.mun.soi) {
-      const mun = getBodyState('mun', st.t);
-      st.pos.add(mun.pos);
-      st.vel.add(mun.vel);
-      st.body = 'kerbin';
-      events.push({ type: 'soi', body: 'kerbin' });
-    }
+  }
+  // leave to parent
+  if (cur.parent && cur.soi !== Infinity && st.pos.length() > cur.soi) {
+    const rel = getBodyState(st.body, st.t); // this body rel to its parent
+    st.pos.add(rel.pos);
+    st.vel.add(rel.vel);
+    st.body = cur.parent;
+    events.push({ type: 'soi', body: cur.parent });
   }
 }
 

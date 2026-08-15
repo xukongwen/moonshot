@@ -17,7 +17,10 @@ import { BODIES, PAD_DIR, PAD_ALTITUDE } from './constants.js';
  */
 export function heightAt(bodyName, dir, detail = true) {
   if (bodyName === 'kerbin') return kerbinHeight(dir, detail);
-  return munHeight(dir, detail);
+  if (bodyName === 'mun') return munHeight(dir, detail);
+  if (bodyName === 'minmus') return minmusHeight(dir, detail);
+  if (bodyName === 'duna') return dunaHeight(dir, detail);
+  return 0;
 }
 
 // ridge transform: 0..1 with sharp crests where n crosses 0.5
@@ -101,8 +104,66 @@ function munColor(h, dir, out) {
   return out;
 }
 
+function minmusHeight(dir, detail) {
+  const x = dir.x, y = dir.y, z = dir.z;
+  // mint flats
+  let h = (fbm3(x * 3.1, y * 3.1, z * 3.1, 5) - 0.5) * 400;
+  // ridged buttes / mesas, wiki max ~5725 m
+  const butte = ridged(fbm3(x * 7.4 + 18.2, y * 7.4, z * 7.4, 4));
+  h += Math.pow(butte, 3.4) * 5000;
+  if (detail) {
+    h += (fbm3(x * 48 + 6.2, y * 48, z * 48, 3) - 0.5) * 70;
+    h += (fbm3(x * 180 + 14.1, y * 180, z * 180, 2) - 0.5) * 16;
+  }
+  return Math.max(0, h); // ice-lake clamp
+}
+
+function dunaHeight(dir, detail) {
+  const x = dir.x, y = dir.y, z = dir.z;
+  let h = (fbm3(x * 3.6, y * 3.6, z * 3.6, 5) - 0.5) * 800;
+  const ridges = ridged(fbm3(x * 8.8 + 22.4, y * 8.8, z * 8.8, 4));
+  h += ridges * 600;
+  if (detail) {
+    h += (fbm3(x * 42 + 5.5, y * 42, z * 42, 3) - 0.5) * 70;
+    h += (fbm3(x * 160 + 19.3, y * 160, z * 160, 2) - 0.5) * 18;
+  }
+  // polar flatten
+  const lat = Math.abs(dir.y);
+  if (lat > 0.68) h *= 1 - smoother(0.68, 0.94, lat) * 0.72;
+  return h;
+}
+
+function minmusColor(h, dir, out) {
+  const t = THREE.MathUtils.clamp(h / 4200, 0, 1);
+  const n = (valueNoise3(dir.x * 55, dir.y * 55, dir.z * 55) - 0.5) * 0.05;
+  // mint / cyan-grey, higher = paler ice
+  out.setRGB(0.52 + t * 0.38 + n, 0.70 + t * 0.24 + n, 0.66 + t * 0.28 + n);
+  return out;
+}
+
+function dunaColor(h, dir, out) {
+  const n = (valueNoise3(dir.x * 40, dir.y * 40, dir.z * 40) - 0.5) * 0.06;
+  const dune = THREE.MathUtils.clamp((h + 500) / 1800, 0, 1);
+  out.setRGB(0.62 + dune * 0.22 + n, 0.26 + dune * 0.08 + n * 0.6, 0.14 + n * 0.4);
+  const lat = Math.abs(dir.y);
+  if (lat > 0.80) {
+    const w = smoother(0.80, 0.93, lat);
+    out.lerp(new THREE.Color(0.93, 0.90, 0.86), w);
+  }
+  return out;
+}
+
+function kerbolColor(_h, _dir, out) {
+  out.setRGB(1.0, 0.94, 0.55);
+  return out;
+}
+
 export function colorAt(bodyName, h, dir, out) {
-  return bodyName === 'kerbin' ? kerbinColor(h, dir, out) : munColor(h, dir, out);
+  if (bodyName === 'kerbin') return kerbinColor(h, dir, out);
+  if (bodyName === 'mun') return munColor(h, dir, out);
+  if (bodyName === 'minmus') return minmusColor(h, dir, out);
+  if (bodyName === 'duna') return dunaColor(h, dir, out);
+  return kerbolColor(h, dir, out);
 }
 
 // ---------------------------------------------------------------------------

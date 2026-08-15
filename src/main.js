@@ -12,7 +12,11 @@ async function boot() {
   renderer.setSize(innerWidth, innerHeight);
   renderer.setPixelRatio(Math.min(2, devicePixelRatio));
   app.prepend(renderer.domElement);
-  await renderer.init();
+  try {
+    await renderer.init();
+  } catch (err) {
+    console.warn('WebGPU init failed, continuing with fallback', err);
+  }
 
   // ---- VAB preview scene ----
   const vabScene = new THREE.Scene();
@@ -55,6 +59,8 @@ async function boot() {
     },
   });
   vab.show();
+
+  window.__moonshot = { flight, vab };
 
   // VAB camera drag
   addEventListener('pointerdown', (e) => {

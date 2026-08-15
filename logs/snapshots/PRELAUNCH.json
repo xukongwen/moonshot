@@ -1,0 +1,162 @@
+{
+  "tag": "PRELAUNCH",
+  "t": 0,
+  "body": "kerbin",
+  "pos": [
+    600057.0043015726,
+    0,
+    0
+  ],
+  "vel": [
+    0,
+    0,
+    0
+  ],
+  "quat": [
+    0,
+    0,
+    -0.7071067811865475,
+    0.7071067811865475
+  ],
+  "throttle": 0,
+  "landed": true,
+  "dead": false,
+  "craft": "Mun Express",
+  "parts": [
+    {
+      "key": "s0",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": "stowed",
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 0
+    },
+    {
+      "key": "s1",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 1
+    },
+    {
+      "key": "s2",
+      "fuel": 500,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 2
+    },
+    {
+      "key": "s3",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 3
+    },
+    {
+      "key": "s4",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 4
+    },
+    {
+      "key": "s5",
+      "fuel": 4000,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "s6",
+      "fuel": 2000,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 6
+    },
+    {
+      "key": "s7",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 7
+    },
+    {
+      "key": "s8",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 8
+    },
+    {
+      "key": "s9",
+      "fuel": 4000,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 9
+    },
+    {
+      "key": "s10",
+      "fuel": 4000,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 10
+    },
+    {
+      "key": "s11",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 11
+    },
+    {
+      "key": "r12",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": false,
+      "alive": true,
+      "stackIndex": 2
+    },
+    {
+      "key": "r13",
+      "fuel": 10500,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 10
+    },
+    {
+      "key": "r14",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 10
+    }
+  ]
+}

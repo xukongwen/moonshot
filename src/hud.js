@@ -75,7 +75,9 @@ export const HUD = {
   },
 
   orbit(st, els, extra) {
-    $('orbit-title').textContent = `ORBIT — ${BODIES[st.body].name.toUpperCase()}`;
+    const body = BODIES[st.body];
+    const title = body.aka ? `${body.name.toUpperCase()} / ${body.aka}` : body.name.toUpperCase();
+    $('orbit-title').textContent = `ORBIT — ${title}`;
     const R = BODIES[st.body].radius;
     const rows = [];
     const row = (k, v) => rows.push(`<div><span class="k">${k}</span>${v}</div>`);
@@ -91,10 +93,20 @@ export const HUD = {
     if (extra.phase !== null) {
       row('Mun phase ∠', `${extra.phase.toFixed(1)}° <span class="dim">(burn at ${extra.transferPhase.toFixed(0)}°)</span>`);
     }
+    if (extra.dunaPhase != null && Number.isFinite(extra.dunaPhase)) {
+      const tgt = extra.dunaTarget ?? 0;
+      row('Duna window', `${extra.dunaPhase.toFixed(1)}° <span class="dim">(Hohmann ${tgt.toFixed(0)}°)</span>`);
+    }
+    if (extra.vesselDunaPhase != null && Number.isFinite(extra.vesselDunaPhase)) {
+      row('Duna phase ∠', `${extra.vesselDunaPhase.toFixed(1)}°`);
+    }
     if (extra.encounter) {
-      row('— MUN ENCOUNTER —', '');
+      const child = extra.encounter.child || 'mun';
+      const cname = child === 'mun' ? 'MUN' : BODIES[child].name.toUpperCase();
+      row(`— ${cname} ENCOUNTER —`, '');
       row('SOI entry in', fmtTime(extra.encounter.tEnter - st.t));
-      row('Mun periapsis', fmtDist(extra.encounter.munPeriapsis));
+      const pe = extra.encounter.periapsis ?? extra.encounter.munPeriapsis;
+      row(child === 'mun' ? 'Mun periapsis' : `${BODIES[child].name} periapsis`, fmtDist(pe));
     }
     $('orbit-data').innerHTML = rows.join('');
   },

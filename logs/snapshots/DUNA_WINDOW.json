@@ -1,0 +1,108 @@
+{
+  "tag": "DUNA_WINDOW",
+  "t": 9901403.854718054,
+  "body": "kerbin",
+  "pos": [
+    664839.8051622775,
+    5.91980107688719e-12,
+    165896.0852361843
+  ],
+  "vel": [
+    571.6210128123793,
+    -1.6693550068302018e-13,
+    -2191.680861493875
+  ],
+  "quat": [
+    -0.5839898651619191,
+    0,
+    0.3986926603138857,
+    0.7071067811865475
+  ],
+  "throttle": 0,
+  "landed": false,
+  "dead": false,
+  "craft": "Mun Express",
+  "parts": [
+    {
+      "key": "s0",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": "stowed",
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 0
+    },
+    {
+      "key": "s1",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 1
+    },
+    {
+      "key": "s2",
+      "fuel": 500,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 2
+    },
+    {
+      "key": "s3",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 3
+    },
+    {
+      "key": "s4",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 4
+    },
+    {
+      "key": "s5",
+      "fuel": 1517.2126988368977,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "s6",
+      "fuel": 758.6063494184489,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 6
+    },
+    {
+      "key": "s7",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 7
+    },
+    {
+      "key": "r12",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": false,
+      "alive": true,
+      "stackIndex": 2
+    }
+  ]
+}

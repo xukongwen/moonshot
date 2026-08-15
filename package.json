@@ -7,9 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/orbits.test.mjs",
+    "test": "node tests/orbits.test.mjs && node tests/system.test.mjs && node tests/hohmann.test.mjs",
     "mission": "node tests/mission.test.mjs",
-    "smoke": "node scripts/smoke.mjs"
+    "smoke": "node scripts/smoke.mjs",
+    "shots": "node scripts/shots.mjs",
+    "mcp": "node mcp/server.mjs"
   },
   "dependencies": {
     "three": "^0.180.0"

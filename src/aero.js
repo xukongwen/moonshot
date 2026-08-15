@@ -13,7 +13,7 @@ export function density(bodyName, alt) {
 export function pressureAtm(bodyName, alt) {
   const b = BODIES[bodyName];
   if (!b.atmoHeight || alt > b.atmoHeight) return 0;
-  return Math.exp(-Math.max(0, alt) / b.scaleHeight);
+  return (b.p0 ?? 1) * Math.exp(-Math.max(0, alt) / b.scaleHeight);
 }
 
 /**

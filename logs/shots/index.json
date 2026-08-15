@@ -1,0 +1,105 @@
+{
+  "at": "2026-08-15T10:14:15.160Z",
+  "results": [
+    {
+      "name": "01-pad.png",
+      "live": true,
+      "bytes": 194145,
+      "real3d": true,
+      "composited": true,
+      "sceneBytes": 184047
+    },
+    {
+      "name": "01-pad.png",
+      "bytes": 212564,
+      "real3d": true,
+      "composited": true,
+      "sceneBytes": 195468
+    },
+    {
+      "name": "02-lko.png",
+      "bytes": 121496,
+      "real3d": true,
+      "composited": false,
+      "sceneBytes": 37057
+    },
+    {
+      "name": "02-lko-map.png",
+      "bytes": 93921,
+      "real3d": false,
+      "composited": false,
+      "sceneBytes": 60097
+    },
+    {
+      "name": "03-window.png",
+      "bytes": 120693,
+      "real3d": true,
+      "composited": false,
+      "sceneBytes": 36788
+    },
+    {
+      "name": "03-window-map.png",
+      "bytes": 94066,
+      "real3d": false,
+      "composited": false,
+      "sceneBytes": 58066
+    },
+    {
+      "name": "04-tdi.png",
+      "bytes": 117323,
+      "real3d": true,
+      "composited": false,
+      "sceneBytes": 36662
+    },
+    {
+      "name": "04-tdi-map.png",
+      "bytes": 92684,
+      "real3d": false,
+      "composited": false,
+      "sceneBytes": 66913
+    },
+    {
+      "name": "05-solar.png",
+      "bytes": 124477,
+      "real3d": true,
+      "composited": false,
+      "sceneBytes": 35519
+    },
+    {
+      "name": "05-solar-map.png",
+      "bytes": 108767,
+      "real3d": false,
+      "composited": false,
+      "sceneBytes": 75655
+    },
+    {
+      "name": "06-duna-soi.png",
+      "bytes": 112574,
+      "real3d": true,
+      "composited": false,
+      "sceneBytes": 36551
+    },
+    {
+      "name": "06-duna-soi-map.png",
+      "bytes": 68136,
+      "real3d": false,
+      "composited": false,
+      "sceneBytes": 38344
+    },
+    {
+      "name": "07-duna-orbit.png",
+      "bytes": 116785,
+      "real3d": true,
+      "composited": false,
+      "sceneBytes": 35889
+    },
+    {
+      "name": "07-duna-orbit-map.png",
+      "bytes": 78573,
+      "real3d": false,
+      "composited": false,
+      "sceneBytes": 48533
+    }
+  ],
+  "errors": []
+}

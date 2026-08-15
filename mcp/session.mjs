@@ -8,10 +8,13 @@ import { buildVesselParts, buildStagePlan, stackGeometry, computeSections, massP
 import { physicsStep, checkSOI } from '../src/physics.js';
 import { elementsFromState, propagate, findMunEncounter, munTransferPhase } from '../src/orbits.js';
 import { heightAt } from '../src/terrain.js';
+import { setLang } from '../src/i18n.js';
+import { Workshop } from './workshop.mjs';
 
 const Y = new Vector3(0, 1, 0);
 const STEP_CAP_S = 120;
 const DEFAULT_DT = 0.05;
+export const WARP_LEVELS = [1, 2, 3, 4, 10, 100, 1000, 10000, 100000];
 
 function clamp(v, lo, hi) {
   const n = Number(v);
@@ -29,7 +32,7 @@ function serializeEvent(ev) {
 }
 
 export class SimSession {
-  constructor() {
+  constructor(opts = {}) {
     this.st = null;
     this.plan = [];
     this.stageIdx = 0;
@@ -37,6 +40,12 @@ export class SimSession {
     this.lastEvents = [];
     this.craftName = null;
     this.liftedOff = false;
+    this.workshop = new Workshop(opts.workshop ?? {});
+    this.lastDesign = null;
+    this.warpIdx = 0;
+    this.mapOpen = false;
+    this.cam = { az: 0.5, el: 0.25, dist: 28 };
+    this.lang = 'en';
   }
 
   hasFlight() {
@@ -51,7 +60,18 @@ export class SimSession {
       throw new Error(`Unknown craft "${name}". Available: ${available}`);
     }
     const design = structuredClone(designSrc);
-    const parts = buildVesselParts(design);
+    design.name = name;
+    return this.newFlightFromDesign(design);
+  }
+
+  /** Same pad spawn as newFlight, from an arbitrary VAB design. */
+  newFlightFromDesign(design) {
+    if (!design || !Array.isArray(design.stack)) {
+      throw new Error('Invalid design: expected { name, stack, radials }');
+    }
+    const d = structuredClone(design);
+    d.radials ??= [];
+    const parts = buildVesselParts(d);
     const geom0 = stackGeometry(parts);
     const mp0 = massProps(parts, geom0);
     const quat0 = new Quaternion().setFromUnitVectors(Y, PAD_DIR);
@@ -70,13 +90,71 @@ export class SimSession {
     this.stageIdx = 0;
     this.events = [];
     this.lastEvents = [];
-    this.craftName = name;
+    this.craftName = d.name || 'Untitled Craft';
     this.liftedOff = false;
+    this.lastDesign = structuredClone(d);
+    this.warpIdx = 0;
     return this.telemetry();
   }
 
+  launchWorkshop() {
+    const v = this.workshop.validateLaunch();
+    if (!v.ok) throw new Error(v.error);
+    return this.newFlightFromDesign(this.workshop.design);
+  }
+
+  revert() {
+    this.st = null;
+    this.plan = [];
+    this.stageIdx = 0;
+    this.events = [];
+    this.lastEvents = [];
+    this.craftName = null;
+    this.liftedOff = false;
+    this.warpIdx = 0;
+    return { reverted: true, workshop: this.workshop.snapshot() };
+  }
+
+  relaunch() {
+    if (!this.lastDesign) {
+      throw new Error('No previous craft to relaunch. Launch from the VAB first.');
+    }
+    return this.newFlightFromDesign(this.lastDesign);
+  }
+
+  setWarp(level) {
+    const idx = clamp(level, 0, WARP_LEVELS.length - 1);
+    this.warpIdx = Math.round(idx);
+    return {
+      warpIdx: this.warpIdx,
+      warp: WARP_LEVELS[this.warpIdx],
+      rails: this.warpIdx > 3,
+    };
+  }
+
+  setMap(open) {
+    this.mapOpen = !!open;
+    return { mapOpen: this.mapOpen };
+  }
+
+  setCamera({ az, el, dist } = {}) {
+    if (az != null) this.cam.az = Number(az);
+    if (el != null) this.cam.el = Number(el);
+    if (dist != null) this.cam.dist = Number(dist);
+    return { cam: { ...this.cam } };
+  }
+
+  setLang(lang) {
+    if (lang !== 'en' && lang !== 'zh') {
+      throw new Error(`Invalid lang "${lang}". Use: en, zh`);
+    }
+    this.lang = lang;
+    setLang(lang);
+    return { lang: this.lang };
+  }
+
   requireFlight() {
-    if (!this.st) throw new Error('No flight in progress. Call ksp_new_flight first.');
+    if (!this.st) throw new Error('No flight in progress. Call ksp_new_flight or ksp_vab_launch first.');
     return this.st;
   }
 
@@ -163,6 +241,11 @@ export class SimSession {
       landed: st.landed,
       dead: st.dead,
       last_events: this.lastEvents.map(serializeEvent),
+      warpIdx: this.warpIdx,
+      warp: WARP_LEVELS[this.warpIdx],
+      mapOpen: this.mapOpen,
+      cam: { ...this.cam },
+      lang: this.lang,
     };
 
     try {
@@ -306,7 +389,7 @@ export class SimSession {
     return { chutes: 'armed', parts: n, ...this.telemetry() };
   }
 
-  step(seconds = 1, dt = DEFAULT_DT) {
+  physicsAdvance(seconds = 1, dt = DEFAULT_DT) {
     this.requireFlight();
     const simTime = Math.min(STEP_CAP_S, Math.max(0, Number(seconds) || 0));
     const h = dt > 0 ? dt : DEFAULT_DT;
@@ -330,7 +413,13 @@ export class SimSession {
     return tlm;
   }
 
-  /** On-rails coast when engines are off and out of atmosphere; else step. */
+  step(seconds = 1, dt = DEFAULT_DT) {
+    this.requireFlight();
+    if (this.warpIdx > 3) return this.coast(seconds);
+    return this.physicsAdvance(seconds, dt);
+  }
+
+  /** On-rails coast when engines are off and out of atmosphere; else physics. */
   coast(seconds) {
     const st = this.requireFlight();
     const cap = Math.min(STEP_CAP_S, Math.max(0, Number(seconds) || 0));
@@ -338,13 +427,13 @@ export class SimSession {
     const alt = this.alt();
     const thrusting = st.throttle > 0 && st.parts.some((p) => p.alive && p.ignited && p.def.engine);
     if (st.landed || st.dead || thrusting || alt < (body.atmoHeight || 0) + 2000) {
-      return this.step(cap);
+      return this.physicsAdvance(cap);
     }
     let el;
     try {
       el = elementsFromState(st.pos, st.vel, body.mu, st.t);
     } catch {
-      return this.step(cap);
+      return this.physicsAdvance(cap);
     }
     const collected = [];
     const t0 = st.t;
@@ -355,7 +444,7 @@ export class SimSession {
       if (pos.length() - BODIES[st.body].radius < 22_000) {
         st.t -= dt;
         const remain = cap - (st.t - t0);
-        const rest = this.step(remain);
+        const rest = this.physicsAdvance(remain);
         rest.events = collected.concat(rest.events || []);
         rest.coast = 'fell-back-to-step';
         return rest;

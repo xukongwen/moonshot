@@ -4,6 +4,7 @@
 import * as THREE from 'three/webgpu';
 import { BODIES, getBodyState, getRelativeState, childrenOf } from './constants.js';
 import { sampleOrbitPoints } from './orbits.js';
+import { t, bodyName } from './i18n.js';
 
 function textSprite(text, color = '#cfe3ff') {
   const c = document.createElement('canvas');
@@ -144,6 +145,12 @@ export class MapView {
     this.peLabel = textSprite('Pe', '#8fd0ff');
     this.munPeLabel = textSprite('Mun Pe', '#ffc14d');
     this.scene.add(this.vesselDot, this.apLabel, this.peLabel, this.munPeLabel);
+    this.refreshLabels();
+  }
+
+  refreshLabels() {
+    this.apLabel.userData.setText(t('map.ap'));
+    this.peLabel.userData.setText(t('map.pe'));
   }
 
   /** Refresh orbital geometry (call ~1 Hz or after burns). */
@@ -187,7 +194,7 @@ export class MapView {
       const childPos = getRelativeState(child, st.body, encounter.tEnter).pos;
       setLine(this.encLine, sampleOrbitPoints(encounter.relElements, 160, BODIES[child].soi), childPos);
       this.encLine.visible = true;
-      this.munPeLabel.userData.setText(child === 'mun' ? 'Mun Pe' : `${BODIES[child].name} Pe`);
+      this.munPeLabel.userData.setText(child === 'mun' ? t('map.munPe') : t('map.bodyPe', { name: bodyName(child) }));
       this.munPeLabel.position.copy(
         encounter.relElements.phat.clone().multiplyScalar(encounter.relElements.rp).add(childPos));
       this.munPeLabel.visible = true;

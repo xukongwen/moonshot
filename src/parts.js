@@ -2,6 +2,7 @@
 // dragArea is an effective Cd*A contribution in m^2.
 
 import { G0 } from './constants.js';
+import { t } from './i18n.js';
 
 export const PARTS = {
   // ---- Pods ----
@@ -134,12 +135,12 @@ export function engineThrust(def, pressureAtm) {
 
 export function partInfoHTML(def) {
   const rows = [
-    `mass ${(partWetMass(def) / 1000).toFixed(2)} t` + (def.fuel ? ` (${def.fuel} kg fuel)` : ''),
-    `${def.size} m · maxT ${def.maxTemp} K`,
+    `${t('part.mass')} ${(partWetMass(def) / 1000).toFixed(2)} t` + (def.fuel ? ` (${def.fuel} kg ${t('part.fuel')})` : ''),
+    `${def.size} m · ${t('part.maxT')} ${def.maxTemp} K`,
   ];
   if (def.engine) {
-    rows.push(`thrust ${(def.engine.thrustVac / 1000).toFixed(0)} kN vac`);
-    rows.push(`Isp ${def.engine.ispVac}s vac / ${def.engine.ispSL}s SL`);
+    rows.push(`${t('part.thrust')} ${(def.engine.thrustVac / 1000).toFixed(0)} kN ${t('part.vac')}`);
+    rows.push(`Isp ${def.engine.ispVac}s ${t('part.vac')} / ${def.engine.ispSL}s SL`);
   }
   return `<b>${def.name}</b><br>${rows.join('<br>')}<br><i>${def.desc}</i>`;
 }

@@ -4,8 +4,26 @@
 import * as THREE from 'three/webgpu';
 import { VAB } from './vab.js';
 import { Flight } from './flight.js';
+import { getLang, setLang, onLangChange, applyStaticI18n, t, otherLangLabel } from './i18n.js';
 
 const app = document.getElementById('app');
+
+applyStaticI18n();
+document.title = t('title');
+
+function syncLangButtons() {
+  const label = otherLangLabel();
+  const a = document.getElementById('btn-lang');
+  const b = document.getElementById('btn-lang-flight');
+  if (a) a.textContent = label;
+  if (b) b.textContent = label;
+}
+
+function toggleLang() {
+  setLang(getLang() === 'en' ? 'zh' : 'en');
+}
+
+syncLangButtons();
 
 async function boot() {
   const renderer = new THREE.WebGPURenderer({ antialias: true });
@@ -60,7 +78,23 @@ async function boot() {
   });
   vab.show();
 
-  window.__moonshot = { flight, vab };
+  window.__moonshot = { flight, vab, setLang, getLang };
+
+  document.getElementById('btn-lang').onclick = toggleLang;
+  document.getElementById('btn-lang-flight').onclick = toggleLang;
+  onLangChange(() => {
+    applyStaticI18n();
+    document.title = t('title');
+    syncLangButtons();
+    vab.refresh();
+    if (flight.active) flight.refreshHUD();
+  });
+
+  addEventListener('keydown', (e) => {
+    if (e.code !== 'KeyL') return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    toggleLang();
+  });
 
   // VAB camera drag
   addEventListener('pointerdown', (e) => {
@@ -105,12 +139,12 @@ boot().catch((err) => {
   const div = document.createElement('div');
   div.style.cssText = 'position:fixed;inset:0;display:grid;place-items:center;color:#ff8d7e;font-family:monospace;padding:40px;text-align:center;';
   const h2 = document.createElement('h2');
-  h2.textContent = 'Failed to start';
+  h2.textContent = t('boot.failed');
   const p1 = document.createElement('p');
   p1.textContent = String(err?.message || err);
   const p2 = document.createElement('p');
   p2.style.color = '#7e93b0';
-  p2.textContent = 'MOONSHOT needs WebGPU (Chrome/Edge 113+, Safari 26+) or WebGL2 fallback.';
+  p2.textContent = t('boot.webgpu');
   const inner = document.createElement('div');
   inner.append(h2, p1, p2);
   div.appendChild(inner);

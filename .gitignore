@@ -20,3 +20,6 @@ npm-debug.log*
 # Editor
 .vscode/
 .idea/
+
+# Headless MCP user crafts
+mcp/crafts.json

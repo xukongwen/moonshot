@@ -1,41 +1,50 @@
 // DOM HUD: readouts, stage list, orbit panel, messages, banners, endcard.
 
 import { fmtTime, fmtDist, BODIES } from './constants.js';
-import { PARTS } from './parts.js';
 import { feedTanks } from './vessel.js';
+import { t, bodyName, getLang, stageLabel } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
 
+function bodyLabel(id) {
+  const n = bodyName(id);
+  return getLang() === 'en' ? n.toUpperCase() : n;
+}
+
 export const HUD = {
-  setMET(t) { $('met').textContent = `T+ ${fmtTime(t)}`; },
+  setMET(tSec) { $('met').textContent = `T+ ${fmtTime(tSec)}`; },
 
   setSituation(text) { $('situation').textContent = text; },
 
   setWarp(w, rails) {
-    $('warp-display').textContent = `WARP ${w}×${rails ? ' (rails)' : ''}`;
+    $('warp-display').textContent = `${t('hud.warp')} ${w}×${rails ? ` (${t('hud.rails')})` : ''}`;
     $('warp-display').style.color = w > 1 ? '#ffd479' : '#7e93b0';
   },
 
-  setThrottle(t) { $('throttle-fill').style.height = `${(t * 100).toFixed(0)}%`; },
+  setThrottle(th) { $('throttle-fill').style.height = `${(th * 100).toFixed(0)}%`; },
 
   setSAS(on, mode) {
     $('sas-ind').classList.toggle('on', on);
-    $('sas-mode-ind').textContent = { hold: 'HOLD', prograde: 'PRO ▲', retrograde: 'RETRO ▼' }[mode] ?? '';
+    $('sas-mode-ind').textContent = {
+      hold: t('sas.hold'),
+      prograde: t('sas.prograde'),
+      retrograde: t('sas.retrograde'),
+    }[mode] ?? '';
   },
 
   readouts(info, st, vspeed) {
-    $('ro-alt').textContent = `ALT ${fmtDist(Math.max(0, info.alt))}`;
-    $('ro-agl').textContent = `AGL ${fmtDist(Math.max(0, info.agl))}`;
-    $('ro-vspeed').textContent = `VSPD ${vspeed >= 0 ? '+' : ''}${vspeed.toFixed(1)} m/s`;
-    $('ro-accel').textContent = `ACC ${info.accelG.toFixed(1)} g`;
-    $('ro-speed').textContent = `${info.alt > 60_000 ? 'ORB' : 'SRF'} ${info.speed.toFixed(info.speed < 100 ? 1 : 0)} m/s`;
-    $('ro-mode').textContent = info.alt > 60_000 ? 'orbital velocity' : 'surface velocity';
-    $('ro-mass').textContent = `MASS ${(st.massProps.m / 1000).toFixed(2)} t`;
+    $('ro-alt').textContent = `${t('hud.alt')} ${fmtDist(Math.max(0, info.alt))}`;
+    $('ro-agl').textContent = `${t('hud.agl')} ${fmtDist(Math.max(0, info.agl))}`;
+    $('ro-vspeed').textContent = `${t('hud.vspd')} ${vspeed >= 0 ? '+' : ''}${vspeed.toFixed(1)} m/s`;
+    $('ro-accel').textContent = `${t('hud.acc')} ${info.accelG.toFixed(1)} g`;
+    $('ro-speed').textContent = `${info.alt > 60_000 ? t('hud.orb') : t('hud.srf')} ${info.speed.toFixed(info.speed < 100 ? 1 : 0)} m/s`;
+    $('ro-mode').textContent = info.alt > 60_000 ? t('hud.orbVel') : t('hud.srfVel');
+    $('ro-mass').textContent = `${t('hud.mass')} ${(st.massProps.m / 1000).toFixed(2)} t`;
     const tf = info.maxTempFrac;
     const el = $('ro-temp');
-    if (tf > 0.85) { el.textContent = 'TEMP CRITICAL'; el.style.color = '#ff5040'; }
-    else if (tf > 0.6) { el.textContent = 'TEMP HIGH'; el.style.color = '#ffae42'; }
-    else { el.textContent = 'TEMP OK'; el.style.color = '#5d7088'; }
+    if (tf > 0.85) { el.textContent = t('hud.tempCrit'); el.style.color = '#ff5040'; }
+    else if (tf > 0.6) { el.textContent = t('hud.tempHigh'); el.style.color = '#ffae42'; }
+    else { el.textContent = t('hud.tempOk'); el.style.color = '#5d7088'; }
   },
 
   /** Stage list + fuel bars. */
@@ -45,68 +54,68 @@ export const HUD = {
       const cls = i < stageIndex ? 'spent' : i === stageIndex ? 'current' : '';
       const names = [
         ...ev.ignite.map((k) => parts.find((p) => p.key === k)?.def.name).filter(Boolean),
-        ev.decouple !== null ? 'decouple' : null,
-        ev.dropRadials.length ? 'drop boosters' : null,
-        ev.chutes ? 'parachutes' : null,
+        ev.decouple !== null ? t('stage.decouple') : null,
+        ev.dropRadials.length ? t('stage.dropBoosters') : null,
+        ev.chutes ? t('stage.parachutes') : null,
       ].filter(Boolean).join(', ');
-      return `<div class="stage-block ${cls}"><span class="sname">S${plan.length - 1 - i}</span> ${names || ev.label}</div>`;
+      return `<div class="stage-block ${cls}"><span class="sname">S${plan.length - 1 - i}</span> ${names || stageLabel(ev.label)}</div>`;
     }).join('');
 
     // one gauge per tank, top-to-bottom; tanks feeding a lit engine highlighted
     const litSections = new Set();
     for (const ep of parts) {
       if (ep.alive && ep.ignited && ep.def.engine && !ep.def.engine.srb) {
-        for (const t of feedTanks(parts, sections, ep)) litSections.add(t.key);
+        for (const tk of feedTanks(parts, sections, ep)) litSections.add(tk.key);
       }
     }
     const tanks = parts
       .filter((p) => p.alive && p.def.fuel)
       .sort((a, b) => a.stackIndex - b.stackIndex);
-    $('resource-bars').innerHTML = tanks.map((t) => {
-      const cap = t.def.fuel * t.sym;
-      const active = litSections.has(t.key) || (t.def.engine?.srb && t.ignited && t.fuel > 0);
-      const label = t.def.engine?.srb ? `${t.def.name} ×${t.sym}` : t.def.name;
+    $('resource-bars').innerHTML = tanks.map((tk) => {
+      const cap = tk.def.fuel * tk.sym;
+      const active = litSections.has(tk.key) || (tk.def.engine?.srb && tk.ignited && tk.fuel > 0);
+      const label = tk.def.engine?.srb ? `${tk.def.name} ×${tk.sym}` : tk.def.name;
       return `
       <div class="bar-row${active ? '' : ' inactive'}">
-        <div class="bar-label"><span>${active ? '▶ ' : ''}${label}</span><span>${t.fuel.toFixed(0)} kg</span></div>
-        <div class="bar-track"><div class="bar-fill ${t.def.engine?.srb ? '' : 'fuel'}" style="width:${(100 * t.fuel / Math.max(1, cap)).toFixed(1)}%"></div></div>
+        <div class="bar-label"><span>${active ? '▶ ' : ''}${label}</span><span>${tk.fuel.toFixed(0)} kg</span></div>
+        <div class="bar-track"><div class="bar-fill ${tk.def.engine?.srb ? '' : 'fuel'}" style="width:${(100 * tk.fuel / Math.max(1, cap)).toFixed(1)}%"></div></div>
       </div>`;
     }).join('');
   },
 
   orbit(st, els, extra) {
     const body = BODIES[st.body];
-    const title = body.aka ? `${body.name.toUpperCase()} / ${body.aka}` : body.name.toUpperCase();
-    $('orbit-title').textContent = `ORBIT — ${title}`;
+    const name = bodyLabel(st.body);
+    const title = getLang() === 'en' && body.aka ? `${name} / ${body.aka}` : name;
+    $('orbit-title').textContent = `${t('hud.orbit')} — ${title}`;
     const R = BODIES[st.body].radius;
     const rows = [];
     const row = (k, v) => rows.push(`<div><span class="k">${k}</span>${v}</div>`);
     if (els) {
-      row('Apoapsis', els.a > 0 ? fmtDist(els.ra - R) : '—');
-      row('Periapsis', fmtDist(els.rp - R));
-      if (extra.tAp !== null && isFinite(extra.tAp)) row('Time to Ap', fmtTime(extra.tAp));
-      if (isFinite(extra.tPe)) row('Time to Pe', fmtTime(extra.tPe));
-      row('Eccentricity', els.e.toFixed(3));
-      if (els.period) row('Period', fmtTime(els.period));
-      row('Inclination', `${(Math.acos(Math.min(1, Math.abs(els.what.y))) * 180 / Math.PI).toFixed(1)}°`);
+      row(t('orb.ap'), els.a > 0 ? fmtDist(els.ra - R) : '—');
+      row(t('orb.pe'), fmtDist(els.rp - R));
+      if (extra.tAp !== null && isFinite(extra.tAp)) row(t('orb.tAp'), fmtTime(extra.tAp));
+      if (isFinite(extra.tPe)) row(t('orb.tPe'), fmtTime(extra.tPe));
+      row(t('orb.ecc'), els.e.toFixed(3));
+      if (els.period) row(t('orb.period'), fmtTime(els.period));
+      row(t('orb.inc'), `${(Math.acos(Math.min(1, Math.abs(els.what.y))) * 180 / Math.PI).toFixed(1)}°`);
     }
     if (extra.phase !== null) {
-      row('Mun phase ∠', `${extra.phase.toFixed(1)}° <span class="dim">(burn at ${extra.transferPhase.toFixed(0)}°)</span>`);
+      row(t('orb.munPhase'), `${extra.phase.toFixed(1)}° <span class="dim">${t('orb.burnAt', { deg: extra.transferPhase.toFixed(0) })}</span>`);
     }
     if (extra.dunaPhase != null && Number.isFinite(extra.dunaPhase)) {
       const tgt = extra.dunaTarget ?? 0;
-      row('Duna window', `${extra.dunaPhase.toFixed(1)}° <span class="dim">(Hohmann ${tgt.toFixed(0)}°)</span>`);
+      row(t('orb.dunaWindow'), `${extra.dunaPhase.toFixed(1)}° <span class="dim">${t('orb.hohmann', { deg: tgt.toFixed(0) })}</span>`);
     }
     if (extra.vesselDunaPhase != null && Number.isFinite(extra.vesselDunaPhase)) {
-      row('Duna phase ∠', `${extra.vesselDunaPhase.toFixed(1)}°`);
+      row(t('orb.dunaPhase'), `${extra.vesselDunaPhase.toFixed(1)}°`);
     }
     if (extra.encounter) {
       const child = extra.encounter.child || 'mun';
-      const cname = child === 'mun' ? 'MUN' : BODIES[child].name.toUpperCase();
-      row(`— ${cname} ENCOUNTER —`, '');
-      row('SOI entry in', fmtTime(extra.encounter.tEnter - st.t));
+      row(t('orb.encounter', { name: bodyLabel(child) }), '');
+      row(t('orb.soiEntry'), fmtTime(extra.encounter.tEnter - st.t));
       const pe = extra.encounter.periapsis ?? extra.encounter.munPeriapsis;
-      row(child === 'mun' ? 'Mun periapsis' : `${BODIES[child].name} periapsis`, fmtDist(pe));
+      row(child === 'mun' ? t('orb.munPe') : t('orb.bodyPe', { name: bodyName(child) }), fmtDist(pe));
     }
     $('orbit-data').innerHTML = rows.join('');
   },

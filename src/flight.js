@@ -23,6 +23,7 @@ import { HUD } from './hud.js';
 import { MapView } from './map.js';
 import { Navball } from './navball.js';
 import { SoundFX } from './sound.js';
+import { t, bodyName, getLang } from './i18n.js';
 
 const WARP_LEVELS = [1, 2, 3, 4, 10, 100, 1000, 10000, 100000];
 const PHYS_DT = 0.02;
@@ -166,8 +167,8 @@ export class Flight {
     this.refreshViz();
     this.active = true;
     $('flight-ui').classList.remove('hidden');
-    HUD.msg(`${design.name} on the pad. SPACE to ignite. H for controls.`);
-    HUD.setSituation('PRELAUNCH — KERBIN');
+    HUD.msg(t('msg.pad', { name: design.name }));
+    HUD.setSituation(t('sit.prelaunch', { body: getLang() === 'en' ? bodyName('kerbin').toUpperCase() : bodyName('kerbin') }));
     HUD.stages(this.plan, 0, this.st.parts, this.st.sections);
   }
 
@@ -274,7 +275,7 @@ export class Flight {
     $('flight-ui').classList.remove('hidden');
     this.hudTimer = 0;
     this.hudTick(1);
-    HUD.msg(`Snapshot ${snap.tag || ''} @ T+${st.t.toFixed(0)}s`);
+    HUD.msg(t('hud.snapshot', { tag: snap.tag || '', t: st.t.toFixed(0) }));
     if (this.mapOpen) this.refreshMapNow();
     return true;
   }
@@ -372,13 +373,13 @@ export class Flight {
           this.legsDeployed = !this.legsDeployed;
           for (const p of this.st.parts) if (p.def.legs) p.legsDown = this.legsDeployed;
           setLegs(this.meshByKey, this.st.parts, this.legsDeployed);
-          HUD.msg(`Landing legs ${this.legsDeployed ? 'deployed' : 'stowed'}`);
+          HUD.msg(this.legsDeployed ? t('msg.legsDeployed') : t('msg.legsStowed'));
           break;
         case 'KeyP':
           for (const p of this.st.parts) {
             if (p.alive && p.def.chute && p.chuteState === 'stowed') p.chuteState = 'armed';
           }
-          HUD.msg('Parachutes armed');
+          HUD.msg(t('msg.chutesArmed'));
           break;
         case 'KeyM': this.toggleMap(); break;
         case 'KeyH': HUD.toggleHelp(); break;
@@ -412,7 +413,7 @@ export class Flight {
 
   setThrottle(v) {
     this.st.throttle = THREE.MathUtils.clamp(v, 0, 1);
-    if (this.rails && v > 0) { this.setWarp(0); HUD.msg('Dropped out of warp: throttle input', 'warn'); }
+    if (this.rails && v > 0) { this.setWarp(0); HUD.msg(t('msg.warpThrottle'), 'warn'); }
   }
 
   handleHeldKeys(dt) {
@@ -448,7 +449,7 @@ export class Flight {
       const inAtmo = focus.atmoHeight &&
         st.pos.length() - focus.radius < focus.atmoHeight + 2000;
       if (!st.landed && (inAtmo || this.enginesLit())) {
-        HUD.msg('Rails warp needs engines off and clear of the atmosphere', 'warn');
+        HUD.msg(t('msg.warpAtmo'), 'warn');
         idx = Math.min(idx, 3);
       }
     }
@@ -468,7 +469,7 @@ export class Flight {
   stage() {
     if (this.st.dead) return;
     this.sound.ensure();
-    if (this.stageIndex >= this.plan.length) { HUD.msg('No more stages', 'warn'); return; }
+    if (this.stageIndex >= this.plan.length) { HUD.msg(t('msg.noStages'), 'warn'); return; }
     if (this.rails) { this.setWarp(0); }
     const ev = this.plan[this.stageIndex++];
     const st = this.st;
@@ -483,13 +484,13 @@ export class Flight {
     }
     if (ev.ignite.length) {
       if (st.landed && st.throttle === 0) this.setThrottle(1);
-      HUD.msg(ev.decouple !== null ? 'Stage separation — ignition!' : 'Ignition!');
+      HUD.msg(ev.decouple !== null ? t('msg.sepIgnition') : t('msg.ignition'));
     }
     if (ev.chutes) {
       for (const p of st.parts) {
         if (p.alive && p.def.chute && p.chuteState === 'stowed') p.chuteState = 'armed';
       }
-      HUD.msg('Parachutes armed');
+      HUD.msg(t('msg.chutesArmed'));
     }
     this.sound.stage();
     st.geom = stackGeometry(st.parts);
@@ -639,7 +640,7 @@ export class Flight {
       const alt = st.pos.length() - BODIES[st.body].radius;
       if (BODIES[st.body].atmoHeight && alt < BODIES[st.body].atmoHeight + 1000) {
         this.setWarp(0);
-        HUD.msg('Atmosphere ahead — dropping out of warp', 'warn');
+        HUD.msg(t('msg.atmoWarp'), 'warn');
       }
       this.lastInfo = {
         alt, agl: alt, speed: st.vel.length(), accelG: 0, maxTempFrac: 0,
@@ -659,27 +660,28 @@ export class Flight {
         case 'liftoff':
           if (!this.flags.liftoff) {
             this.flags.liftoff = true;
-            HUD.banner('LIFTOFF!');
-            HUD.msg('Liftoff!');
+            HUD.banner(t('banner.liftoff'));
+            HUD.msg(t('msg.liftoff'));
           }
           break;
         case 'landed': {
-          const where = BODIES[st.body].name;
           if (st.body === 'mun' && !this.flags.munLanded) {
             this.flags.munLanded = true;
-            HUD.banner('🌕 YOU LANDED ON THE MUN!', 6000);
-            HUD.msg(`Touchdown at ${ev.speed.toFixed(1)} m/s. Flag-planting optional.`);
+            HUD.banner(t('banner.munLand'), 6000);
+            HUD.msg(t('msg.touchdownFlag', { speed: ev.speed.toFixed(1) }));
           } else if (st.body === 'kerbin' && this.flags.liftoff) {
-            const verb = ev.water ? 'Splashdown' : 'Touchdown';
-            HUD.msg(`${verb} at ${ev.speed.toFixed(1)} m/s`);
+            const verb = ev.water ? t('verb.splashdown') : t('verb.touchdown');
+            HUD.msg(ev.water
+              ? t('msg.splashdownSpeed', { speed: ev.speed.toFixed(1) })
+              : t('msg.touchdownSpeed', { speed: ev.speed.toFixed(1) }));
             if (this.flags.munLanded) {
-              HUD.banner('🏆 MUN ROUND TRIP COMPLETE');
-              HUD.endcard('MISSION COMPLETE', `${verb} on Kerbin after a successful Mun landing.<br>The space program is very proud.`, true);
+              HUD.banner(t('banner.roundtrip'));
+              HUD.endcard(t('end.complete'), t('end.completeText', { verb }), true);
             } else if (this.flags.space || this.flags.orbit) {
-              HUD.endcard('SAFE RECOVERY', `${verb} on ${where}. Crew recovered.`, true);
+              HUD.endcard(t('end.recovery'), t('end.recoveryText', { verb, where: bodyName(st.body) }), true);
             }
           } else {
-            HUD.msg(`Landed at ${ev.speed.toFixed(1)} m/s`);
+            HUD.msg(t('msg.landedSpeed', { speed: ev.speed.toFixed(1) }));
           }
           break;
         }
@@ -688,9 +690,12 @@ export class Flight {
           this.sound.explosion();
           this.boom.spawn(new THREE.Vector3(0, 0, 0), 14);
           if (this.vGroup) this.vGroup.visible = false;
-          HUD.endcard('RAPID UNSCHEDULED DISASSEMBLY',
-            `Impact at ${ev.speed.toFixed(0)} m/s on ${BODIES[st.body].name}.<br>` +
-            (ev.speed < 20 ? 'So close — landing legs and less speed next time.' : 'The crater is impressive, at least.'));
+          HUD.endcard(t('end.crash'),
+            t('end.crashText', {
+              speed: ev.speed.toFixed(0),
+              body: bodyName(st.body),
+              hint: ev.speed < 20 ? t('end.crashClose') : t('end.crashCrater'),
+            }));
           break;
         }
         case 'overheat': {
@@ -700,32 +705,32 @@ export class Flight {
             mesh.visible = false;
             this.boom.spawn(mesh.getWorldPosition(new THREE.Vector3()).sub(this.vGroupWorldShift()), 5);
           }
-          HUD.msg(`${ev.part.def.name} destroyed by overheating!`, 'bad');
+          HUD.msg(t('msg.overheat', { name: ev.part.def.name }), 'bad');
           if (ev.part.def.pod) {
             st.dead = true;
-            HUD.endcard('BURNED UP ON REENTRY',
-              'The pod overheated. Try a shallower reentry (periapsis 30–45 km), keep the heat shield pointed retrograde.');
+            HUD.endcard(t('end.burned'), t('end.burnedText'));
           }
           break;
         }
         case 'chute':
           this.sound.chute();
-          HUD.msg('Parachute deployed!');
+          HUD.msg(t('msg.chuteDeploy'));
           setCanopies(this.meshByKey, st.parts);
           break;
         case 'chute-torn':
-          HUD.msg('Parachute torn off — too fast!', 'bad');
+          HUD.msg(t('msg.chuteTorn'), 'bad');
           this.sound.warn();
           setCanopies(this.meshByKey, st.parts);
           break;
         case 'soi':
           if (ev.body === 'mun') {
             this.flags.munSoi = true;
-            HUD.banner('ENTERING MUN SPHERE OF INFLUENCE');
+            HUD.banner(t('banner.munSoi'));
           } else if (ev.body === 'kerbin') {
-            HUD.msg('Back in Kerbin space');
+            HUD.msg(t('msg.kerbinSpace'));
           } else {
-            HUD.banner(`ENTERED ${BODIES[ev.body].name.toUpperCase()} SOI`);
+            const soiName = getLang() === 'en' ? bodyName(ev.body).toUpperCase() : bodyName(ev.body);
+            HUD.banner(t('banner.soi', { name: soiName }));
           }
           this.encounter = null;
           if (this.mapOpen) this.refreshMapNow();
@@ -741,13 +746,13 @@ export class Flight {
     const alt = st.pos.length() - BODIES[st.body].radius;
     if (!this.flags.space && st.body === 'kerbin' && alt > BODIES.kerbin.atmoHeight) {
       this.flags.space = true;
-      HUD.banner('SPACE REACHED — 70 km');
+      HUD.banner(t('banner.space'));
     }
     if (!this.flags.orbit && st.body === 'kerbin' && this.curEls) {
       const els = this.curEls;
       if (els.a > 0 && els.rp > BODIES.kerbin.radius + BODIES.kerbin.atmoHeight) {
         this.flags.orbit = true;
-        HUD.banner('STABLE ORBIT ACHIEVED');
+        HUD.banner(t('banner.orbit'));
       }
     }
   }
@@ -874,17 +879,17 @@ export class Flight {
     HUD.readouts(info, st, vspeed);
 
     // situation line
-    const bodyName = BODIES[st.body].name.toUpperCase();
-    let sit = 'FLYING';
-    if (st.dead) sit = 'DESTROYED';
-    else if (st.landed) sit = this.flags.liftoff ? 'LANDED' : 'PRELAUNCH';
+    const sitBody = getLang() === 'en' ? bodyName(st.body).toUpperCase() : bodyName(st.body);
+    let sitKey = 'sit.flying';
+    if (st.dead) sitKey = 'sit.destroyed';
+    else if (st.landed) sitKey = this.flags.liftoff ? 'sit.landed' : 'sit.prelaunch';
     else if (info.alt > (BODIES[st.body].atmoHeight || 4000) && this.curEls) {
       const atmoTop = BODIES[st.body].radius + (BODIES[st.body].atmoHeight || 0);
-      if (this.curEls.a <= 0) sit = 'ESCAPING';
-      else if (this.curEls.rp > atmoTop) sit = 'ORBITING';
-      else sit = 'SUB-ORBITAL';
+      if (this.curEls.a <= 0) sitKey = 'sit.escaping';
+      else if (this.curEls.rp > atmoTop) sitKey = 'sit.orbiting';
+      else sitKey = 'sit.suborbital';
     }
-    HUD.setSituation(`${sit} — ${bodyName}`);
+    HUD.setSituation(t(sitKey, { body: sitBody }));
 
     // orbital elements (recompute when not on rails)
     if (!st.landed) {
@@ -952,6 +957,14 @@ export class Flight {
 
   refreshMapNow() {
     this.map.refresh(this.st, this.curEls, this.encounter);
+  }
+
+  refreshHUD() {
+    if (!this.active || !this.st) return;
+    this.hudTimer = 0;
+    this.hudTick(1);
+    this.map?.refreshLabels?.();
+    if (this.mapOpen) this.refreshMapNow();
   }
 
   resize(w, h) {

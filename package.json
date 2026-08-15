@@ -7,11 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/orbits.test.mjs && node tests/system.test.mjs && node tests/hohmann.test.mjs",
+    "test": "node tests/orbits.test.mjs && node tests/system.test.mjs && node tests/hohmann.test.mjs && node tests/workshop.test.mjs && node tests/wiki-curator.test.mjs",
     "mission": "node tests/mission.test.mjs",
     "smoke": "node scripts/smoke.mjs",
     "shots": "node scripts/shots.mjs",
-    "mcp": "node mcp/server.mjs"
+    "mcp": "node mcp/server.mjs",
+    "wiki:curator": "node scripts/wiki-auto-curator.mjs"
   },
   "dependencies": {
     "three": "^0.180.0"

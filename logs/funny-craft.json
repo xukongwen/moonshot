@@ -1,0 +1,1302 @@
+{
+  "at": "2026-08-15T10:53:47.774Z",
+  "name": "这也能飞？",
+  "design": {
+    "name": "这也能飞？",
+    "stack": [
+      "chute",
+      "pod-mk1",
+      "heat-shield",
+      "tank-s",
+      "tank-s",
+      "tank-s",
+      "tank-s",
+      "tank-s",
+      "tank-s",
+      "decoupler-s",
+      "tank-xl",
+      "tank-xl",
+      "eng-titan"
+    ],
+    "radials": [
+      {
+        "part": "srb",
+        "sym": 6,
+        "host": 10
+      },
+      {
+        "part": "legs",
+        "sym": 1,
+        "host": 10
+      },
+      {
+        "part": "srb",
+        "sym": 6,
+        "host": 11
+      },
+      {
+        "part": "fins",
+        "sym": 1,
+        "host": 12
+      }
+    ]
+  },
+  "stack": [
+    "chute",
+    "pod-mk1",
+    "heat-shield",
+    "tank-s",
+    "tank-s",
+    "tank-s",
+    "tank-s",
+    "tank-s",
+    "tank-s",
+    "decoupler-s",
+    "tank-xl",
+    "tank-xl",
+    "eng-titan"
+  ],
+  "radials": [
+    {
+      "part": "srb",
+      "sym": 6,
+      "host": 10
+    },
+    {
+      "part": "legs",
+      "sym": 1,
+      "host": 10
+    },
+    {
+      "part": "srb",
+      "sym": 6,
+      "host": 11
+    },
+    {
+      "part": "fins",
+      "sym": 1,
+      "host": 12
+    }
+  ],
+  "selected": 12,
+  "stats": {
+    "stages": [
+      {
+        "label": "Ignition",
+        "dv": 3507.623303630048,
+        "twrSL": 3.7293484021560674,
+        "twrVac": 4.200578016170978,
+        "burnTime": 68.5,
+        "wet": 98040,
+        "prop": 74000
+      }
+    ],
+    "parts": 17,
+    "height_m": 18.650000000000006,
+    "mass_t": 98.04,
+    "totalDv": 3507.623303630048
+  },
+  "snapshot": {
+    "name": "这也能飞？",
+    "stack": [
+      "chute",
+      "pod-mk1",
+      "heat-shield",
+      "tank-s",
+      "tank-s",
+      "tank-s",
+      "tank-s",
+      "tank-s",
+      "tank-s",
+      "decoupler-s",
+      "tank-xl",
+      "tank-xl",
+      "eng-titan"
+    ],
+    "radials": [
+      {
+        "part": "srb",
+        "sym": 6,
+        "host": 10
+      },
+      {
+        "part": "legs",
+        "sym": 1,
+        "host": 10
+      },
+      {
+        "part": "srb",
+        "sym": 6,
+        "host": 11
+      },
+      {
+        "part": "fins",
+        "sym": 1,
+        "host": 12
+      }
+    ],
+    "selected": 12,
+    "stats": {
+      "stages": [
+        {
+          "label": "Ignition",
+          "dv": 3507.623303630048,
+          "twrSL": 3.7293484021560674,
+          "twrVac": 4.200578016170978,
+          "burnTime": 68.5,
+          "wet": 98040,
+          "prop": 74000
+        }
+      ],
+      "parts": 17,
+      "height_m": 18.650000000000006,
+      "mass_t": 98.04,
+      "totalDv": 3507.623303630048
+    },
+    "parts": [
+      {
+        "id": "chute",
+        "name": "Mk2 Parachute",
+        "index": 0,
+        "category": "Utility"
+      },
+      {
+        "id": "pod-mk1",
+        "name": "Mk1 Command Pod",
+        "index": 1,
+        "category": "Pods"
+      },
+      {
+        "id": "heat-shield",
+        "name": "AB-1 Heat Shield",
+        "index": 2,
+        "category": "Utility"
+      },
+      {
+        "id": "tank-s",
+        "name": "FT-100 Tank",
+        "index": 3,
+        "category": "Tanks"
+      },
+      {
+        "id": "tank-s",
+        "name": "FT-100 Tank",
+        "index": 4,
+        "category": "Tanks"
+      },
+      {
+        "id": "tank-s",
+        "name": "FT-100 Tank",
+        "index": 5,
+        "category": "Tanks"
+      },
+      {
+        "id": "tank-s",
+        "name": "FT-100 Tank",
+        "index": 6,
+        "category": "Tanks"
+      },
+      {
+        "id": "tank-s",
+        "name": "FT-100 Tank",
+        "index": 7,
+        "category": "Tanks"
+      },
+      {
+        "id": "tank-s",
+        "name": "FT-100 Tank",
+        "index": 8,
+        "category": "Tanks"
+      },
+      {
+        "id": "decoupler-s",
+        "name": "TD-12 Decoupler",
+        "index": 9,
+        "category": "Coupling"
+      },
+      {
+        "id": "tank-xl",
+        "name": "FT-3200 Tank",
+        "index": 10,
+        "category": "Tanks"
+      },
+      {
+        "id": "tank-xl",
+        "name": "FT-3200 Tank",
+        "index": 11,
+        "category": "Tanks"
+      },
+      {
+        "id": "eng-titan",
+        "name": "T-900 \"Titan\"",
+        "index": 12,
+        "category": "Engines"
+      }
+    ],
+    "radialParts": [
+      {
+        "index": 0,
+        "part": "srb",
+        "name": "SRB-30 Booster",
+        "sym": 6,
+        "host": 10
+      },
+      {
+        "index": 1,
+        "part": "legs",
+        "name": "LT-2 Landing Legs ×4",
+        "sym": 1,
+        "host": 10
+      },
+      {
+        "index": 2,
+        "part": "srb",
+        "name": "SRB-30 Booster",
+        "sym": 6,
+        "host": 11
+      },
+      {
+        "index": 3,
+        "part": "fins",
+        "name": "Stabilizer Fins ×4",
+        "sym": 1,
+        "host": 12
+      }
+    ],
+    "design": {
+      "name": "这也能飞？",
+      "stack": [
+        "chute",
+        "pod-mk1",
+        "heat-shield",
+        "tank-s",
+        "tank-s",
+        "tank-s",
+        "tank-s",
+        "tank-s",
+        "tank-s",
+        "decoupler-s",
+        "tank-xl",
+        "tank-xl",
+        "eng-titan"
+      ],
+      "radials": [
+        {
+          "part": "srb",
+          "sym": 6,
+          "host": 10
+        },
+        {
+          "part": "legs",
+          "sym": 1,
+          "host": 10
+        },
+        {
+          "part": "srb",
+          "sym": 6,
+          "host": 11
+        },
+        {
+          "part": "fins",
+          "sym": 1,
+          "host": 12
+        }
+      ]
+    }
+  },
+  "saved": {
+    "saved": "这也能飞？"
+  },
+  "calls": [
+    {
+      "tool": "ksp_vab_clear",
+      "args": {},
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "Untitled Craft",
+        "stack": [],
+        "radials": [],
+        "selected": -1,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 0,
+          "height_m": 0,
+          "parts": 0
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_set_name",
+      "args": {
+        "name": "这也能飞？"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [],
+        "radials": [],
+        "selected": -1,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 0,
+          "height_m": 0,
+          "parts": 0
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "chute"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute"
+        ],
+        "radials": [],
+        "selected": 0,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 0.1,
+          "height_m": 0.35,
+          "parts": 1
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "pod-mk1"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1"
+        ],
+        "radials": [],
+        "selected": 1,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 0.9,
+          "height_m": 1.4500000000000002,
+          "parts": 2
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "heat-shield"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield"
+        ],
+        "radials": [],
+        "selected": 2,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 1.4,
+          "height_m": 1.75,
+          "parts": 3
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "tank-s"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s"
+        ],
+        "radials": [],
+        "selected": 3,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 1.96,
+          "height_m": 2.65,
+          "parts": 4
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "tank-s"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s"
+        ],
+        "radials": [],
+        "selected": 4,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 2.52,
+          "height_m": 3.5500000000000003,
+          "parts": 5
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "tank-s"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s"
+        ],
+        "radials": [],
+        "selected": 5,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 3.08,
+          "height_m": 4.449999999999999,
+          "parts": 6
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "tank-s"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s"
+        ],
+        "radials": [],
+        "selected": 6,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 3.64,
+          "height_m": 5.35,
+          "parts": 7
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "tank-s"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s"
+        ],
+        "radials": [],
+        "selected": 7,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 4.2,
+          "height_m": 6.25,
+          "parts": 8
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "tank-s"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s"
+        ],
+        "radials": [],
+        "selected": 8,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 4.76,
+          "height_m": 7.15,
+          "parts": 9
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "decoupler-s"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s"
+        ],
+        "radials": [],
+        "selected": 9,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 4.81,
+          "height_m": 7.449999999999999,
+          "parts": 10
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "tank-xl"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl"
+        ],
+        "radials": [],
+        "selected": 10,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 22.81,
+          "height_m": 11.850000000000001,
+          "parts": 11
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "tank-xl"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl"
+        ],
+        "radials": [],
+        "selected": 11,
+        "stats": {
+          "totalDv": 0,
+          "mass_t": 40.81,
+          "height_m": 16.250000000000004,
+          "parts": 12
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_part",
+      "args": {
+        "id": "eng-titan"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [],
+        "selected": 12,
+        "stats": {
+          "totalDv": 3434.017277912572,
+          "mass_t": 46.81,
+          "height_m": 18.650000000000006,
+          "parts": 13
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_get",
+      "args": {},
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [],
+        "selected": 12,
+        "stats": {
+          "totalDv": 3434.017277912572,
+          "mass_t": 46.81,
+          "height_m": 18.650000000000006,
+          "parts": 13
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_move_part",
+      "args": {
+        "index": 12,
+        "dir": -1
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "eng-titan",
+          "tank-xl"
+        ],
+        "radials": [],
+        "selected": 11,
+        "stats": {
+          "totalDv": 3434.017277912572,
+          "mass_t": 46.81,
+          "height_m": 18.650000000000006,
+          "parts": 13
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_move_part",
+      "args": {
+        "index": 11,
+        "dir": 1
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [],
+        "selected": 12,
+        "stats": {
+          "totalDv": 3434.017277912572,
+          "mass_t": 46.81,
+          "height_m": 18.650000000000006,
+          "parts": 13
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_get",
+      "args": {},
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [],
+        "selected": 12,
+        "stats": {
+          "totalDv": 3434.017277912572,
+          "mass_t": 46.81,
+          "height_m": 18.650000000000006,
+          "parts": 13
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_select",
+      "args": {
+        "index": 10
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [],
+        "selected": 10,
+        "stats": {
+          "totalDv": 3434.017277912572,
+          "mass_t": 46.81,
+          "height_m": 18.650000000000006,
+          "parts": 13
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_radial",
+      "args": {
+        "id": "srb",
+        "sym": 6
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 10
+          }
+        ],
+        "selected": 10,
+        "stats": {
+          "totalDv": 3510.8822503651595,
+          "mass_t": 72.31,
+          "height_m": 18.650000000000006,
+          "parts": 14
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_radial",
+      "args": {
+        "id": "legs"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 10
+          },
+          {
+            "part": "legs",
+            "sym": 1,
+            "host": 10
+          }
+        ],
+        "selected": 10,
+        "stats": {
+          "totalDv": 3495.277319590879,
+          "mass_t": 72.46,
+          "height_m": 18.650000000000006,
+          "parts": 15
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_select",
+      "args": {
+        "index": 11
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 10
+          },
+          {
+            "part": "legs",
+            "sym": 1,
+            "host": 10
+          }
+        ],
+        "selected": 11,
+        "stats": {
+          "totalDv": 3495.277319590879,
+          "mass_t": 72.46,
+          "height_m": 18.650000000000006,
+          "parts": 15
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_radial",
+      "args": {
+        "id": "srb",
+        "sym": 6
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 10
+          },
+          {
+            "part": "legs",
+            "sym": 1,
+            "host": 10
+          },
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 11
+          }
+        ],
+        "selected": 11,
+        "stats": {
+          "totalDv": 3514.2310676229463,
+          "mass_t": 97.96,
+          "height_m": 18.650000000000006,
+          "parts": 16
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_select",
+      "args": {
+        "index": 12
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 10
+          },
+          {
+            "part": "legs",
+            "sym": 1,
+            "host": 10
+          },
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 11
+          }
+        ],
+        "selected": 12,
+        "stats": {
+          "totalDv": 3514.2310676229463,
+          "mass_t": 97.96,
+          "height_m": 18.650000000000006,
+          "parts": 16
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_add_radial",
+      "args": {
+        "id": "fins"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 10
+          },
+          {
+            "part": "legs",
+            "sym": 1,
+            "host": 10
+          },
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 11
+          },
+          {
+            "part": "fins",
+            "sym": 1,
+            "host": 12
+          }
+        ],
+        "selected": 12,
+        "stats": {
+          "totalDv": 3507.623303630048,
+          "mass_t": 98.04,
+          "height_m": 18.650000000000006,
+          "parts": 17
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_stats",
+      "args": {},
+      "ok": true,
+      "error": null,
+      "summary": {
+        "totalDv": 3507.623303630048,
+        "mass_t": 98.04,
+        "height_m": 18.650000000000006,
+        "parts": 17,
+        "stages": [
+          {
+            "label": "Ignition",
+            "dv": 3507.623303630048,
+            "twrSL": 3.7293484021560674,
+            "twrVac": 4.200578016170978,
+            "burnTime": 68.5,
+            "wet": 98040,
+            "prop": 74000
+          }
+        ]
+      }
+    },
+    {
+      "tool": "ksp_vab_get",
+      "args": {},
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 10
+          },
+          {
+            "part": "legs",
+            "sym": 1,
+            "host": 10
+          },
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 11
+          },
+          {
+            "part": "fins",
+            "sym": 1,
+            "host": 12
+          }
+        ],
+        "selected": 12,
+        "stats": {
+          "totalDv": 3507.623303630048,
+          "mass_t": 98.04,
+          "height_m": 18.650000000000006,
+          "parts": 17
+        }
+      }
+    },
+    {
+      "tool": "ksp_vab_save",
+      "args": {
+        "name": "这也能飞？"
+      },
+      "ok": true,
+      "error": null,
+      "summary": {
+        "name": "这也能飞？",
+        "stack": [
+          "chute",
+          "pod-mk1",
+          "heat-shield",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "tank-s",
+          "decoupler-s",
+          "tank-xl",
+          "tank-xl",
+          "eng-titan"
+        ],
+        "radials": [
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 10
+          },
+          {
+            "part": "legs",
+            "sym": 1,
+            "host": 10
+          },
+          {
+            "part": "srb",
+            "sym": 6,
+            "host": 11
+          },
+          {
+            "part": "fins",
+            "sym": 1,
+            "host": 12
+          }
+        ],
+        "selected": 12,
+        "saved": "这也能飞？",
+        "stats": {
+          "totalDv": 3507.623303630048,
+          "mass_t": 98.04,
+          "height_m": 18.650000000000006,
+          "parts": 17
+        }
+      }
+    }
+  ],
+  "errors": []
+}

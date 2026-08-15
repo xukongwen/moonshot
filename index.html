@@ -12,37 +12,38 @@
     <!-- ===================== VAB ===================== -->
     <div id="vab" class="screen hidden">
       <div id="vab-top" class="panel">
-        <span class="logo">MOONSHOT<span class="sub">VEHICLE ASSEMBLY</span></span>
+        <span class="logo">MOONSHOT<span class="sub" data-i18n="vab.assembly">VEHICLE ASSEMBLY</span></span>
         <input id="craft-name" value="Untitled Craft" spellcheck="false" />
-        <button id="btn-save">Save</button>
-        <select id="load-select"><option value="">Load craft…</option></select>
-        <button id="btn-clear">Clear</button>
+        <button id="btn-save" data-i18n="vab.save">Save</button>
+        <select id="load-select" data-i18n-placeholder="vab.load"><option value="">Load craft…</option></select>
+        <button id="btn-clear" data-i18n="vab.clear">Clear</button>
         <span class="spacer"></span>
-        <button id="btn-stock-hopper" class="ghost">Stock: Suborbital Hopper</button>
-        <button id="btn-stock-mun" class="ghost">Stock: Mun Express</button>
-        <button id="btn-launch" class="launch">LAUNCH ▶</button>
+        <button id="btn-stock-hopper" class="ghost" data-i18n="vab.stockHopper">Stock: Suborbital Hopper</button>
+        <button id="btn-stock-mun" class="ghost" data-i18n="vab.stockMun">Stock: Mun Express</button>
+        <button id="btn-lang" class="ghost">中文</button>
+        <button id="btn-launch" class="launch" data-i18n="vab.launch">LAUNCH ▶</button>
       </div>
       <div id="vab-left" class="panel">
         <div id="palette-tabs"></div>
         <div id="palette"></div>
-        <div id="part-info" class="dim">Hover a part for stats. Click to add to the stack (inserted below the selected part).</div>
+        <div id="part-info" class="dim" data-i18n="vab.hoverHint">Hover a part for stats. Click to add to the stack (inserted below the selected part).</div>
       </div>
       <div id="vab-right" class="panel">
-        <h3>STACK <span class="dim">(top → bottom)</span></h3>
+        <h3><span data-i18n="vab.stack">STACK</span> <span class="dim" data-i18n="vab.stackDir">(top → bottom)</span></h3>
         <div id="stack-list"></div>
         <div id="radial-tools">
-          <h3>RADIAL ATTACH</h3>
+          <h3 data-i18n="vab.radial">RADIAL ATTACH</h3>
           <div class="row">
             <select id="radial-part"></select>
             <select id="radial-sym">
               <option value="2">×2</option><option value="3">×3</option>
               <option value="4" selected>×4</option><option value="6">×6</option>
             </select>
-            <button id="btn-radial-add">Add</button>
+            <button id="btn-radial-add" data-i18n="vab.add">Add</button>
           </div>
-          <div class="dim">Attaches to the selected stack part. Boosters &amp; drop tanks get radial decouplers automatically.</div>
+          <div class="dim" data-i18n="vab.radialHint">Attaches to the selected stack part. Boosters &amp; drop tanks get radial decouplers automatically.</div>
         </div>
-        <h3>STAGING &amp; Δv <span class="dim">(vacuum)</span></h3>
+        <h3><span data-i18n="vab.staging">STAGING &amp; Δv</span> <span class="dim" data-i18n="vab.vacuum">(vacuum)</span></h3>
         <div id="stage-stats"></div>
         <div id="craft-stats"></div>
       </div>
@@ -58,13 +59,14 @@
         <span id="warp-display">WARP 1×</span>
         <button id="btn-warp-down">◀</button>
         <button id="btn-warp-up">▶</button>
-        <button id="btn-map">Map [M]</button>
-        <button id="btn-help">Keys [H]</button>
-        <button id="btn-revert" class="danger">Revert to VAB</button>
+        <button id="btn-map" data-i18n="flight.map">Map [M]</button>
+        <button id="btn-help" data-i18n="flight.keys">Keys [H]</button>
+        <button id="btn-lang-flight" class="ghost">中文</button>
+        <button id="btn-revert" class="danger" data-i18n="flight.revert">Revert to VAB</button>
       </div>
 
       <div id="stage-panel" class="panel">
-        <h3>STAGES</h3>
+        <h3 data-i18n="hud.stages">STAGES</h3>
         <div id="stage-list"></div>
         <div id="resource-bars"></div>
       </div>
@@ -91,7 +93,7 @@
       </div>
 
       <div id="throttle-wrap" class="panel">
-        <div class="dim">THR</div>
+        <div class="dim" data-i18n="hud.thr">THR</div>
         <div id="throttle-track"><div id="throttle-fill"></div></div>
         <div id="sas-ind" class="on">SAS</div>
         <div id="sas-mode-ind">HOLD</div>
@@ -103,29 +105,30 @@
       <div id="endcard" class="panel hidden">
         <h2 id="endcard-title">CRASHED</h2>
         <p id="endcard-text"></p>
-        <button id="btn-end-revert">Revert to VAB</button>
-        <button id="btn-end-relaunch">Relaunch same craft</button>
+        <button id="btn-end-revert" data-i18n="flight.revert">Revert to VAB</button>
+        <button id="btn-end-relaunch" data-i18n="flight.relaunch">Relaunch same craft</button>
       </div>
 
       <div id="help" class="panel hidden">
-        <h3>FLIGHT CONTROLS</h3>
+        <h3 data-i18n="flight.helpTitle">FLIGHT CONTROLS</h3>
         <table>
-          <tr><td>Shift / Ctrl</td><td>throttle up / down</td></tr>
-          <tr><td>Z / X</td><td>full throttle / cut</td></tr>
-          <tr><td>Space</td><td>activate next stage</td></tr>
-          <tr><td>W / S</td><td>pitch</td></tr>
-          <tr><td>A / D</td><td>yaw</td></tr>
-          <tr><td>Q / E</td><td>roll</td></tr>
-          <tr><td>T</td><td>toggle SAS</td></tr>
-          <tr><td>1 / 2 / 3</td><td>SAS: hold / prograde / retrograde</td></tr>
-          <tr><td>G</td><td>toggle landing legs</td></tr>
-          <tr><td>P</td><td>arm / deploy parachutes</td></tr>
-          <tr><td>, / .</td><td>time warp down / up</td></tr>
-          <tr><td>M</td><td>map view</td></tr>
-          <tr><td>Mouse drag / wheel</td><td>camera</td></tr>
+          <tr><td>Shift / Ctrl</td><td data-i18n="flight.help.throttle">throttle up / down</td></tr>
+          <tr><td>Z / X</td><td data-i18n="flight.help.fullcut">full throttle / cut</td></tr>
+          <tr><td>Space</td><td data-i18n="flight.help.stage">activate next stage</td></tr>
+          <tr><td>W / S</td><td data-i18n="flight.help.pitch">pitch</td></tr>
+          <tr><td>A / D</td><td data-i18n="flight.help.yaw">yaw</td></tr>
+          <tr><td>Q / E</td><td data-i18n="flight.help.roll">roll</td></tr>
+          <tr><td>T</td><td data-i18n="flight.help.sas">toggle SAS</td></tr>
+          <tr><td>1 / 2 / 3</td><td data-i18n="flight.help.sasmode">SAS: hold / prograde / retrograde</td></tr>
+          <tr><td>G</td><td data-i18n="flight.help.legs">toggle landing legs</td></tr>
+          <tr><td>P</td><td data-i18n="flight.help.chutes">arm / deploy parachutes</td></tr>
+          <tr><td>, / .</td><td data-i18n="flight.help.warp">time warp down / up</td></tr>
+          <tr><td>M</td><td data-i18n="flight.help.map">map view</td></tr>
+          <tr><td>L</td><td data-i18n="flight.help.lang">toggle language</td></tr>
+          <tr><td>Mouse drag / wheel</td><td data-i18n="flight.help.camera">camera</td></tr>
         </table>
-        <div class="dim">Rails warp (&gt;4×) needs engines off and to be out of the atmosphere.</div>
-        <button id="btn-help-close">Close</button>
+        <div class="dim" data-i18n="flight.helpRails">Rails warp (&gt;4×) needs engines off and to be out of the atmosphere.</div>
+        <button id="btn-help-close" data-i18n="flight.close">Close</button>
       </div>
     </div>
   </div>

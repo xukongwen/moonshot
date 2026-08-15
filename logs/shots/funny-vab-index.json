@@ -1,0 +1,14 @@
+{
+  "at": "2026-08-15T10:54:00.253Z",
+  "results": [
+    {
+      "name": "funny-vab.png",
+      "attempt": 1,
+      "bytes": 239296,
+      "real3d": true,
+      "composited": true,
+      "sceneBytes": 184892
+    }
+  ],
+  "errors": []
+}

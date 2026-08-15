@@ -6,15 +6,20 @@ import { PARTS, CATEGORIES, RADIAL_PARTS, partInfoHTML } from './parts.js';
 import { buildVesselParts, stagingStats, stackGeometry } from './vessel.js';
 import { buildVesselGroup, setLegs } from './vesselviz.js';
 import { STOCK } from './stock.js';
+import { t, STRINGS, stageLabel } from './i18n.js';
 
 const $ = (id) => document.getElementById(id);
 const STORE_KEY = 'moonshot-crafts';
+
+function untitledNames() {
+  return [STRINGS.en['vab.untitled'], STRINGS.zh['vab.untitled']];
+}
 
 export class VAB {
   /** ctx: { scene, camera, onLaunch } — scene/camera owned by main. */
   constructor(ctx) {
     this.ctx = ctx;
-    this.design = { name: 'Untitled Craft', stack: [], radials: [] };
+    this.design = { name: t('vab.untitled'), stack: [], radials: [] };
     this.selected = -1;       // selected stack index
     this.group = null;
     this.activeCategory = 'Pods';
@@ -22,13 +27,7 @@ export class VAB {
   }
 
   buildUI() {
-    const tabs = $('palette-tabs');
-    for (const cat of CATEGORIES) {
-      const b = document.createElement('button');
-      b.textContent = cat;
-      b.onclick = () => { this.activeCategory = cat; this.renderPalette(); };
-      tabs.appendChild(b);
-    }
+    this.renderTabs();
     this.renderPalette();
 
     const radialSel = $('radial-part');
@@ -45,13 +44,29 @@ export class VAB {
     $('btn-stock-hopper').onclick = () => this.loadStock('Suborbital Hopper');
     $('btn-stock-mun').onclick = () => this.loadStock('Mun Express');
     $('btn-launch').onclick = () => this.launch();
-    $('craft-name').oninput = (e) => { this.design.name = e.target.value || 'Untitled Craft'; };
+    $('craft-name').value = this.design.name;
+    $('craft-name').oninput = (e) => { this.design.name = e.target.value || t('vab.untitled'); };
     this.refreshLoadList();
   }
 
+  renderTabs() {
+    const tabs = $('palette-tabs');
+    if (!tabs.children.length) {
+      for (const cat of CATEGORIES) {
+        const b = document.createElement('button');
+        b.dataset.cat = cat;
+        b.onclick = () => { this.activeCategory = cat; this.renderPalette(); };
+        tabs.appendChild(b);
+      }
+    }
+    [...tabs.children].forEach((b) => {
+      b.textContent = t(`cat.${b.dataset.cat}`);
+      b.classList.toggle('active', b.dataset.cat === this.activeCategory);
+    });
+  }
+
   renderPalette() {
-    [...$('palette-tabs').children].forEach((b) =>
-      b.classList.toggle('active', b.textContent === this.activeCategory));
+    this.renderTabs();
     const pal = $('palette');
     pal.innerHTML = '';
     for (const [id, def] of Object.entries(PARTS)) {
@@ -60,7 +75,7 @@ export class VAB {
       b.className = 'part-btn';
       const meta = def.engine
         ? `${(def.engine.thrustVac / 1000).toFixed(0)} kN · Isp ${def.engine.ispVac}s`
-        : def.fuel ? `${def.fuel} kg fuel` : `${(def.mass / 1000).toFixed(2)} t`;
+        : def.fuel ? t('vab.fuelKg', { n: def.fuel }) : `${(def.mass / 1000).toFixed(2)} t`;
       b.innerHTML = `<span class="pname">${def.name}</span><span class="pmeta">${def.size} m · ${meta}</span>`;
       b.onmouseenter = () => { $('part-info').innerHTML = partInfoHTML(def); };
       b.onclick = () => this.addStackPart(id);
@@ -72,7 +87,7 @@ export class VAB {
     if (PARTS[id].radial && !PARTS[id].decoupler) {
       // radial-only parts can't go in the stack (except none currently)
       if (id === 'srb' || id === 'fins' || id === 'legs') {
-        $('part-info').innerHTML = `<b>${PARTS[id].name}</b> is radial-attach: select a stack part and use Radial Attach.`;
+        $('part-info').innerHTML = `<b>${t('vab.radialOnly', { name: PARTS[id].name })}</b>`;
         return;
       }
     }
@@ -86,7 +101,7 @@ export class VAB {
 
   addRadial() {
     if (this.selected < 0 || !this.design.stack[this.selected]) {
-      $('part-info').innerHTML = 'Select a stack part first.';
+      $('part-info').innerHTML = t('vab.selectStack');
       return;
     }
     const part = $('radial-part').value;
@@ -118,16 +133,27 @@ export class VAB {
   }
 
   refresh() {
+    this.syncUntitledName();
+    this.renderTabs();
+    this.renderPalette();
     this.renderStackList();
     this.renderStats();
     this.rebuildPreview();
+  }
+
+  syncUntitledName() {
+    const names = untitledNames();
+    if (names.includes(this.design.name) || names.includes($('craft-name').value)) {
+      this.design.name = t('vab.untitled');
+      $('craft-name').value = this.design.name;
+    }
   }
 
   renderStackList() {
     const list = $('stack-list');
     list.innerHTML = '';
     if (!this.design.stack.length) {
-      list.innerHTML = '<div class="dim">Empty. Add a pod from the palette — the stack builds top-down.</div>';
+      list.innerHTML = `<div class="dim">${t('vab.emptyStack')}</div>`;
       return;
     }
     this.design.stack.forEach((id, i) => {
@@ -168,20 +194,20 @@ export class VAB {
     $('stage-stats').innerHTML = stats.length
       ? stats.map((s, i) => `
         <div class="stage-block">
-          <span class="sname">Stage ${stats.length - i}</span> — ${s.label}<br>
-          Δv <b>${s.dv.toFixed(0)} m/s</b> · TWR ${s.twrSL.toFixed(2)} SL / ${s.twrVac.toFixed(2)} vac<br>
-          <span class="dim">burn ${s.burnTime.toFixed(0)} s · ${(s.wet / 1000).toFixed(1)} t wet</span>
+          <span class="sname">${t('vab.stageN', { n: stats.length - i })}</span> — ${stageLabel(s.label)}<br>
+          Δv <b>${s.dv.toFixed(0)} m/s</b> · TWR ${s.twrSL.toFixed(2)} SL / ${s.twrVac.toFixed(2)} ${t('part.vac')}<br>
+          <span class="dim">${t('vab.burn', { s: s.burnTime.toFixed(0), mass: (s.wet / 1000).toFixed(1) })}</span>
         </div>`).join('')
-      : '<div class="dim">No engines staged yet.</div>';
+      : `<div class="dim">${t('vab.noEnginesStaged')}</div>`;
 
     const parts = buildVesselParts(this.design);
     const geom = stackGeometry(parts);
     const wet = parts.reduce((s, p) => s + p.def.mass * p.sym + p.fuel + (p.ablator || 0), 0);
     const totalDv = stats.reduce((s, x) => s + x.dv, 0);
     $('craft-stats').innerHTML =
-      `Parts ${parts.length} · Height ${geom.totalLength.toFixed(1)} m · Mass <b>${(wet / 1000).toFixed(2)} t</b><br>` +
-      `Total Δv (vac): <b>${totalDv.toFixed(0)} m/s</b><br>` +
-      `<span class="dim">Mun round trip needs roughly 5,800–7,000 m/s and pad TWR > 1.2</span>`;
+      `${t('vab.partsLine', { n: parts.length, h: geom.totalLength.toFixed(1) })} <b>${(wet / 1000).toFixed(2)} t</b><br>` +
+      `${t('vab.totalDv')} <b>${totalDv.toFixed(0)} m/s</b><br>` +
+      `<span class="dim">${t('vab.munHint')}</span>`;
   }
 
   rebuildPreview() {
@@ -201,7 +227,7 @@ export class VAB {
     all[this.design.name] = this.design;
     localStorage.setItem(STORE_KEY, JSON.stringify(all));
     this.refreshLoadList();
-    $('part-info').textContent = `Saved “${this.design.name}”.`;
+    $('part-info').textContent = t('vab.saved', { name: this.design.name });
   }
 
   refreshLoadList() {
@@ -236,11 +262,11 @@ export class VAB {
   launch() {
     const parts = buildVesselParts(this.design);
     if (!parts.some((p) => p.def.pod)) {
-      $('part-info').innerHTML = '<b style="color:#ff8d7e">No command pod!</b> Add one or the rocket has no one to fly it.';
+      $('part-info').innerHTML = `<b style="color:#ff8d7e">${t('vab.noPod')}</b>`;
       return;
     }
     if (!parts.some((p) => p.def.engine)) {
-      $('part-info').innerHTML = '<b style="color:#ff8d7e">No engines.</b> Gravity wins by default.';
+      $('part-info').innerHTML = `<b style="color:#ff8d7e">${t('vab.noEngine')}</b>`;
       return;
     }
     this.ctx.onLaunch(structuredClone(this.design));

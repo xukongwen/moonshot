@@ -3,17 +3,20 @@
 // stdin/stdout. Protocol logs go to stderr only — stdout is the wire.
 
 import { createInterface } from 'node:readline';
-import { SimSession } from './session.mjs';
+import { fileURLToPath } from 'node:url';
+import { resolve } from 'node:path';
+import { SimSession, WARP_LEVELS } from './session.mjs';
+import { listPartsCatalog } from './workshop.mjs';
 import { STOCK } from '../src/stock.js';
 
 const session = new SimSession();
 
 const CRAFTS = Object.keys(STOCK);
 
-const TOOLS = [
+export const TOOLS = [
   {
     name: 'ksp_new_flight',
-    description: 'Start a new flight on the Kerbin pad. Resets the current session.',
+    description: 'Start a new flight on the Kerbin pad with a stock craft (Launch from VAB with Mun Express / Hopper). Resets the current session.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -28,17 +31,17 @@ const TOOLS = [
   },
   {
     name: 'ksp_telemetry',
-    description: 'Current vessel telemetry snapshot (altitude, speed, orbit, fuel, staging).',
+    description: 'Read the flight HUD: altitude, speed, orbit, fuel, staging, warp, camera.',
     inputSchema: { type: 'object', properties: {} },
   },
   {
     name: 'ksp_stage',
-    description: 'Fire the next staging event (ignite engines, decouple, drop boosters, or arm chutes).',
+    description: 'Press Space — fire the next staging event (ignite engines, decouple, drop boosters, or arm chutes).',
     inputSchema: { type: 'object', properties: {} },
   },
   {
     name: 'ksp_throttle',
-    description: 'Set engine throttle in [0, 1].',
+    description: 'Set engine throttle in [0, 1] (Shift / Ctrl, or Z / X for full / cut).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -49,7 +52,7 @@ const TOOLS = [
   },
   {
     name: 'ksp_sas',
-    description: 'Set stability-assist mode.',
+    description: 'Set stability-assist mode (T to toggle, F to cycle hold / prograde / retrograde).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -79,7 +82,7 @@ const TOOLS = [
   },
   {
     name: 'ksp_controls',
-    description: 'Set pitch/yaw/roll stick inputs in [-1, 1]. Omitted axes are left unchanged.',
+    description: 'Set pitch/yaw/roll stick inputs in [-1, 1] (WASD / QE). Omitted axes are left unchanged.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -91,7 +94,7 @@ const TOOLS = [
   },
   {
     name: 'ksp_legs',
-    description: 'Deploy or retract landing legs.',
+    description: 'Deploy or retract landing legs (press G).',
     inputSchema: {
       type: 'object',
       properties: {
@@ -102,12 +105,12 @@ const TOOLS = [
   },
   {
     name: 'ksp_chutes',
-    description: 'Arm parachutes (they deploy automatically when safe).',
+    description: 'Arm parachutes (press P; they deploy automatically when safe).',
     inputSchema: { type: 'object', properties: {} },
   },
   {
     name: 'ksp_step',
-    description: 'Advance the simulation. Capped at 120 seconds per call.',
+    description: 'Advance the simulation (let the clock run). Capped at 120 seconds per call. If time warp is above 4×, uses on-rails coast.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -119,6 +122,224 @@ const TOOLS = [
           description: 'Simulated seconds to advance (default 1, max 120)',
         },
       },
+    },
+  },
+  {
+    name: 'ksp_parts',
+    description: 'Open the VAB parts catalog — every part a human can click in the palette (id, name, category, size, mass, fuel, engine, radial).',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_vab_get',
+    description: 'Look at the current VAB design: stack, radials, selected part, and staging / Δv stats.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_vab_set_name',
+    description: 'Type a name in the VAB craft-name field.',
+    inputSchema: {
+      type: 'object',
+      properties: { name: { type: 'string', description: 'Craft name' } },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'ksp_vab_clear',
+    description: 'Click Clear — empty the stack and radials, keep the craft name.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_vab_select',
+    description: 'Click a stack part in the VAB list (index 0 = top). Pass -1 to deselect.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        index: { type: 'integer', description: 'Stack index, or -1 for none' },
+      },
+      required: ['index'],
+    },
+  },
+  {
+    name: 'ksp_vab_add_part',
+    description: 'Click a part in the VAB palette to add it to the stack (inserted below the selected part, or at the bottom). Radial-only parts (SRB, fins, legs) must use ksp_vab_add_radial.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Part id from ksp_parts' },
+        index: { type: 'integer', description: 'Optional insertion index (0 = top)' },
+      },
+      required: ['id'],
+    },
+  },
+  {
+    name: 'ksp_vab_remove_part',
+    description: 'Click ✕ on a stack part (also drops radials attached to it).',
+    inputSchema: {
+      type: 'object',
+      properties: { index: { type: 'integer', description: 'Stack index to remove' } },
+      required: ['index'],
+    },
+  },
+  {
+    name: 'ksp_vab_move_part',
+    description: 'Click ↑ / ↓ on a stack part (dir -1 = up toward the nose, +1 = down toward the engines).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        index: { type: 'integer', description: 'Stack index' },
+        dir: { type: 'integer', enum: [-1, 1], description: '-1 up / +1 down' },
+      },
+      required: ['index', 'dir'],
+    },
+  },
+  {
+    name: 'ksp_vab_add_radial',
+    description: 'Click Add under Radial Attach — attach boosters, fins, or legs to a stack part. Legs/fins are already ×4 sets (sym forced to 1). Host defaults to the selected stack part.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Radial part id (srb, fins, legs, …)' },
+        host: { type: 'integer', description: 'Stack index to attach to (default: selected)' },
+        sym: { type: 'integer', minimum: 1, description: 'Symmetry count (ignored for legs/fins)' },
+      },
+      required: ['id'],
+    },
+  },
+  {
+    name: 'ksp_vab_remove_radial',
+    description: 'Click ✕ on a radial attachment in the VAB stack list.',
+    inputSchema: {
+      type: 'object',
+      properties: { index: { type: 'integer', description: 'Index in the radials array' } },
+      required: ['index'],
+    },
+  },
+  {
+    name: 'ksp_vab_stock',
+    description: 'Click Stock: Suborbital Hopper or Stock: Mun Express — load a built-in craft into the VAB.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', enum: CRAFTS, description: 'Stock craft name' },
+      },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'ksp_vab_save',
+    description: 'Click Save — persist the current VAB design to mcp/crafts.json (not browser localStorage).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Optional name; defaults to the current craft name' },
+      },
+    },
+  },
+  {
+    name: 'ksp_vab_list',
+    description: 'Open the VAB load list — saved user crafts plus stock names.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_vab_load',
+    description: 'Pick a saved user craft from the VAB load dropdown (not stock — use ksp_vab_stock for those).',
+    inputSchema: {
+      type: 'object',
+      properties: { name: { type: 'string', description: 'Saved craft name' } },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'ksp_vab_delete',
+    description: 'Delete a saved user craft from mcp/crafts.json.',
+    inputSchema: {
+      type: 'object',
+      properties: { name: { type: 'string', description: 'Saved craft name' } },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'ksp_vab_launch',
+    description: 'Click LAUNCH ▶ — validate (needs a command pod and an engine) and start a flight from the current VAB design.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_vab_stats',
+    description: 'Read the VAB staging & Δv panel (same numbers as ksp_vab_get.stats).',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_coast',
+    description: 'Coast / wait (engines off, out of atmosphere uses on-rails Kepler). Capped at 120 seconds per call — loop for longer coasts.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        seconds: {
+          type: 'number',
+          minimum: 0,
+          maximum: 120,
+          description: 'Seconds to coast (max 120; loop the tool for longer)',
+        },
+      },
+      required: ['seconds'],
+    },
+  },
+  {
+    name: 'ksp_warp',
+    description: 'Set time warp (comma / period, or the warp buttons). Levels 0–8: 1×, 2×, 3×, 4×, 10×, 100×, 1000×, 10000×, 100000×. Above 4×, subsequent ksp_step / ksp_coast use on-rails propagate.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        level: {
+          type: 'integer',
+          minimum: 0,
+          maximum: 8,
+          description: `Warp index 0..8 matching ${JSON.stringify(WARP_LEVELS)}`,
+        },
+      },
+      required: ['level'],
+    },
+  },
+  {
+    name: 'ksp_revert',
+    description: 'Click Revert to VAB — end the flight and return to the workshop (design is kept).',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_relaunch',
+    description: 'Click Relaunch same craft — put the last launched design back on the pad.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_map',
+    description: 'Toggle map view (press M). Headless: stores the map-open flag.',
+    inputSchema: {
+      type: 'object',
+      properties: { open: { type: 'boolean', description: 'true = open map' } },
+      required: ['open'],
+    },
+  },
+  {
+    name: 'ksp_camera',
+    description: 'Orbit the camera (drag to pan, scroll to zoom) in flight or map view. Headless: stores az / el / dist.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        az: { type: 'number', description: 'Azimuth (radians)' },
+        el: { type: 'number', description: 'Elevation (radians)' },
+        dist: { type: 'number', description: 'Distance from vessel' },
+      },
+    },
+  },
+  {
+    name: 'ksp_lang',
+    description: 'Toggle UI language (EN / 中文 button). Sets i18n even without a DOM.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        lang: { type: 'string', enum: ['en', 'zh'], description: 'Language' },
+      },
+      required: ['lang'],
     },
   },
 ];
@@ -134,7 +355,8 @@ function textResult(obj, isError = false) {
   return result;
 }
 
-function callTool(name, args = {}) {
+export function callTool(name, args = {}) {
+  const w = session.workshop;
   switch (name) {
     case 'ksp_new_flight':
       return session.newFlight(args.craft ?? 'Mun Express');
@@ -160,6 +382,67 @@ function callTool(name, args = {}) {
       return session.armChutes();
     case 'ksp_step':
       return session.step(args.seconds ?? 1);
+    case 'ksp_parts':
+      return listPartsCatalog();
+    case 'ksp_vab_get':
+      return w.snapshot();
+    case 'ksp_vab_set_name':
+      if (args.name == null) throw new Error('ksp_vab_set_name requires name');
+      return w.setName(args.name);
+    case 'ksp_vab_clear':
+      return w.clear();
+    case 'ksp_vab_select':
+      if (args.index == null) throw new Error('ksp_vab_select requires index');
+      return w.select(args.index);
+    case 'ksp_vab_add_part':
+      if (args.id == null) throw new Error('ksp_vab_add_part requires id');
+      return w.addStackPart(args.id, args.index);
+    case 'ksp_vab_remove_part':
+      if (args.index == null) throw new Error('ksp_vab_remove_part requires index');
+      return w.removeStackPart(args.index);
+    case 'ksp_vab_move_part':
+      if (args.index == null || args.dir == null) throw new Error('ksp_vab_move_part requires index and dir');
+      return w.moveStackPart(args.index, args.dir);
+    case 'ksp_vab_add_radial':
+      if (args.id == null) throw new Error('ksp_vab_add_radial requires id');
+      return w.addRadial(args.id, args.sym, args.host);
+    case 'ksp_vab_remove_radial':
+      if (args.index == null) throw new Error('ksp_vab_remove_radial requires index');
+      return w.removeRadial(args.index);
+    case 'ksp_vab_stock':
+      if (args.name == null) throw new Error('ksp_vab_stock requires name');
+      return w.loadStock(args.name);
+    case 'ksp_vab_save':
+      return w.save(args.name);
+    case 'ksp_vab_list':
+      return { saved: w.listSaved(), stock: CRAFTS };
+    case 'ksp_vab_load':
+      if (args.name == null) throw new Error('ksp_vab_load requires name');
+      return w.load(args.name);
+    case 'ksp_vab_delete':
+      if (args.name == null) throw new Error('ksp_vab_delete requires name');
+      return w.deleteSaved(args.name);
+    case 'ksp_vab_launch':
+      return session.launchWorkshop();
+    case 'ksp_vab_stats':
+      return w.stats();
+    case 'ksp_coast':
+      return session.coast(args.seconds ?? 1);
+    case 'ksp_warp':
+      if (args.level == null) throw new Error('ksp_warp requires level (0..8)');
+      return session.setWarp(args.level);
+    case 'ksp_revert':
+      return session.revert();
+    case 'ksp_relaunch':
+      return session.relaunch();
+    case 'ksp_map':
+      if (args.open == null) throw new Error('ksp_map requires open (boolean)');
+      return session.setMap(args.open);
+    case 'ksp_camera':
+      return session.setCamera(args);
+    case 'ksp_lang':
+      if (args.lang == null) throw new Error('ksp_lang requires lang (en|zh)');
+      return session.setLang(args.lang);
     default:
       throw new Error(`Unknown tool: ${name}`);
   }
@@ -245,37 +528,44 @@ function handle(msg) {
   }
 }
 
-const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
-rl.on('line', (line) => {
-  const trimmed = line.trim();
-  if (!trimmed) return;
-  if (/^Content-Length:/i.test(trimmed)) return;
-  log('<<', trimmed);
-  let msg;
-  try {
-    msg = JSON.parse(trimmed);
-  } catch (err) {
-    log('parse error', err.message);
-    replyError(null, -32700, 'Parse error');
-    return;
-  }
-  if (Array.isArray(msg)) {
-    for (const item of msg) handle(item);
-  } else {
-    handle(msg);
-  }
-});
+function startStdio() {
+  const rl = createInterface({ input: process.stdin, crlfDelay: Infinity });
+  rl.on('line', (line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return;
+    if (/^Content-Length:/i.test(trimmed)) return;
+    log('<<', trimmed);
+    let msg;
+    try {
+      msg = JSON.parse(trimmed);
+    } catch (err) {
+      log('parse error', err.message);
+      replyError(null, -32700, 'Parse error');
+      return;
+    }
+    if (Array.isArray(msg)) {
+      for (const item of msg) handle(item);
+    } else {
+      handle(msg);
+    }
+  });
 
-rl.on('close', () => {
-  log('stdin closed');
-  process.exit(0);
-});
+  rl.on('close', () => {
+    log('stdin closed');
+    process.exit(0);
+  });
 
-process.on('uncaughtException', (err) => {
-  log('uncaughtException', err);
-});
-process.on('unhandledRejection', (err) => {
-  log('unhandledRejection', err);
-});
+  process.on('uncaughtException', (err) => {
+    log('uncaughtException', err);
+  });
+  process.on('unhandledRejection', (err) => {
+    log('unhandledRejection', err);
+  });
 
-log('Moonshot MCP server ready (stdio). Crafts:', CRAFTS.join(', '));
+  log('Moonshot MCP server ready (stdio). Crafts:', CRAFTS.join(', '));
+}
+
+const isMain = process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isMain) startStdio();
+
+export { session };

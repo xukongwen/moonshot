@@ -1,51 +1,45 @@
-# 🚀 MOONSHOT
+# Moonshot
 
-A Kerbal Space Program–style game in the browser: build a rocket, launch it,
-fly to orbit, transfer to the Mun, land, plant a metaphorical flag, and come
-home. Built with **three.js WebGPU + TSL** (falls back to WebGL2), real
-two-body orbital mechanics with patched conics, and zero asset files — every
-texture and sound is procedural.
+本仓库是 [dgreenheck/moonshot](https://github.com/dgreenheck/moonshot) 的 fork。
+
+**原版作者：** [Daniel Greenheck](https://github.com/dgreenheck)（[@dgreenheck](https://github.com/dgreenheck)）。游戏本体——装配、飞行物理、开普勒轨道、Kerbin↔Mun、程序地形和座舱——都是他写的。
+
+**这个 fork：** 由 **grok-bot（程序员）** 在原版上继续写。我们会在这个基础上一直完善，目标是做成 agent 能飞的小型 KSP。
+
+This repo is a fork of [dgreenheck/moonshot](https://github.com/dgreenheck/moonshot) by **Daniel Greenheck**. The Kerbol system, interplanetary Hohmann, headless autopilot, and flight logs in this tree were added by **grok-bot**. We plan to keep building on it.
+
+## 这个 fork 多了什么
+
+- **Kerbol 嵌套 SOI：** Kerbol 为惯性根，Kerbin / Mun / Minmus / Duna（火星）。patched conics，出 SOI 换父星。
+- **行星霍曼转移：** 窗口相位、逃逸 v∞、渐近线对准点火。已飞通 Kerbin → Duna 捕获（见 `DUNA_LOG.md`）。
+- **无头驾驶：** `mcp/session.mjs` 同一套物理；`mcp/duna-hohmann.mjs`、`mcp/systemtour.mjs`、`mcp/roundtrip.mjs`。
+- **日志和截图：** 关键节点 snapshot + 地图/飞行图，在 `logs/`。
 
 ```bash
 npm install
-npm run dev        # open the printed URL (Chrome/Edge for WebGPU)
-npm test           # orbital math vs. brute-force RK4 integration
-npm run mission    # autopilot flies the stock rocket to a Mun landing, headless
+npm run dev        # 打开打印的 URL（Chrome/Edge 走 WebGPU）
+npm test           # 开普勒 / 天体树 / 霍曼
+npm run mission    # 原版：无头自动驾驶登 Mun
+node mcp/duna-hohmann.mjs   # Kerbin → Duna 霍曼
+node mcp/systemtour.mjs     # 入轨、Minmus、逃出 Kerbin
 ```
 
-## What's simulated
+## What is simulated
 
-- **Vehicle assembly** — stack parts top-to-bottom, radial boosters with
-  2/3/4/6× symmetry, auto-staging, per-stage **Δv / TWR / burn time** readouts
-  (time-marching burn sim, handles SRB flameout properly), craft save/load.
-- **Flight physics** — RK4 integration, thrust with Isp(pressure), exponential
-  atmosphere, drag with a real center-of-pressure (fins keep you pointy-end
-  first), reaction wheels + engine gimbal, SAS (hold / prograde / retrograde).
-- **Orbital mechanics** — osculating Kepler elements, elliptic & hyperbolic
-  analytic propagation, **sphere-of-influence transitions** (Kerbin ↔ Mun),
-  Mun encounter prediction with periapsis readout, transfer phase-angle gauge.
-- **Time warp** — physics warp to 4×, on-rails Kepler warp to 100,000×
-  (engines off, out of atmosphere — the navball won't save you on rails).
-- **Thermodynamics** — reentry heating on the windward part, part overheat
-  destruction, ablative heat shields. Steep Mun returns without a shield are
-  fatal; aim for a 30–50 km periapsis.
-- **Staging & fuel flow** — decouplers split the rocket into sections,
-  engines drain their own section's tanks, SRBs are self-contained, jettisoned
-  stages become tumbling debris with their own ballistic + drag sim.
-- **Landing** — procedural terrain on both bodies (the same height field
-  drives collision, the local terrain mesh, and the planet texture), landing
-  legs (≤12 m/s), parachutes for Kerbin, crash physics for everything else.
-- **The cockpit** — navball with prograde/retrograde markers, altimeter,
-  Ap/Pe/period/inclination, map view with orbit lines and encounter trajectory,
-  procedural engine rumble and wind.
+原版（Daniel Greenheck）已经有的：
 
-The whole solar system runs at KSP scale (Kerbin R=600 km, Mun at 12,000 km)
-in double precision on the CPU, with a floating-origin renderer so nothing
-jitters 12,000 km from home. The math is verified: `tests/orbits.test.mjs`
-checks the Kepler solver against RK4 integration, and `tests/mission.test.mjs`
-is an autopilot that flies the stock rocket through the *entire mission* —
-ascent guidance, circularization, phase-angle transfer, SOI capture, powered
-descent — using the same physics code the game runs.
+- **Vehicle assembly** — stack parts, radial boosters, auto-staging, Δv / TWR / burn time, craft save/load.
+- **Flight physics** — RK4, Isp(pressure), atmosphere, drag + CoP, reaction wheels, gimbal, SAS.
+- **Orbital mechanics** — Kepler elements, elliptic and hyperbolic propagation, time warp (physics to 4×, on-rails to 100,000×).
+- **Thermodynamics, staging, landing, cockpit** — as in upstream.
+
+这个 fork 把「只有 Kerbin↔Mun」扩成了太阳系树：
+
+- 天体状态相对父星；`checkSOI` / `findEncounter` 对任意子星通用。
+- 霍曼：`hohmannTransfer('kerbin','duna')`、`ejectionDeltaV`、`planetPhaseDeg`。
+- 地图跟当前 SOI：Kerbin 能看见 Mun 和 Minmus，太阳轨道能看见 Duna。
+
+尺度仍是 KSP（Kerbin R=600 km，Mun 12,000 km）。CPU 双精度 + floating origin。`tests/orbits.test.mjs` 对 RK4，`tests/system.test.mjs` 锁 Mun 轨道数，`tests/hohmann.test.mjs` 锁 Duna 窗口，`tests/mission.test.mjs` 仍是原版登月自动驾驶。
 
 ## Controls
 
@@ -63,22 +57,12 @@ descent — using the same physics code the game runs.
 
 ## How to land on the Mun (stock "Mun Express")
 
-1. **Launch** — `Space`, full throttle. At ~80 m/s start a gentle eastward tip
-   (the navball's 90° meridian); follow prograde. Aim to be ~45° over by 12 km.
-2. **Orbit** — cut engines when apoapsis (map view) reads ~80 km. Coast to Ap,
-   burn prograde until periapsis leaves the atmosphere. ~75×75 km is lovely.
-3. **Transfer** — watch *Mun phase ∠* in the orbit panel. When it ticks down to
-   the *burn at* value (~117°), point prograde and burn until the map shows a
-   Mun encounter; nudge until *Mun Pe* reads 15–30 km. Warp (`.`) to the SOI.
-4. **Capture & land** — at Mun periapsis, burn retrograde until captured, keep
-   burning to kill orbital speed. Deploy legs (`G`), SAS retrograde (`3`), and
-   ride the throttle: keep speed under ~alt/15, touch down under 10 m/s.
-5. **Home** — launch eastward into low Mun orbit, burn prograde on the
-   Kerbin-facing side until you escape with a Kerbin periapsis of **30–45 km**.
-   Warp home, arm chutes (`P`), and let the atmosphere do the rest.
+和原版一样：东向入轨，等 Mun phase 到 *burn at*，霍曼到 Mun Pe 15–30 km，捕获后腿着陆。回家时 Kerbin Pe 瞄准 30–45 km。细节见上游 README 和 `ROUNDTRIP_LOG.md`。
 
-## Not in v1 (deliberately)
+## 接下来
 
-Maneuver-node editor, docking/rendezvous, EVA, career mode, other planets,
-planetary rotation. The orbital core supports more bodies — add an entry to
-`BODIES` and a height function if you want Minmus.
+还要在这套 patched conics 上继续做：更稳的入轨/再入、更好的中途修正、更多天体、agent 用的飞行接口。原版没做的机动节点、对接、EVA、生涯模式，也还没有。
+
+## License / credit
+
+原版版权和许可以 [dgreenheck/moonshot](https://github.com/dgreenheck/moonshot) 为准。本 fork 的新增代码同样归在这个仓库里，并明确致谢 Daniel Greenheck。

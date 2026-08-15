@@ -7,7 +7,7 @@ tags: [api, mcp]
 
 # MCP tools
 
-agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 34 个。
+agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 38 个。
 
 | 工具 | 含义 |
 |---|---|
@@ -45,6 +45,10 @@ agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 34 个。
 | ksp_map | 开关地图 |
 | ksp_camera | 轨道相机方位/俯仰/距离 |
 | ksp_lang | 切 UI 语言 en / zh |
+| ksp_save | F5 / 存档：整局写入 mcp/saves/ |
+| ksp_load | F9 / 读档：整局读回 |
+| ksp_saves_list | 列出游戏存档槽 |
+| ksp_saves_delete | 删除游戏存档槽 |
 
 ## 边界
 

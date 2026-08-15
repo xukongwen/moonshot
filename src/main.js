@@ -4,7 +4,12 @@
 import * as THREE from 'three/webgpu';
 import { VAB } from './vab.js';
 import { Flight } from './flight.js';
+import { HUD } from './hud.js';
 import { getLang, setLang, onLangChange, applyStaticI18n, t, otherLangLabel } from './i18n.js';
+import {
+  buildSave, validateSave, snapshotFromState, QUICKSAVE_NAME,
+  listBrowserSaves, writeBrowserSave, readBrowserSave,
+} from './save.js';
 
 const app = document.getElementById('app');
 
@@ -78,7 +83,153 @@ async function boot() {
   });
   vab.show();
 
-  window.__moonshot = { flight, vab, setLang, getLang };
+  const $ = (id) => document.getElementById(id);
+  const CRAFT_KEY = 'moonshot-crafts';
+
+  function collectCrafts() {
+    try {
+      const data = JSON.parse(localStorage.getItem(CRAFT_KEY) ?? '{}');
+      return data && typeof data === 'object' && !Array.isArray(data) ? data : {};
+    } catch { return {}; }
+  }
+
+  function restoreCrafts(crafts) {
+    if (!crafts || typeof crafts !== 'object' || Array.isArray(crafts)) return;
+    try {
+      const all = collectCrafts();
+      Object.assign(all, crafts);
+      localStorage.setItem(CRAFT_KEY, JSON.stringify(all));
+    } catch { /* private mode */ }
+  }
+
+  function refreshSaveSelects() {
+    const names = listBrowserSaves();
+    for (const id of ['save-select', 'flight-save-select']) {
+      const sel = $(id);
+      if (!sel) continue;
+      const prev = sel.value;
+      while (sel.options.length > 1) sel.remove(1);
+      for (const name of names) {
+        const o = document.createElement('option');
+        o.value = name;
+        o.textContent = name;
+        sel.appendChild(o);
+      }
+      if (names.includes(prev)) sel.value = prev;
+    }
+  }
+
+  function saveFeedback(msg) {
+    if (mode === 'flight' && flight.active) HUD.msg(msg);
+    else {
+      const info = $('part-info');
+      if (info) info.textContent = msg;
+    }
+  }
+
+  function captureGameSave(name) {
+    const workshop = {
+      name: vab.design.name,
+      stack: [...vab.design.stack],
+      radials: structuredClone(vab.design.radials),
+      selected: vab.selected,
+    };
+    let flightBlock = null;
+    let saveMode = mode;
+    if (mode === 'flight' && flight.active && flight.st) {
+      saveMode = 'flight';
+      const design = structuredClone(flight.design);
+      flightBlock = {
+        craftName: design?.name ?? '',
+        design: {
+          name: design?.name ?? '',
+          stack: [...(design?.stack ?? [])],
+          radials: structuredClone(design?.radials ?? []),
+        },
+        snapshot: snapshotFromState(flight.st, { tag: name, craft: design?.name }),
+        stageIdx: flight.stageIndex,
+        warpIdx: flight.warpIdx,
+        sas: !!flight.st.sas,
+        sasMode: flight.st.sasMode ?? 'hold',
+        controls: { ...(flight.st.controls ?? { pitch: 0, yaw: 0, roll: 0 }) },
+        mapOpen: !!flight.mapOpen,
+        cam: { ...flight.camCtl },
+        liftedOff: !!flight.flags?.liftoff,
+      };
+    }
+    return buildSave({
+      name,
+      mode: saveMode,
+      lang: getLang(),
+      workshop,
+      crafts: collectCrafts(),
+      flight: flightBlock,
+    });
+  }
+
+  function applyGameSave(doc) {
+    validateSave(doc);
+    restoreCrafts(doc.crafts);
+    vab.applyWorkshop(doc.workshop);
+    vab.refreshLoadList();
+    if (doc.lang === 'en' || doc.lang === 'zh') setLang(doc.lang);
+
+    if (doc.mode === 'flight' && doc.flight?.design) {
+      vab.hide();
+      mode = 'flight';
+      flight.sound.ensure();
+      flight.start(structuredClone(doc.flight.design));
+      if (doc.flight.snapshot) flight.applySnapshot(doc.flight.snapshot);
+      flight.applyGameExtras(doc.flight);
+    } else if (mode === 'flight') {
+      flight.stop();
+      mode = 'vab';
+      vab.show();
+    }
+    refreshSaveSelects();
+    return doc;
+  }
+
+  function saveGame(name) {
+    const n = String(name ?? '').trim();
+    if (!n) {
+      saveFeedback(t('save.needName'));
+      return null;
+    }
+    const doc = captureGameSave(n);
+    writeBrowserSave(n, doc);
+    refreshSaveSelects();
+    saveFeedback(t('save.saved', { name: n }));
+    return doc;
+  }
+
+  function loadGame(name) {
+    const n = String(name ?? '').trim();
+    if (!n) {
+      saveFeedback(t('save.none'));
+      return null;
+    }
+    const doc = readBrowserSave(n);
+    applyGameSave(doc);
+    saveFeedback(t('save.loaded', { name: n }));
+    return doc;
+  }
+
+  function typedSaveName() {
+    return ($('save-name')?.value || '').trim();
+  }
+
+  function selectedSaveName() {
+    return ($('flight-save-select')?.value || $('save-select')?.value || '').trim();
+  }
+
+  $('btn-game-save').onclick = () => saveGame(typedSaveName());
+  $('save-select').onchange = (e) => { if (e.target.value) loadGame(e.target.value); };
+  $('btn-flight-save').onclick = () => saveGame(typedSaveName() || QUICKSAVE_NAME);
+  $('flight-save-select').onchange = (e) => { if (e.target.value) loadGame(e.target.value); };
+  refreshSaveSelects();
+
+  window.__moonshot = { flight, vab, setLang, getLang, saveGame, loadGame };
 
   document.getElementById('btn-lang').onclick = toggleLang;
   document.getElementById('btn-lang-flight').onclick = toggleLang;
@@ -91,9 +242,23 @@ async function boot() {
   });
 
   addEventListener('keydown', (e) => {
-    if (e.code !== 'KeyL') return;
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
-    toggleLang();
+    const typing = e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA';
+    if (e.code === 'KeyL') {
+      if (typing) return;
+      toggleLang();
+      return;
+    }
+    if (e.code === 'F5') {
+      e.preventDefault();
+      if (typing && e.target.id === 'save-name') return;
+      saveGame(QUICKSAVE_NAME);
+      return;
+    }
+    if (e.code === 'F9') {
+      e.preventDefault();
+      if (typing && e.target.id === 'save-name') return;
+      loadGame(selectedSaveName() || QUICKSAVE_NAME);
+    }
   });
 
   // VAB camera drag

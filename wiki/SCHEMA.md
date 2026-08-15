@@ -26,6 +26,7 @@ wiki/adr/                      决策
 wiki/modules/                  子系统真相
 wiki/missions/                 已飞任务指针，不是全文日志
 wiki/api/                      agent 可读 MCP 目录
+wiki/releases/                 预发布说明（0.era.build）
 
 ## 页形
 

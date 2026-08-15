@@ -14,18 +14,18 @@ tags: [mcp, vab]
 ## 当前判断
 
 stdio 入口是 mcp/server.mjs（还不是 Cursor connector）。
-DOM-free 车间：mcp/workshop.mjs。无头存档在 mcp/crafts.json。浏览器 VAB 用 localStorage 键 moonshot-crafts。两套仓库，不要混。
+DOM-free 车间：mcp/workshop.mjs。无头飞船在 mcp/crafts.json。浏览器 VAB 用 localStorage 键 moonshot-crafts。整局游戏存档另见 mcp/saves/ 与 moonshot-saves。不要混。
 发射校验：必须有 command pod 和 engine。
 测试 tests/workshop.test.mjs 会从空车间重建 Mun Express。
 
-34 个工具：ksp_new_flight, ksp_telemetry, ksp_stage, ksp_throttle, ksp_sas, ksp_point, ksp_controls, ksp_legs, ksp_chutes, ksp_step, ksp_parts, ksp_vab_get, ksp_vab_set_name, ksp_vab_clear, ksp_vab_select, ksp_vab_add_part, ksp_vab_remove_part, ksp_vab_move_part, ksp_vab_add_radial, ksp_vab_remove_radial, ksp_vab_stock, ksp_vab_save, ksp_vab_list, ksp_vab_load, ksp_vab_delete, ksp_vab_launch, ksp_vab_stats, ksp_coast, ksp_warp, ksp_revert, ksp_relaunch, ksp_map, ksp_camera, ksp_lang。
+38 个工具：原 34 个加上 ksp_save、ksp_load、ksp_saves_list、ksp_saves_delete（整局存档，见 modules/saves.md）。ksp_vab_save 仍只存飞船。
 
 ## 关键入口
 
 工具表：wiki/api/mcp-tools.md
 车间：mcp/workshop.mjs
 会话：mcp/session.mjs
-测试：tests/workshop.test.mjs
+测试：tests/workshop.test.mjs · tests/saves.test.mjs
 
 ## 边界
 

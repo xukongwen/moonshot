@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-15T11:04:42.033Z",
+  "generatedAt": "2026-08-15T11:36:08.925Z",
   "activeCap": 15,
   "logKeepDays": 14,
   "entries": [
@@ -37,7 +37,7 @@
       "summaryOneLiner": "永远说中文。不要把整份 log 或 index 变更流水倒进聊天。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:02:29.332Z",
+      "mtime": "2026-08-15T11:35:16.305Z",
       "compactionState": "full"
     },
     {
@@ -46,10 +46,10 @@
       "memoryTier": "active",
       "memoryStatus": "living",
       "decayClass": "protocol",
-      "summaryOneLiner": "agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 34 个。",
+      "summaryOneLiner": "agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 38 个。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:03:07.727Z",
+      "mtime": "2026-08-15T11:26:50.852Z",
       "compactionState": "full"
     },
     {
@@ -61,7 +61,7 @@
       "summaryOneLiner": "先读 [`active-memory.md`](./active-memory.md)、[`memory-registry.json`](./memory-registry.json)、[`lint-report.md`](./lint-report.md)。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:04:31.891Z",
+      "mtime": "2026-08-15T11:35:40.721Z",
       "compactionState": "full"
     },
     {
@@ -73,7 +73,7 @@
       "summaryOneLiner": "<!-- wiki-auto-curator:near-window -->",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:04:31.891Z",
+      "mtime": "2026-08-15T11:35:40.721Z",
       "compactionState": "full"
     },
     {
@@ -133,7 +133,7 @@
       "summaryOneLiner": "说明无头 MCP 如何覆盖原版人类操作：飞行、VAB、地图、语言。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:02:45.375Z",
+      "mtime": "2026-08-15T11:26:50.852Z",
       "compactionState": "full"
     },
     {
@@ -149,6 +149,30 @@
       "compactionState": "full"
     },
     {
+      "path": "wiki/modules/saves.md",
+      "title": "saves",
+      "memoryTier": "active",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "说明整局游戏存档（session），不是飞船文件。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-15T11:26:50.852Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/modules/versioning.md",
+      "title": "versioning",
+      "memoryTier": "active",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "说明 Moonshot 的长期预发布版本：`0.<era>.<build>`。agent 只加 build，不把中间位当成经典 Semver 的 minor。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-15T11:35:16.305Z",
+      "compactionState": "full"
+    },
+    {
       "path": "wiki/Moonshot 宪法.md",
       "title": "Moonshot 宪法",
       "memoryTier": "active",
@@ -161,6 +185,30 @@
       "compactionState": "full"
     },
     {
+      "path": "wiki/releases/v0.1.1.md",
+      "title": "v0.1.1",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "episodic",
+      "summaryOneLiner": "记录预发布 `v0.1.1`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-15T11:23:04.677Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/releases/v0.1.2.md",
+      "title": "v0.1.2",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "episodic",
+      "summaryOneLiner": "记录预发布 `v0.1.2`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-15T11:36:04.845Z",
+      "compactionState": "full"
+    },
+    {
       "path": "wiki/SCHEMA.md",
       "title": "Wiki SCHEMA",
       "memoryTier": "cold",
@@ -169,7 +217,7 @@
       "summaryOneLiner": "规定 Moonshot wiki 的目录、页形和收尾同步。Wiki 编译知识，不替代代码。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:02:24.816Z",
+      "mtime": "2026-08-15T11:22:37.961Z",
       "compactionState": "full"
     },
     {

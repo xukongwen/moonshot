@@ -16,6 +16,9 @@
         <input id="craft-name" value="Untitled Craft" spellcheck="false" />
         <button id="btn-save" data-i18n="vab.save">Save</button>
         <select id="load-select" data-i18n-placeholder="vab.load"><option value="">Load craft…</option></select>
+        <input id="save-name" spellcheck="false" data-i18n-placeholder="save.game" placeholder="Save game" />
+        <button id="btn-game-save" data-i18n="save.game">Save game</button>
+        <select id="save-select" data-i18n-placeholder="save.load"><option value="">Load game…</option></select>
         <button id="btn-clear" data-i18n="vab.clear">Clear</button>
         <span class="spacer"></span>
         <button id="btn-stock-hopper" class="ghost" data-i18n="vab.stockHopper">Stock: Suborbital Hopper</button>
@@ -62,6 +65,8 @@
         <button id="btn-map" data-i18n="flight.map">Map [M]</button>
         <button id="btn-help" data-i18n="flight.keys">Keys [H]</button>
         <button id="btn-lang-flight" class="ghost">中文</button>
+        <button id="btn-flight-save" data-i18n="save.game">Save game</button>
+        <select id="flight-save-select" data-i18n-placeholder="save.load"><option value="">Load game…</option></select>
         <button id="btn-revert" class="danger" data-i18n="flight.revert">Revert to VAB</button>
       </div>
 
@@ -125,6 +130,8 @@
           <tr><td>, / .</td><td data-i18n="flight.help.warp">time warp down / up</td></tr>
           <tr><td>M</td><td data-i18n="flight.help.map">map view</td></tr>
           <tr><td>L</td><td data-i18n="flight.help.lang">toggle language</td></tr>
+          <tr><td>F5</td><td data-i18n="flight.help.f5">quicksave</td></tr>
+          <tr><td>F9</td><td data-i18n="flight.help.f9">load save</td></tr>
           <tr><td>Mouse drag / wheel</td><td data-i18n="flight.help.camera">camera</td></tr>
         </table>
         <div class="dim" data-i18n="flight.helpRails">Rails warp (&gt;4×) needs engines off and to be out of the atmosphere.</div>

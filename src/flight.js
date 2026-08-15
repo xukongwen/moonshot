@@ -280,6 +280,29 @@ export class Flight {
     return true;
   }
 
+  /** After start(design) + applySnapshot, restore stage/warp/sas/cam/map. */
+  applyGameExtras(block) {
+    if (!this.st || !block) return;
+    if (block.stageIdx != null) this.stageIndex = Number(block.stageIdx) || 0;
+    if (block.warpIdx != null) this.setWarp(Number(block.warpIdx) || 0);
+    if (block.sas != null) this.st.sas = !!block.sas;
+    if (block.sasMode) this.st.sasMode = block.sasMode;
+    if (block.controls) {
+      this.st.controls.pitch = block.controls.pitch ?? 0;
+      this.st.controls.yaw = block.controls.yaw ?? 0;
+      this.st.controls.roll = block.controls.roll ?? 0;
+    }
+    if (block.mapOpen != null && !!block.mapOpen !== this.mapOpen) this.toggleMap();
+    if (block.cam) {
+      if (block.cam.az != null) this.camCtl.az = Number(block.cam.az);
+      if (block.cam.el != null) this.camCtl.el = Number(block.cam.el);
+      if (block.cam.dist != null) this.camCtl.dist = Number(block.cam.dist);
+    }
+    if (block.liftedOff != null && this.flags) this.flags.liftoff = !!block.liftedOff;
+    HUD.stages(this.plan, this.stageIndex, this.st.parts, this.st.sections);
+    this.refreshHUD();
+  }
+
   inferStageIndex() {
     if (!this.plan?.length) { this.stageIndex = 0; return; }
     this.stageIndex = 0;

@@ -8,6 +8,7 @@ import { resolve } from 'node:path';
 import { SimSession, WARP_LEVELS } from './session.mjs';
 import { listPartsCatalog } from './workshop.mjs';
 import { STOCK } from '../src/stock.js';
+import { listSaves, writeSave, readSave, deleteSave } from './saves.mjs';
 
 const session = new SimSession();
 
@@ -342,6 +343,44 @@ export const TOOLS = [
       required: ['lang'],
     },
   },
+  {
+    name: 'ksp_save',
+    description: 'F5 / 存档 — save the whole session (VAB workshop, user crafts, and flight if any) to mcp/saves/. Not a craft file.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Save slot name' },
+      },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'ksp_load',
+    description: 'F9 / 读档 — load a named game save (workshop + crafts + flight). Not ksp_vab_load.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Save slot name' },
+      },
+      required: ['name'],
+    },
+  },
+  {
+    name: 'ksp_saves_list',
+    description: 'List game save slots in mcp/saves/.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_saves_delete',
+    description: 'Delete a named game save slot from mcp/saves/.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: 'Save slot name' },
+      },
+      required: ['name'],
+    },
+  },
 ];
 
 function log(...args) {
@@ -443,6 +482,23 @@ export function callTool(name, args = {}) {
     case 'ksp_lang':
       if (args.lang == null) throw new Error('ksp_lang requires lang (en|zh)');
       return session.setLang(args.lang);
+
+    case 'ksp_save':
+      if (args.name == null || String(args.name).trim() === '') {
+        throw new Error('ksp_save requires name');
+      }
+      {
+        const doc = session.captureSave(args.name);
+        return { ...writeSave(args.name, doc), mode: doc.mode };
+      }
+    case 'ksp_load':
+      if (args.name == null) throw new Error('ksp_load requires name');
+      return session.applySave(readSave(args.name));
+    case 'ksp_saves_list':
+      return { saves: listSaves() };
+    case 'ksp_saves_delete':
+      if (args.name == null) throw new Error('ksp_saves_delete requires name');
+      return deleteSave(args.name);
     default:
       throw new Error(`Unknown tool: ${name}`);
   }

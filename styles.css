@@ -42,7 +42,9 @@ h3 { font-size: 11px; letter-spacing: 0.12em; color: #7e93b0; margin: 10px 0 6px
   position: absolute; top: 10px; left: 10px; right: 10px; height: 46px;
   display: flex; align-items: center; gap: 8px; padding: 0 12px;
 }
-#craft-name { width: 180px; }
+#craft-name { width: 140px; }
+#save-name { width: 96px; }
+#save-select, #flight-save-select { max-width: 120px; }
 #vab-left {
   position: absolute; top: 66px; left: 10px; bottom: 10px; width: 250px;
   padding: 10px; display: flex; flex-direction: column;

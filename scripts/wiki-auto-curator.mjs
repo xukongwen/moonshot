@@ -38,6 +38,8 @@ const FORCE_ACTIVE = [
   "wiki/modules/hohmann.md",
   "wiki/modules/mcp.md",
   "wiki/modules/i18n.md",
+  "wiki/modules/versioning.md",
+  "wiki/modules/saves.md",
   "wiki/adr/2026-08-15-parent-relative-body-state.md",
   "wiki/adr/2026-08-15-ejection-asymptote.md",
   "wiki/api/mcp-tools.md",
@@ -51,6 +53,7 @@ const LINT_SKIP_PREFIXES = [
   "wiki/receipts/",
   "wiki/debt/",
   "wiki/inbox/",
+  "wiki/releases/",
   "wiki/digest/_template.md",
 ];
 
@@ -114,6 +117,9 @@ function classify(rel, text) {
     return { decayClass: "protocol", memoryTier: "cold", memoryStatus: "living" };
   }
   if (rel === "wiki/log.md" || rel.startsWith("wiki/log/") || rel.startsWith("wiki/index-changelog/")) {
+    return { decayClass: "episodic", memoryTier: "cold", memoryStatus: "living" };
+  }
+  if (rel.startsWith("wiki/releases/")) {
     return { decayClass: "episodic", memoryTier: "cold", memoryStatus: "living" };
   }
   if (rel === "wiki/index.md") {

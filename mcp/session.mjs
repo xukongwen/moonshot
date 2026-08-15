@@ -10,6 +10,8 @@ import { elementsFromState, propagate, findMunEncounter, munTransferPhase } from
 import { heightAt } from '../src/terrain.js';
 import { setLang } from '../src/i18n.js';
 import { Workshop } from './workshop.mjs';
+import { serializeSnapshot, applySnapshotToState } from './snapshot.mjs';
+import { buildSave, validateSave } from '../src/save.js';
 
 const Y = new Vector3(0, 1, 0);
 const STEP_CAP_S = 120;
@@ -464,5 +466,114 @@ export class SimSession {
     tlm.stepped_s = st.t - t0;
     tlm.coast = 'rails';
     return tlm;
+  }
+
+  captureSave(name) {
+    const slot = String(name ?? '').trim();
+    if (!slot) throw new Error('captureSave requires name');
+    const w = this.workshop.snapshot();
+    const workshop = {
+      name: w.name,
+      stack: w.stack,
+      radials: w.radials,
+      selected: w.selected,
+    };
+    const crafts = {};
+    for (const [k, v] of Object.entries(this.workshop.readAll())) {
+      crafts[k] = {
+        name: v.name ?? k,
+        stack: [...(v.stack ?? [])],
+        radials: structuredClone(v.radials ?? []),
+      };
+    }
+    let flight = null;
+    let mode = 'vab';
+    if (this.hasFlight()) {
+      mode = 'flight';
+      const designSrc = this.lastDesign ?? this.workshop.design;
+      const design = {
+        name: designSrc.name ?? this.craftName ?? '',
+        stack: [...(designSrc.stack ?? [])],
+        radials: structuredClone(designSrc.radials ?? []),
+      };
+      flight = {
+        craftName: this.craftName ?? design.name ?? '',
+        design,
+        snapshot: serializeSnapshot(this.st, { tag: slot, craft: this.craftName }),
+        stageIdx: this.stageIdx,
+        warpIdx: this.warpIdx,
+        sas: !!this.st.sas,
+        sasMode: this.st.sasMode ?? 'hold',
+        controls: {
+          pitch: this.st.controls?.pitch ?? 0,
+          yaw: this.st.controls?.yaw ?? 0,
+          roll: this.st.controls?.roll ?? 0,
+        },
+        mapOpen: !!this.mapOpen,
+        cam: { ...this.cam },
+        liftedOff: !!this.liftedOff,
+      };
+    }
+    return buildSave({
+      name: slot,
+      mode,
+      lang: this.lang,
+      workshop,
+      crafts,
+      flight,
+    });
+  }
+
+  applySave(doc) {
+    validateSave(doc);
+    const w = doc.workshop;
+    this.workshop.design = {
+      name: w.name ?? '',
+      stack: Array.isArray(w.stack) ? [...w.stack] : [],
+      radials: Array.isArray(w.radials) ? structuredClone(w.radials) : [],
+    };
+    const sel = Number(w.selected);
+    this.workshop.selected = Number.isInteger(sel) ? sel : -1;
+    if (this.workshop.selected >= this.workshop.design.stack.length) {
+      this.workshop.selected = this.workshop.design.stack.length - 1;
+    }
+
+    if (doc.crafts && typeof doc.crafts === 'object' && !Array.isArray(doc.crafts)) {
+      const all = this.workshop.readAll();
+      for (const [k, v] of Object.entries(doc.crafts)) {
+        if (v && typeof v === 'object') all[k] = structuredClone(v);
+      }
+      this.workshop.writeAll(all);
+    }
+
+    if (doc.lang === 'en' || doc.lang === 'zh') this.setLang(doc.lang);
+
+    if (doc.mode === 'flight' && doc.flight?.design) {
+      const f = doc.flight;
+      this.newFlightFromDesign(f.design);
+      if (f.craftName) this.craftName = f.craftName;
+      if (f.snapshot) applySnapshotToState(this.st, f.snapshot);
+      this.refreshMass();
+      if (f.stageIdx != null) this.stageIdx = Number(f.stageIdx) || 0;
+      if (f.warpIdx != null) this.warpIdx = Number(f.warpIdx) || 0;
+      if (f.sas != null) this.st.sas = !!f.sas;
+      if (f.sasMode) this.st.sasMode = f.sasMode;
+      if (f.controls) {
+        this.st.controls.pitch = f.controls.pitch ?? 0;
+        this.st.controls.yaw = f.controls.yaw ?? 0;
+        this.st.controls.roll = f.controls.roll ?? 0;
+      }
+      if (f.mapOpen != null) this.mapOpen = !!f.mapOpen;
+      if (f.cam) {
+        if (f.cam.az != null) this.cam.az = Number(f.cam.az);
+        if (f.cam.el != null) this.cam.el = Number(f.cam.el);
+        if (f.cam.dist != null) this.cam.dist = Number(f.cam.dist);
+      }
+      if (f.liftedOff != null) this.liftedOff = !!f.liftedOff;
+      return this.telemetry();
+    }
+
+    this.revert();
+    return this.workshop.snapshot();
   }
 }

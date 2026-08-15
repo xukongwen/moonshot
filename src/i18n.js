@@ -41,6 +41,16 @@ export const STRINGS = {
     'vab.munHint': 'Mun round trip needs roughly 5,800–7,000 m/s and pad TWR > 1.2',
     'vab.fuelKg': '{n} kg fuel',
 
+    'save.game': 'Save game',
+    'save.load': 'Load game…',
+    'save.quick': 'Quicksave',
+    'save.saved': 'Saved “{name}”.',
+    'save.loaded': 'Loaded “{name}”.',
+    'save.none': 'No save selected.',
+    'save.needName': 'Name the save first.',
+    'flight.help.f5': 'quicksave',
+    'flight.help.f9': 'load save',
+
     'cat.Pods': 'Pods',
     'cat.Tanks': 'Tanks',
     'cat.Engines': 'Engines',
@@ -216,6 +226,16 @@ export const STRINGS = {
     'vab.totalDv': '总Δv（真空）：',
     'vab.munHint': '缪恩往返大约需要 5,800–7,000 m/s，发射台推重比 > 1.2',
     'vab.fuelKg': '{n} kg 燃料',
+
+    'save.game': '存档',
+    'save.load': '读档',
+    'save.quick': '快速存档',
+    'save.saved': '已存档“{name}”。',
+    'save.loaded': '已读档“{name}”。',
+    'save.none': '没有选中的存档。',
+    'save.needName': '请先填写存档名。',
+    'flight.help.f5': '快速存档',
+    'flight.help.f9': '读取存档',
 
     'cat.Pods': '指令舱',
     'cat.Tanks': '燃料箱',

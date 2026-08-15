@@ -4,8 +4,8 @@
 
 | 字段 | 值 |
 |---|---|
-| 生成时间 | 2026-08-15T11:04:42.033Z |
-| 条数 | 9 / 15 |
+| 生成时间 | 2026-08-15T11:36:08.925Z |
+| 条数 | 11 / 15 |
 | Registry | [memory-registry.json](./memory-registry.json) |
 | 计划 | [Wiki Auto-Curator 架构.md](./Wiki%20Auto-Curator%20架构.md) |
 
@@ -17,9 +17,11 @@
 - [hohmann](./modules/hohmann.md) — 记录 Kerbin 到 Duna 霍曼窗口、逃逸点火约定，以及已飞通的一次捕获。
 - [mcp](./modules/mcp.md) — 说明无头 MCP 如何覆盖原版人类操作：飞行、VAB、地图、语言。
 - [i18n](./modules/i18n.md) — 说明界面英中切换怎么存、怎么切，以及零件名不翻译。
+- [versioning](./modules/versioning.md) — 说明 Moonshot 的长期预发布版本：`0.<era>.<build>`。agent 只加 build，不把中间位当成经典 Semver 的 minor。
+- [saves](./modules/saves.md) — 说明整局游戏存档（session），不是飞船文件。
 - [ADR：getBodyState 保持父星相对](./adr/2026-08-15-parent-relative-body-state.md) — 锁定天体状态坐标系，避免为了「太阳系惯性」拆掉 Mun Express。
 - [ADR：逃逸点火对准双曲线渐近线](./adr/2026-08-15-ejection-asymptote.md) — 锁定 TDI 点火相位，避免在几何 midnight 烧出一条错过 Duna 的双曲线。
-- [MCP tools](./api/mcp-tools.md) — agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 34 个。
+- [MCP tools](./api/mcp-tools.md) — agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 38 个。
 
 ## 读取协议
 

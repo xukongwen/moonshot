@@ -63,6 +63,11 @@ node mcp/systemtour.mjs     # 入轨、Minmus、逃出 Kerbin
 
 还要在这套 patched conics 上继续做：更稳的入轨/再入、更好的中途修正、更多天体、agent 用的飞行接口。原版没做的机动节点、对接、EVA、生涯模式，也还没有。
 
+
+## 版本
+
+`0.1.N` 预发布（非正式版）。记录见 [CHANGELOG.md](./CHANGELOG.md)。较大功能后：`npm run release`。
+
 ## Wiki
 
 `wiki/` 是 agent 的长期记忆，不是给人翻的说明书。新会话从 `wiki/active-memory.md` 开始。整理用 package.json 里的 `wiki:curator` 脚本。

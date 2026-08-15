@@ -32,6 +32,8 @@ const force = [
   "wiki/modules/hohmann.md",
   "wiki/modules/mcp.md",
   "wiki/modules/i18n.md",
+  "wiki/modules/versioning.md",
+  "wiki/modules/saves.md",
   "wiki/adr/2026-08-15-parent-relative-body-state.md",
   "wiki/adr/2026-08-15-ejection-asymptote.md",
   "wiki/api/mcp-tools.md",

@@ -259,6 +259,20 @@ export class VAB {
     this.refresh();
   }
 
+  /** Restore workshop fields from a game save (not a craft file). */
+  applyWorkshop(workshop) {
+    const w = workshop || {};
+    this.design = {
+      name: w.name || t('vab.untitled'),
+      stack: Array.isArray(w.stack) ? [...w.stack] : [],
+      radials: Array.isArray(w.radials) ? structuredClone(w.radials) : [],
+    };
+    this.selected = Number.isInteger(w.selected) ? w.selected : -1;
+    if (this.selected >= this.design.stack.length) this.selected = this.design.stack.length - 1;
+    $('craft-name').value = this.design.name;
+    this.refresh();
+  }
+
   launch() {
     const parts = buildVesselParts(this.design);
     if (!parts.some((p) => p.def.pod)) {

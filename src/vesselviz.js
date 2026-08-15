@@ -127,6 +127,17 @@ export function buildPartMesh(p) {
       g.add(disc);
       break;
     }
+    case 'rcs': {
+      g.add(cyl(r * 0.42, r * 0.42, L, BLUE));
+      for (let i = 0; i < 4; i++) {
+        const noz = cyl(0.05, 0.07, 0.16, DARK);
+        const a = (i / 4) * Math.PI * 2;
+        noz.rotation.z = Math.PI / 2;
+        noz.position.set(Math.cos(a) * r * 0.48, 0, Math.sin(a) * r * 0.48);
+        g.add(noz);
+      }
+      break;
+    }
     default:
       g.add(cyl(r, r, L, GRAY));
   }

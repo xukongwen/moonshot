@@ -33,6 +33,7 @@ const FORCE_ACTIVE_SET = new Set();
 
 const FORCE_ACTIVE = [
   "wiki/Moonshot 宪法.md",
+  "wiki/交汇对接架构计划.md",
   "wiki/Wiki Auto-Curator 架构.md",
   "wiki/modules/patched-conics.md",
   "wiki/modules/hohmann.md",

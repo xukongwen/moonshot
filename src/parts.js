@@ -87,6 +87,18 @@ export const PARTS = {
     dragArea: 0.5, maxTemp: 1400, shape: 'adapter',
     desc: 'Tapers a 2.5 m stack to 1.25 m.',
   },
+  'dock-port-s': {
+    name: 'DP-12 Docking Port', category: 'Coupling', size: 1.25, mass: 50, length: 0.35,
+    dock: { size: 1.25 }, dragArea: 0.1, maxTemp: 1400, shape: 'decoupler',
+    desc: '1.25 m stack docking port. Same-size capture only.',
+  },
+
+  // ---- RCS ----
+  'rcs-block': {
+    name: 'RV-2 RCS Block', category: 'Utility', size: 1.25, mass: 80, length: 0.4,
+    rcs: { thrust: 2000 }, radial: true, dragArea: 0.15, maxTemp: 1400, shape: 'rcs',
+    desc: '2 kN translation thruster. v1 uses no monoprop — the part must be on the vessel.',
+  },
 
   // ---- Aero & utility ----
   'nose-cone': {

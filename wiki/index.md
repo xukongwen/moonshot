@@ -14,12 +14,17 @@
 - 宪法：Moonshot 宪法.md
 - 规则：AGENTS.md · SCHEMA.md
 - 整理：Wiki Auto-Curator 架构.md
+- 计划：交汇对接架构计划.md
 - 模块：modules/patched-conics.md · modules/hohmann.md · modules/mcp.md · modules/i18n.md · modules/versioning.md · modules/saves.md
 - 决策：adr/2026-08-15-parent-relative-body-state.md · adr/2026-08-15-ejection-asymptote.md
 - 工具：api/mcp-tools.md
 - 任务：missions/duna-hohmann.md · missions/mun-express.md
 
 ## 当前入口
+
+- 发布 v0.1.3
+
+- 交汇对接：R1–R6 已落地（2336 m / 8.34 m/s，硬对接可分离），见 交汇对接架构计划.md
 
 - 发布 v0.1.2
 

@@ -13,7 +13,8 @@ tags: [save, mcp, vab, flight]
 
 ## 当前判断
 
-format 是 `moonshot-save`，formatVersion 1。文档含 workshop、crafts 袋、以及 flight（mode=flight 时）。
+format 是 `moonshot-save`，formatVersion 2（仍读 v1 单船 `flight`）。
+v2 飞行另有 `vessels[]`、`activeId`、`targetId`、`weld`、`dockState`。v1 只有单个 `flight`，读入后变成一艘船。
 Craft save ≠ game save：`ksp_vab_save` / localStorage `moonshot-crafts` 只存设计；`ksp_save` / `moonshot-saves` 存整局。
 无头槽位在 `mcp/saves/*.json`（gitignore，目录靠 .gitkeep）。浏览器用 localStorage 键 `moonshot-saves`。
 飞行块先还原 design 再套 snapshot（serializeSnapshot 字段），然后 stage / warp / sas / cam / map。

@@ -35,4 +35,5 @@ tags: [constitution]
 ## 已知问题
 
 - MCP stdio 服务器已有，尚未做成 Cursor connector。
-- 原版没有的机动节点、对接、EVA、生涯模式，这里也还没有。
+- 对接已做，见 `wiki/交汇对接架构计划.md`。
+- 原版没有的机动节点、EVA、生涯模式，这里也还没有。

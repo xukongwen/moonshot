@@ -158,6 +158,7 @@ function changelogCommits(commits) {
 }
 
 function writePackageVersion(next) {
+  // Game UI reads package.json via src/version.js — next release updates the top-bar label.
   const pkg = JSON.parse(fs.readFileSync(PKG_PATH, "utf8"));
   pkg.version = next;
   fs.writeFileSync(PKG_PATH, JSON.stringify(pkg, null, 2) + "\n");

@@ -10,11 +10,19 @@ import {
   buildSave, validateSave, snapshotFromState, QUICKSAVE_NAME,
   listBrowserSaves, writeBrowserSave, readBrowserSave,
 } from './save.js';
+import { VERSION } from './version.js';
 
 const app = document.getElementById('app');
 
 applyStaticI18n();
 document.title = t('title');
+
+function paintVersion() {
+  for (const el of document.querySelectorAll('[data-game-version]')) {
+    el.textContent = `v${VERSION}`;
+  }
+}
+paintVersion();
 
 function syncLangButtons() {
   const label = otherLangLabel();
@@ -157,6 +165,20 @@ async function boot() {
         liftedOff: !!flight.flags?.liftoff,
       };
     }
+    const vessels = (mode === 'flight' && flight.active && flight.vessels)
+      ? flight.vessels.map((v) => ({
+        id: v.id,
+        name: v.name,
+        design: {
+          name: v.design?.name ?? v.name ?? '',
+          stack: [...(v.design?.stack ?? [])],
+          radials: structuredClone(v.design?.radials ?? []),
+        },
+        snapshot: snapshotFromState(v.st, { tag: name, craft: v.name }),
+        stageIdx: v.stageIdx ?? 0,
+        liftedOff: !!v.liftedOff,
+      }))
+      : null;
     return buildSave({
       name,
       mode: saveMode,
@@ -164,6 +186,11 @@ async function boot() {
       workshop,
       crafts: collectCrafts(),
       flight: flightBlock,
+      vessels,
+      activeId: flight.activeId ?? null,
+      targetId: flight.targetId ?? null,
+      weld: flight.weld ?? null,
+      dockState: flight.dockState ?? 'free',
     });
   }
 
@@ -181,6 +208,27 @@ async function boot() {
       flight.start(structuredClone(doc.flight.design));
       if (doc.flight.snapshot) flight.applySnapshot(doc.flight.snapshot);
       flight.applyGameExtras(doc.flight);
+      if (Array.isArray(doc.vessels)) {
+        for (const rec of doc.vessels) {
+          if (!rec?.design || rec.id === (doc.activeId || 'active')) continue;
+          const v = flight.spawnOrbital(rec.design, {
+            name: rec.name, id: rec.id, body: rec.snapshot?.body || 'kerbin',
+            ap_m: 80_000, pe_m: 80_000, ta_deg: 0,
+          });
+          const s = rec.snapshot;
+          if (s?.pos && v?.st) {
+            v.st.pos.set(s.pos[0], s.pos[1], s.pos[2]);
+            v.st.vel.set(s.vel[0], s.vel[1], s.vel[2]);
+            if (s.quat) v.st.quat.set(s.quat[0], s.quat[1], s.quat[2], s.quat[3]);
+            v.st.body = s.body || v.st.body;
+            v.st.t = s.t ?? v.st.t;
+            v.st.landed = !!s.landed;
+          }
+        }
+        flight.targetId = doc.targetId ?? null;
+        flight.dockState = doc.dockState ?? 'free';
+        flight.refreshHUD?.();
+      }
     } else if (mode === 'flight') {
       flight.stop();
       mode = 'vab';
@@ -229,7 +277,14 @@ async function boot() {
   $('flight-save-select').onchange = (e) => { if (e.target.value) loadGame(e.target.value); };
   refreshSaveSelects();
 
-  window.__moonshot = { flight, vab, setLang, getLang, saveGame, loadGame };
+  function enterFlight(design) {
+    vab.hide();
+    mode = 'flight';
+    flight.sound.ensure();
+    flight.start(design);
+    return true;
+  }
+  window.__moonshot = { flight, vab, setLang, getLang, saveGame, loadGame, version: VERSION, enterFlight };
 
   document.getElementById('btn-lang').onclick = toggleLang;
   document.getElementById('btn-lang-flight').onclick = toggleLang;
@@ -245,6 +300,7 @@ async function boot() {
     const typing = e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA';
     if (e.code === 'KeyL') {
       if (typing) return;
+      if (mode === 'flight' && flight.active) return; // RCS right
       toggleLang();
       return;
     }

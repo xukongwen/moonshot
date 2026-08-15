@@ -53,6 +53,21 @@ export function physicsStep(st, dt, events) {
   }
   const extAcc = new THREE.Vector3().copy(thrustAcc).addScaledVector(dragF, 1 / Math.max(1, mp.m));
 
+  // RCS translate in body frame: +Y nose, +X right, +Z third axis. No fuel in v1.
+  const tr = st.translate;
+  if (tr && (tr.x || tr.y || tr.z)) {
+    let rcsN = 0;
+    for (const p of st.parts) {
+      if (p.alive && p.def.rcs) rcsN += p.def.rcs.thrust * (p.sym || 1);
+    }
+    if (rcsN > 0) {
+      const bodyF = new THREE.Vector3(tr.x || 0, tr.y || 0, tr.z || 0);
+      if (bodyF.lengthSq() > 1) bodyF.normalize();
+      bodyF.multiplyScalar(rcsN).applyQuaternion(st.quat);
+      extAcc.addScaledVector(bodyF, 1 / Math.max(1, mp.m));
+    }
+  }
+
   // ---- attitude ----
   if (!st.landed) {
     stepAttitude(st, dt, { mp, copY, qDyn, press, thrust, perEngine, dragF, noseWorld, up });

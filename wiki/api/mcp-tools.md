@@ -7,7 +7,7 @@ tags: [api, mcp]
 
 # MCP tools
 
-agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 38 个。
+agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 44 个。
 
 | 工具 | 含义 |
 |---|---|
@@ -49,6 +49,14 @@ agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 38 个。
 | ksp_load | F9 / 读档：整局读回 |
 | ksp_saves_list | 列出游戏存档槽 |
 | ksp_saves_delete | 删除游戏存档槽 |
+| ksp_vessels | 列出会话里的船：id、name、body、高度、状态 |
+| ksp_spawn_orbital | 把库存船或设计放到开普勒轨道（圆轨道 ap=pe） |
+| ksp_target | 选定目标船，或 null 取消 |
+| ksp_translate | RCS 平移杆量，体轴 -1..1（+y 机头） |
+| ksp_dock | 尝试捕获；门槛满足即硬焊 |
+| ksp_undock | 拆开焊接并给一点分离 |
+
+`ksp_telemetry` 在有目标且同一 SOI 时多：`target`、`range_m`、`closing_ms`（负=接近）、`rel_speed_ms`、`dockState`。
 
 ## 边界
 

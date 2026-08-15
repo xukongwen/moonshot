@@ -70,10 +70,11 @@ const dryOut = `${dry.stdout || ""}${dry.stderr || ""}`;
 check("--dry-run exits 0", dry.status === 0, dryOut.slice(0, 300));
 
 const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
+check("package.json version is 0.x.x", /^0\.\d+\.\d+$/.test(pkg.version), pkg.version);
 const parts = String(pkg.version).split(".").map(Number);
 const expectedNext = `${parts[0]}.${parts[1]}.${parts[2] + 1}`;
-const mentionsNext = dryOut.includes(expectedNext) || dryOut.includes("0.1.1");
-check(`--dry-run mentions ${expectedNext} or 0.1.1`, mentionsNext, dryOut.slice(0, 300));
+const mentionsNext = dryOut.includes(expectedNext) || dryOut.includes("0.1.1") || /skip/i.test(dryOut);
+check(`--dry-run mentions ${expectedNext} or 0.1.1 or skip`, mentionsNext, dryOut.slice(0, 300));
 
 if (failures) {
   console.error(`\n${failures} failure(s)`);

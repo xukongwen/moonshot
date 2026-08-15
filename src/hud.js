@@ -117,7 +117,32 @@ export const HUD = {
       const pe = extra.encounter.periapsis ?? extra.encounter.munPeriapsis;
       row(child === 'mun' ? t('orb.munPe') : t('orb.bodyPe', { name: bodyName(child) }), fmtDist(pe));
     }
+    if (extra.targetNav && extra.targetNav.range_m != null) {
+      row(t('hud.target'), extra.targetName ?? extra.targetNav.target ?? '—');
+      row(t('hud.range'), fmtDist(extra.targetNav.range_m));
+      const c = extra.targetNav.closing_ms;
+      row(t('hud.closing'), `${c >= 0 ? '+' : ''}${c.toFixed(1)} m/s`);
+      if (extra.dockState) row(t('hud.dock'), t(`hud.dock${extra.dockState[0].toUpperCase()}${extra.dockState.slice(1)}`));
+    }
     $('orbit-data').innerHTML = rows.join('');
+  },
+
+  targetReadouts(nav, dockState, name) {
+    const box = $('rdv-panel');
+    if (!box) return;
+    if (!nav || nav.range_m == null) {
+      box.classList.add('hidden');
+      return;
+    }
+    box.classList.remove('hidden');
+    const el = (id, s) => { const n = $(id); if (n) n.textContent = s; };
+    el('ro-target', `${t('hud.target')} ${name ?? nav.target ?? ''}`);
+    el('ro-range', `${t('hud.range')} ${fmtDist(nav.range_m)}`);
+    const c = nav.closing_ms;
+    el('ro-closing', `${t('hud.closing')} ${c >= 0 ? '+' : ''}${Number(c).toFixed(1)} m/s`);
+    const ds = dockState ?? 'free';
+    const key = `hud.dock${ds[0].toUpperCase()}${ds.slice(1)}`;
+    el('ro-dock', `${t('hud.dock')} ${t(key)}`);
   },
 
   msg(text, cls = '') {

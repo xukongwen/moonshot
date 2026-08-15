@@ -141,16 +141,22 @@ export class MapView {
     this.scene.add(this.orbitLine, this.encLine);
 
     this.vesselDot = dotSprite('#7fd0ff', 0.016);
+    this.targetDot = dotSprite('#ff8866', 0.018);
+    this.targetLabel = textSprite('Tgt', '#ff8866');
+    this.otherDots = [];
     this.apLabel = textSprite('Ap', '#8fd0ff');
     this.peLabel = textSprite('Pe', '#8fd0ff');
     this.munPeLabel = textSprite('Mun Pe', '#ffc14d');
-    this.scene.add(this.vesselDot, this.apLabel, this.peLabel, this.munPeLabel);
+    this.scene.add(this.vesselDot, this.targetDot, this.targetLabel, this.apLabel, this.peLabel, this.munPeLabel);
+    this.targetDot.visible = false;
+    this.targetLabel.visible = false;
     this.refreshLabels();
   }
 
   refreshLabels() {
     this.apLabel.userData.setText(t('map.ap'));
     this.peLabel.userData.setText(t('map.pe'));
+    this.targetLabel?.userData.setText(t('hud.target'));
   }
 
   /** Refresh orbital geometry (call ~1 Hz or after burns). */
@@ -205,9 +211,31 @@ export class MapView {
   }
 
   /** Per-frame: vessel marker + camera. Frame origin is the current SOI body. */
-  update(st) {
+  update(st, others = []) {
     this.frameBody = st.body;
     this.vesselDot.position.copy(st.pos);
+    const same = others.filter((o) => o && o.pos && o.body === st.body);
+    const tgt = same.find((o) => o.target) || same[0];
+    if (tgt) {
+      this.targetDot.visible = true;
+      this.targetLabel.visible = true;
+      this.targetDot.position.copy(tgt.pos);
+      this.targetLabel.position.copy(tgt.pos);
+    } else {
+      this.targetDot.visible = false;
+      this.targetLabel.visible = false;
+    }
+    while (this.otherDots.length < same.length) {
+      const d = dotSprite('#c8d6e5', 0.012);
+      this.scene.add(d);
+      this.otherDots.push(d);
+    }
+    this.otherDots.forEach((d, i) => {
+      if (i < same.length) {
+        d.visible = true;
+        d.position.copy(same[i].pos);
+      } else d.visible = false;
+    });
 
     const { minD, maxD } = zoomLimits(st.body);
     this.cam.dist = THREE.MathUtils.clamp(this.cam.dist, minD, maxD);

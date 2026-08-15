@@ -381,6 +381,60 @@ export const TOOLS = [
       required: ['name'],
     },
   },
+  {
+    name: 'ksp_vessels',
+    description: 'List vessels in the session: id, name, body, altitude, situation.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_spawn_orbital',
+    description: 'Spawn a craft into a Kepler orbit (circular OK: ap=pe). Does not reset the active pad ship.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        craft: { type: 'string', description: 'Stock craft name, or omit and pass design' },
+        design: { type: 'object', description: 'VAB design { name, stack, radials }' },
+        body: { type: 'string', default: 'kerbin' },
+        ap_m: { type: 'number', description: 'Apoapsis altitude (m)' },
+        pe_m: { type: 'number', description: 'Periapsis altitude (m); default = ap_m' },
+        ta_deg: { type: 'number', default: 0, description: 'True anomaly (deg)' },
+        name: { type: 'string', description: 'Display name' },
+      },
+      required: ['ap_m'],
+    },
+  },
+  {
+    name: 'ksp_target',
+    description: 'Set the target vessel id, or null to clear.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { description: 'Vessel id, or null to clear' },
+      },
+    },
+  },
+  {
+    name: 'ksp_translate',
+    description: 'RCS translate stick in body axes [-1,1]: +y nose, +x right, +z up. Requires an rcs-block on the vessel (v1 uses no fuel).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        x: { type: 'number', minimum: -1, maximum: 1 },
+        y: { type: 'number', minimum: -1, maximum: 1 },
+        z: { type: 'number', minimum: -1, maximum: 1 },
+      },
+    },
+  },
+  {
+    name: 'ksp_dock',
+    description: 'Attempt docking capture with the target (port <1.5 m, axis <15°, closing <1 m/s, same size). Hard-welds immediately if thresholds are met.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_undock',
+    description: 'Split a welded pair and apply a tiny separation.',
+    inputSchema: { type: 'object', properties: {} },
+  },
 ];
 
 function log(...args) {
@@ -499,6 +553,27 @@ export function callTool(name, args = {}) {
     case 'ksp_saves_delete':
       if (args.name == null) throw new Error('ksp_saves_delete requires name');
       return deleteSave(args.name);
+    case 'ksp_vessels':
+      session.requireFlight();
+      return { vessels: session.listVessels(), activeId: session.activeId, targetId: session.targetId };
+    case 'ksp_spawn_orbital': {
+      const src = args.design ?? args.craft ?? 'Mun Express';
+      return session.spawnOrbital(src, {
+        body: args.body ?? 'kerbin',
+        ap_m: args.ap_m,
+        pe_m: args.pe_m ?? args.ap_m,
+        ta_deg: args.ta_deg ?? 0,
+        name: args.name,
+      });
+    }
+    case 'ksp_target':
+      return session.setTarget(args.id ?? null);
+    case 'ksp_translate':
+      return session.setTranslate(args);
+    case 'ksp_dock':
+      return session.dock();
+    case 'ksp_undock':
+      return session.undock();
     default:
       throw new Error(`Unknown tool: ${name}`);
   }

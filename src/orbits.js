@@ -296,3 +296,79 @@ export function ejectionDeltaV(rPark, muPlanet, vInf) {
   const vEj = Math.sqrt(vEsc * vEsc + vInf * vInf);
   return { vCirc, vEsc, vEj, dV: vEj - vCirc };
 }
+
+/**
+ * Build an equatorial (XZ, Y-up) state from apoapsis / periapsis altitudes
+ * and true anomaly. Same convention as body circularRel (periapsis along +X).
+ */
+export function stateFromKepler(bodyName, { ap_m, pe_m, ta_deg = 0 } = {}) {
+  const body = BODIES[bodyName];
+  if (!body) throw new Error(`Unknown body "${bodyName}"`);
+  let ra = body.radius + Number(ap_m);
+  let rp = body.radius + Number(pe_m);
+  if (!Number.isFinite(ra) || !Number.isFinite(rp)) {
+    throw new Error('stateFromKepler requires ap_m and pe_m');
+  }
+  if (rp > ra) { const tmp = ra; ra = rp; rp = tmp; }
+  const a = (ra + rp) / 2;
+  const e = a > 1e-9 ? Math.max(0, (ra - rp) / (ra + rp)) : 0;
+  const nu = (Number(ta_deg) || 0) * Math.PI / 180;
+  const p = a * (1 - e * e);
+  const r = p / (1 + e * Math.cos(nu));
+  // phat = +X, qhat = -Z (matches circularRel at th=0)
+  const pos = new Vector3(r * Math.cos(nu), 0, -r * Math.sin(nu));
+  const k = Math.sqrt(body.mu / Math.max(p, 1e-9));
+  const vel = new Vector3(-k * Math.sin(nu), 0, -k * (e + Math.cos(nu)));
+  return { pos, vel, a, e, r, ra, rp, nu };
+}
+
+function phaseBetween(fromPos, toPos) {
+  const rv = fromPos.clone().normalize();
+  const rm = toPos.clone().normalize();
+  const cross = new Vector3().crossVectors(rv, rm);
+  let a = Math.atan2(cross.y, rv.dot(rm)) * 180 / Math.PI;
+  if (a < 0) a += 360;
+  return a;
+}
+
+function hohmannBetweenRadii(r1, r2, mu, chaserPos = null, targetPos = null) {
+  const aT = (r1 + r2) / 2;
+  const tT = Math.PI * Math.sqrt(Math.abs(aT) ** 3 / mu);
+  const n1 = Math.sqrt(mu / Math.abs(r1) ** 3);
+  const n2 = Math.sqrt(mu / Math.abs(r2) ** 3);
+  const phaseDeg = 180 - (n2 * tT * 180) / Math.PI;
+  const v1 = Math.sqrt(mu / r1);
+  const v2 = Math.sqrt(mu / r2);
+  const vPe = Math.sqrt(mu * (2 / r1 - 1 / aT));
+  const vAp = Math.sqrt(mu * (2 / r2 - 1 / aT));
+  const dv1 = vPe - v1;
+  const dv2 = v2 - vAp;
+  let phase = null;
+  let wait = 0;
+  if (chaserPos && targetPos) {
+    phase = phaseBetween(chaserPos, targetPos);
+    const nRel = n1 - n2;
+    if (Math.abs(nRel) > 1e-14) {
+      let dPhase = ((phase - phaseDeg) % 360 + 360) % 360;
+      wait = (dPhase * Math.PI / 180) / nRel;
+      if (wait < 0) wait += Math.abs((2 * Math.PI) / nRel);
+    }
+  }
+  return { phase, phaseDeg, dv1, dv2, wait, tT, r1, r2, aT, v1, v2, vPe, vAp };
+}
+
+/** Hohmann between two ships around the same body (circular-SMA assumption). */
+export function shipHohmann(chaserPos, chaserVel, targetPos, targetVel, mu) {
+  const r1 = chaserPos.length();
+  const r2 = targetPos.length();
+  return hohmannBetweenRadii(r1, r2, mu, chaserPos, targetPos);
+}
+
+/** Same helper from stored elements (uses SMA as circular radius). */
+export function rendezvousToVessel(chaserEl, targetEl) {
+  const mu = chaserEl.mu;
+  const r1 = chaserEl.a > 0 ? chaserEl.a : chaserEl.rp;
+  const r2 = targetEl.a > 0 ? targetEl.a : targetEl.rp;
+  return hohmannBetweenRadii(r1, r2, mu);
+}
+

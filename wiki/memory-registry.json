@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-15T11:36:08.925Z",
+  "generatedAt": "2026-08-15T13:00:29.437Z",
   "activeCap": 15,
   "logKeepDays": 14,
   "entries": [
@@ -46,10 +46,10 @@
       "memoryTier": "active",
       "memoryStatus": "living",
       "decayClass": "protocol",
-      "summaryOneLiner": "agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 38 个。",
+      "summaryOneLiner": "agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 44 个。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:26:50.852Z",
+      "mtime": "2026-08-15T11:59:19.246Z",
       "compactionState": "full"
     },
     {
@@ -61,7 +61,7 @@
       "summaryOneLiner": "先读 [`active-memory.md`](./active-memory.md)、[`memory-registry.json`](./memory-registry.json)、[`lint-report.md`](./lint-report.md)。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:35:40.721Z",
+      "mtime": "2026-08-15T12:59:44.507Z",
       "compactionState": "full"
     },
     {
@@ -73,7 +73,7 @@
       "summaryOneLiner": "<!-- wiki-auto-curator:near-window -->",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:35:40.721Z",
+      "mtime": "2026-08-15T12:59:44.507Z",
       "compactionState": "full"
     },
     {
@@ -133,7 +133,7 @@
       "summaryOneLiner": "说明无头 MCP 如何覆盖原版人类操作：飞行、VAB、地图、语言。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:26:50.852Z",
+      "mtime": "2026-08-15T11:59:19.246Z",
       "compactionState": "full"
     },
     {
@@ -157,7 +157,7 @@
       "summaryOneLiner": "说明整局游戏存档（session），不是飞船文件。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:26:50.852Z",
+      "mtime": "2026-08-15T11:59:19.246Z",
       "compactionState": "full"
     },
     {
@@ -169,7 +169,7 @@
       "summaryOneLiner": "说明 Moonshot 的长期预发布版本：`0.<era>.<build>`。agent 只加 build，不把中间位当成经典 Semver 的 minor。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:35:16.305Z",
+      "mtime": "2026-08-15T11:39:08.192Z",
       "compactionState": "full"
     },
     {
@@ -181,7 +181,7 @@
       "summaryOneLiner": "给 agent 一份不可漂移的仓库级判断：这是什么、代码与 wiki 谁说了算、哪些事默认不做。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:01:23.700Z",
+      "mtime": "2026-08-15T12:59:04.991Z",
       "compactionState": "full"
     },
     {
@@ -209,6 +209,18 @@
       "compactionState": "full"
     },
     {
+      "path": "wiki/releases/v0.1.3.md",
+      "title": "v0.1.3",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "episodic",
+      "summaryOneLiner": "记录预发布 `v0.1.3`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-15T12:59:38.855Z",
+      "compactionState": "full"
+    },
+    {
       "path": "wiki/SCHEMA.md",
       "title": "Wiki SCHEMA",
       "memoryTier": "cold",
@@ -230,6 +242,18 @@
       "successor": null,
       "lastReferencedAt": null,
       "mtime": "2026-08-15T11:02:02.852Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/交汇对接架构计划.md",
+      "title": "交汇对接架构计划",
+      "memoryTier": "active",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "北极星：世界里至少两艘船。人（和 agent）能选定目标、交汇、对接。每一刀的人类新操作都要有 MCP。R1–R6 已验收：交汇 2336 m / 8.34 m/s；硬对接可分离；截图 rdv-map / rdv-hud / rdv-close / dock-hard。版本将是 0.1.3。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-15T12:59:04.991Z",
       "compactionState": "full"
     }
   ]

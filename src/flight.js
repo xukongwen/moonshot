@@ -10,8 +10,9 @@ import { density, pressureAtm } from './aero.js';
 import {
   elementsFromState, propagate, timeToApoapsis, timeToPeriapsis,
   findMunEncounter, findEncounter, munTransferPhase,
-  planetPhaseDeg, hohmannTransfer,
+  planetPhaseDeg, hohmannTransfer, stateFromKepler,
 } from './orbits.js';
+import { evaluateCapture, applyWeld, weldFromStates, placeFacingPorts } from './docking.js';
 import { physicsStep, checkSOI, stepDebris } from './physics.js';
 import { buildVesselParts, buildStagePlan, stackGeometry, computeSections, massProps, partY } from './vessel.js';
 import { buildVesselGroup, buildPartMesh, setLegs, setCanopies } from './vesselviz.js';
@@ -148,11 +149,22 @@ export class Flight {
       throttle: 0, landed: true, dead: false,
       parts, geom, sections: computeSections(parts), massProps: mp,
       controls: { pitch: 0, yaw: 0, roll: 0 },
+      translate: { x: 0, y: 0, z: 0 },
       sas: true, sasMode: 'hold', sasTarget: quat.clone(),
       elements: null,
     };
     this.plan = buildStagePlan(parts);
     this.stageIndex = 0;
+    this.vessels = [{
+      id: 'active', name: design.name, design, st: this.st,
+      plan: this.plan, stageIdx: 0, liftedOff: false,
+    }];
+    this.activeId = 'active';
+    this.targetId = null;
+    this.weld = null;
+    this.dockState = 'free';
+    this._idSeq = 1;
+    this.clearOtherViz();
     this.flags = { liftoff: false, space: false, orbit: false, munSoi: false, munLanded: false };
     this.warpIdx = 0;
     this.rails = false;
@@ -343,6 +355,158 @@ export class Flight {
 
   cleanupVessel() {
     if (this.vGroup) { this.scene.remove(this.vGroup); this.vGroup = null; }
+    this.clearOtherViz();
+  }
+
+  clearOtherViz() {
+    if (this.otherViz) {
+      for (const g of this.otherViz.values()) this.scene.remove(g);
+    }
+    this.otherViz = new Map();
+  }
+
+  vesselById(id) {
+    return this.vessels?.find((v) => v.id === id) ?? null;
+  }
+
+  putInOrbit({ body = 'kerbin', ap_m, pe_m, ta_deg = 0 } = {}) {
+    if (!this.st) return false;
+    const kv = stateFromKepler(body, { ap_m, pe_m: pe_m ?? ap_m, ta_deg });
+    this.st.body = body;
+    this.st.landed = false;
+    this.st.dead = false;
+    this.st.pos.copy(kv.pos);
+    this.st.vel.copy(kv.vel);
+    this.st.quat.setFromUnitVectors(
+      new THREE.Vector3(0, 1, 0),
+      kv.vel.lengthSq() > 1 ? kv.vel.clone().normalize() : new THREE.Vector3(0, 0, -1),
+    );
+    this.st.angVel.set(0, 0, 0);
+    this.st.sas = true;
+    this.st.sasMode = 'hold';
+    this.st.sasTarget.copy(this.st.quat);
+    this.st.elements = null;
+    this.rails = false;
+    this.warpIdx = 0;
+    if (this.flags) this.flags.liftoff = true;
+    this.camCtl.dist = 80;
+    this.camCtl.el = -0.2;
+    const alt = this.st.pos.length() - BODIES[body].radius;
+    this.lastInfo = {
+      alt, agl: alt, speed: this.st.vel.length(), accelG: 0, maxTempFrac: 0,
+      thrust: 0, perEngine: new Map(), rho: 0, press: 0, qDyn: 0, flux: 0, plasma: 0, terrainH: 0,
+    };
+    this.hudTimer = 0;
+    this.refreshHUD?.();
+    return true;
+  }
+
+  spawnOrbital(design, opts = {}) {
+    if (!design || !Array.isArray(design.stack)) {
+      throw new Error('spawnOrbital needs a design');
+    }
+    const d = structuredClone(design);
+    d.radials ??= [];
+    const body = opts.body || 'kerbin';
+    const t0 = this.st?.t ?? 0;
+    const kv = stateFromKepler(body, {
+      ap_m: opts.ap_m, pe_m: opts.pe_m ?? opts.ap_m, ta_deg: opts.ta_deg ?? 0,
+    });
+    const parts = buildVesselParts(d);
+    for (const p of parts) if (p.def.engine) p.ignited = true;
+    const geom = stackGeometry(parts);
+    const mp = massProps(parts, geom);
+    const quat = new THREE.Quaternion().setFromUnitVectors(
+      new THREE.Vector3(0, 1, 0),
+      kv.vel.lengthSq() > 1 ? kv.vel.clone().normalize() : new THREE.Vector3(0, 0, -1),
+    );
+    const st = {
+      t: t0, met: t0, body,
+      pos: kv.pos, vel: kv.vel, quat, angVel: new THREE.Vector3(),
+      throttle: 0, landed: false, dead: false,
+      parts, geom, sections: computeSections(parts), massProps: mp,
+      controls: { pitch: 0, yaw: 0, roll: 0 },
+      translate: { x: 0, y: 0, z: 0 },
+      sas: true, sasMode: 'hold', sasTarget: quat.clone(),
+      elements: null,
+    };
+    if (!this.vessels) this.vessels = [];
+    const id = opts.id != null ? String(opts.id) : String(this._idSeq++);
+    const vessel = {
+      id, name: opts.name || d.name || `Vessel ${id}`,
+      design: d, st, plan: buildStagePlan(parts), stageIdx: 0, liftedOff: true,
+    };
+    this.vessels.push(vessel);
+    this.ensureOtherViz(vessel);
+    return vessel;
+  }
+
+  ensureOtherViz(v) {
+    if (!this.otherViz) this.otherViz = new Map();
+    if (v.id === this.activeId) return;
+    if (this.otherViz.has(v.id)) return;
+    const { group } = buildVesselGroup(v.st.parts);
+    this.scene.add(group);
+    this.otherViz.set(v.id, group);
+  }
+
+  setTarget(id) {
+    this.targetId = id == null ? null : String(id);
+    return this.targetId;
+  }
+
+  relativeNav() {
+    const tgt = this.vesselById(this.targetId);
+    if (!this.st || !tgt || tgt.st.body !== this.st.body) {
+      return { target: this.targetId, range_m: null, closing_ms: null, rel_speed_ms: null };
+    }
+    const rel = tgt.st.pos.clone().sub(this.st.pos);
+    const range = rel.length();
+    const relVel = tgt.st.vel.clone().sub(this.st.vel);
+    const closing = range > 1e-6 ? relVel.dot(rel.clone().normalize()) : 0;
+    return { target: tgt.id, range_m: range, closing_ms: closing, rel_speed_ms: relVel.length() };
+  }
+
+  mapOthers() {
+    return (this.vessels ?? [])
+      .filter((v) => v.id !== this.activeId)
+      .map((v) => ({
+        id: v.id, name: v.name, body: v.st.body, pos: v.st.pos,
+        target: v.id === this.targetId,
+      }));
+  }
+
+  dock() {
+    const tgt = this.vesselById(this.targetId) || (this.vessels ?? []).find((v) => v.id !== this.activeId);
+    if (!this.st || !tgt) return { dockState: this.dockState ?? 'free', docked: false };
+    const ev = evaluateCapture(this.st, tgt.st);
+    if (ev.ok) {
+      this.weld = weldFromStates(this.activeId, this.st, tgt.id, tgt.st);
+      this.dockState = 'hard';
+      applyWeld(this.st, tgt.st, this.weld);
+      return { docked: true, dockState: 'hard', dist: ev.dist };
+    }
+    return { docked: false, dockState: this.dockState ?? 'free', dist: ev.dist, axisAng: ev.axisAng, closing: ev.closing };
+  }
+
+  undock() {
+    if (!this.weld) return { dockState: 'free', undocked: false };
+    const a = this.vesselById(this.weld.a);
+    const b = this.vesselById(this.weld.b);
+    if (a && b) {
+      const axis = new THREE.Vector3(0, 1, 0).applyQuaternion(a.st.quat);
+      b.st.pos.addScaledVector(axis, 0.45);
+      b.st.vel.copy(a.st.vel).addScaledVector(axis, 0.2);
+    }
+    this.weld = null;
+    this.dockState = 'free';
+    return { dockState: 'free', undocked: true };
+  }
+
+  placeFacingForShot(gap = 0.8) {
+    const tgt = this.vesselById(this.targetId) || (this.vessels ?? []).find((v) => v.id !== this.activeId);
+    if (!this.st || !tgt) return null;
+    return placeFacingPorts(this.st, tgt.st, gap);
   }
 
   refreshViz() {
@@ -405,7 +569,7 @@ export class Flight {
           HUD.msg(t('msg.chutesArmed'));
           break;
         case 'KeyM': this.toggleMap(); break;
-        case 'KeyH': HUD.toggleHelp(); break;
+        case 'F1': e.preventDefault(); HUD.toggleHelp(); break;
         case 'Comma': this.setWarp(this.warpIdx - 1); break;
         case 'Period': this.setWarp(this.warpIdx + 1); break;
       }
@@ -446,6 +610,10 @@ export class Flight {
     st.controls.pitch = (this.keys.KeyW ? -1 : 0) + (this.keys.KeyS ? 1 : 0);
     st.controls.yaw = (this.keys.KeyA ? -1 : 0) + (this.keys.KeyD ? 1 : 0);
     st.controls.roll = (this.keys.KeyQ ? -1 : 0) + (this.keys.KeyE ? 1 : 0);
+    st.translate = st.translate || { x: 0, y: 0, z: 0 };
+    st.translate.y = (this.keys.KeyI ? 1 : 0) + (this.keys.KeyK ? -1 : 0);
+    st.translate.x = (this.keys.KeyL ? 1 : 0) + (this.keys.KeyJ ? -1 : 0);
+    st.translate.z = (this.keys.KeyH ? 1 : 0) + (this.keys.KeyN ? -1 : 0);
   }
 
   toggleMap() {
@@ -615,7 +783,7 @@ export class Flight {
     this.hudTick(dt);
 
     if (this.mapOpen) {
-      this.map.update(st);
+      this.map.update(st, this.mapOthers());
       this.renderer.render(this.map.scene, this.map.camera);
     } else {
       this.renderer.render(this.scene, this.camera);
@@ -643,7 +811,53 @@ export class Flight {
       return !d.dead;
     });
     this.processEvents(events);
+    this.stepOtherVessels(total);
     this.milestones();
+  }
+
+  stepOtherVessels(total) {
+    const n = Math.min(40, Math.ceil(total / PHYS_DT));
+    const h = total / Math.max(1, n);
+    const events = [];
+    for (const v of this.vessels ?? []) {
+      if (v.id === this.activeId) continue;
+      if (this.weld && v.id === this.weld.b) continue;
+      v.st.throttle = 0;
+      v.st.translate = { x: 0, y: 0, z: 0 };
+      const dist = v.st.pos.distanceTo(this.st.pos);
+      const far = dist > 50_000 || this.rails;
+      for (let i = 0; i < n; i++) {
+        if (far && !v.st.landed) {
+          try {
+            const el = elementsFromState(v.st.pos, v.st.vel, BODIES[v.st.body].mu, v.st.t);
+            v.st.t += h;
+            const pv = propagate(el, v.st.t);
+            v.st.pos.copy(pv.pos); v.st.vel.copy(pv.vel);
+          } catch {
+            physicsStep(v.st, h, events);
+            v.st.t += h;
+          }
+        } else {
+          physicsStep(v.st, h, events);
+          v.st.t += h;
+        }
+      }
+    }
+    if (this.weld) {
+      const a = this.vesselById(this.weld.a);
+      const b = this.vesselById(this.weld.b);
+      if (a && b) applyWeld(a.st, b.st, this.weld);
+    } else if (this.targetId) {
+      const tgt = this.vesselById(this.targetId);
+      if (tgt) {
+        const ev = evaluateCapture(this.st, tgt.st);
+        if (ev.ok) {
+          this.weld = weldFromStates(this.activeId, this.st, tgt.id, tgt.st);
+          this.dockState = 'hard';
+          applyWeld(this.st, tgt.st, this.weld);
+        }
+      }
+    }
   }
 
   railsStep(dt) {
@@ -673,6 +887,7 @@ export class Flight {
       // gentle cooldown on rails
       for (const p of st.parts) p.temp = Math.max(4, p.temp - 5 * dt * Math.min(warp, 100));
     }
+    this.stepOtherVessels(dt * warp);
     this.milestones();
   }
 
@@ -809,6 +1024,22 @@ export class Flight {
       this.vGroup.quaternion.copy(st.quat);
       this.vGroup.position.copy(new THREE.Vector3(0, mp.comY, 0).applyQuaternion(st.quat).negate());
     }
+    for (const v of this.vessels ?? []) {
+      if (v.id === this.activeId) continue;
+      this.ensureOtherViz(v);
+      const group = this.otherViz.get(v.id);
+      if (!group) continue;
+      let rel = v.st.pos.clone();
+      if (v.st.body !== st.body) {
+        const frame = getRelativeState(v.st.body, st.body, st.t);
+        rel.add(frame.pos);
+      }
+      rel.sub(origin);
+      const mp = v.st.massProps ?? massProps(v.st.parts, v.st.geom);
+      group.quaternion.copy(v.st.quat);
+      group.position.copy(rel).add(new THREE.Vector3(0, mp.comY, 0).applyQuaternion(v.st.quat).negate());
+      group.visible = rel.length() < 5e5;
+    }
 
     // terrain patch
     const alt = st.pos.length() - BODIES[st.body].radius;
@@ -890,6 +1121,9 @@ export class Flight {
     this.hudTimer = 0.12;
     const st = this.st;
     const info = this.lastInfo;
+    const navEarly = this.relativeNav();
+    const tgtEarly = this.vesselById(this.targetId);
+    HUD.targetReadouts(navEarly, this.dockState, tgtEarly?.name);
     if (!info) return;
 
     HUD.setMET(st.met);
@@ -969,17 +1203,24 @@ export class Flight {
       if (va < 0) va += 360;
       vesselDunaPhase = va;
     }
+    const nav = this.relativeNav();
+    const tgt = this.vesselById(this.targetId);
+    HUD.targetReadouts(nav, this.dockState, tgt?.name);
     HUD.orbit(st, this.curEls, {
       tAp: this.curEls ? timeToApoapsis(this.curEls, st.t) : null,
       tPe: this.curEls ? timeToPeriapsis(this.curEls, st.t) : Infinity,
       phase, transferPhase,
       dunaPhase, dunaTarget, vesselDunaPhase,
       encounter: this.encounter,
+      targetNav: nav,
+      targetName: tgt?.name,
+      dockState: this.dockState,
     });
   }
 
   refreshMapNow() {
     this.map.refresh(this.st, this.curEls, this.encounter);
+    this.map.update(this.st, this.mapOthers());
   }
 
   refreshHUD() {

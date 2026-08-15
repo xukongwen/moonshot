@@ -2,7 +2,7 @@
 // Browser-safe: no node:fs import. Node reads package.json via getBuiltinModule.
 
 export const SAVE_FORMAT = 'moonshot-save';
-export const SAVE_FORMAT_VERSION = 1;
+export const SAVE_FORMAT_VERSION = 2;
 export const BROWSER_SAVES_KEY = 'moonshot-saves';
 export const QUICKSAVE_NAME = '快速存档';
 
@@ -48,6 +48,11 @@ export function buildSave(partial = {}) {
       ? structuredClone(partial.crafts)
       : {},
     flight: partial.flight ?? null,
+    vessels: Array.isArray(partial.vessels) ? structuredClone(partial.vessels) : null,
+    activeId: partial.activeId ?? null,
+    targetId: partial.targetId ?? null,
+    weld: partial.weld ?? null,
+    dockState: partial.dockState ?? 'free',
   };
 }
 
@@ -59,8 +64,8 @@ export function validateSave(obj) {
   if (obj.format !== SAVE_FORMAT) {
     throw new Error(`Invalid save format "${obj.format ?? ''}". Expected "${SAVE_FORMAT}".`);
   }
-  if (obj.formatVersion !== SAVE_FORMAT_VERSION) {
-    throw new Error(`Unsupported save formatVersion ${obj.formatVersion}. Expected ${SAVE_FORMAT_VERSION}.`);
+  if (obj.formatVersion !== 1 && obj.formatVersion !== 2) {
+    throw new Error(`Unsupported save formatVersion ${obj.formatVersion}. Expected 1 or 2.`);
   }
   if (obj.workshop == null || typeof obj.workshop !== 'object' || Array.isArray(obj.workshop)) {
     throw new Error('Invalid save: missing workshop');

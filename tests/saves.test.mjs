@@ -33,7 +33,7 @@ try {
     const radials = structuredClone(session.workshop.design.radials);
     const doc = session.captureSave('tiny');
     check('format', doc.format === SAVE_FORMAT);
-    check('formatVersion 1', doc.formatVersion === 1);
+    check('formatVersion 2', doc.formatVersion === 2);
     check('mode vab', doc.mode === 'vab');
     check('flight null', doc.flight === null);
     check('workshop stack', deepEqual(doc.workshop.stack, stack), JSON.stringify(doc.workshop.stack));
@@ -109,6 +109,40 @@ try {
     check('read workshop', read.workshop.name === 'A', read.workshop.name);
     deleteSave('slot-a', savesDir);
     check('deleted', listSaves(savesDir).length === 0, JSON.stringify(listSaves(savesDir)));
+  }
+
+  // ---- 5b. v1 still loads; v2 two-ship roundtrip ----
+  {
+    console.log('5b. v1 load + v2 two-ship');
+    const v1 = buildSave({
+      formatVersion: 1,
+      name: 'legacy',
+      mode: 'flight',
+      workshop: { name: '', stack: [], radials: [], selected: -1 },
+      flight: null,
+    });
+    v1.formatVersion = 1;
+    let v1ok = false;
+    try { validateSave(v1); v1ok = true; } catch (e) { v1ok = false; }
+    check('validateSave accepts v1', v1ok);
+
+    const session = new SimSession({ workshop: { craftsPath: join(root, 'rdv-crafts.json') } });
+    session.newFlight('Mun Express');
+    const spawned = session.spawnOrbital('Mun Express', {
+      body: 'kerbin', ap_m: 100_000, pe_m: 100_000, ta_deg: 20, name: 'Target',
+    });
+    session.setTarget(spawned.id);
+    const doc = session.captureSave('two');
+    check('v2 format', doc.formatVersion === 2);
+    check('vessels length 2', Array.isArray(doc.vessels) && doc.vessels.length === 2, String(doc.vessels?.length));
+    check('activeId saved', doc.activeId === 'active', String(doc.activeId));
+    check('targetId saved', doc.targetId === spawned.id, String(doc.targetId));
+
+    const other = new SimSession({ workshop: { craftsPath: join(root, 'rdv-crafts-2.json') } });
+    other.applySave(doc);
+    check('loaded 2 vessels', other.vessels.length === 2, String(other.vessels.length));
+    check('loaded target', other.targetId === spawned.id, String(other.targetId));
+    check('both have pos', other.vessels.every((v) => v.st?.pos && v.st.pos.length() > 0));
   }
 
   // ---- 5. MCP tools ----

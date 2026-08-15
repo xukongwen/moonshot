@@ -1,21 +1,25 @@
 // Headless Moonshot sim session. Reuses the game physics exactly like
-// tests/mission.test.mjs — one in-memory flight the MCP server drives.
+// tests/mission.test.mjs — vessels[] + activeId, this.st aliases the active ship.
 
 import { Vector3, Quaternion } from 'three';
 import { STOCK } from '../src/stock.js';
 import { BODIES, getBodyState, getRelativeState, PAD_DIR, PAD_ALTITUDE } from '../src/constants.js';
 import { buildVesselParts, buildStagePlan, stackGeometry, computeSections, massProps } from '../src/vessel.js';
 import { physicsStep, checkSOI } from '../src/physics.js';
-import { elementsFromState, propagate, findMunEncounter, munTransferPhase } from '../src/orbits.js';
+import { elementsFromState, propagate, findMunEncounter, munTransferPhase, stateFromKepler } from '../src/orbits.js';
 import { heightAt } from '../src/terrain.js';
 import { setLang } from '../src/i18n.js';
 import { Workshop } from './workshop.mjs';
 import { serializeSnapshot, applySnapshotToState } from './snapshot.mjs';
 import { buildSave, validateSave } from '../src/save.js';
+import {
+  evaluateCapture, applyWeld, weldFromStates, serializeWeld, hydrateWeld,
+} from '../src/docking.js';
 
 const Y = new Vector3(0, 1, 0);
 const STEP_CAP_S = 120;
 const DEFAULT_DT = 0.05;
+const RAILS_DIST_M = 50_000;
 export const WARP_LEVELS = [1, 2, 3, 4, 10, 100, 1000, 10000, 100000];
 
 function clamp(v, lo, hi) {
@@ -33,15 +37,60 @@ function serializeEvent(ev) {
   return out;
 }
 
+function resolveDesign(design) {
+  if (typeof design === 'string') {
+    const src = STOCK[design];
+    if (!src) {
+      throw new Error(`Unknown craft "${design}". Available: ${Object.keys(STOCK).join(', ')}`);
+    }
+    const d = structuredClone(src);
+    d.name = design;
+    d.radials ??= [];
+    return d;
+  }
+  if (!design || !Array.isArray(design.stack)) {
+    throw new Error('Invalid design: expected { name, stack, radials } or a stock craft name');
+  }
+  const d = structuredClone(design);
+  d.radials ??= [];
+  return d;
+}
+
+function makeState({ parts, body, pos, vel, quat, t, landed }) {
+  const geom0 = stackGeometry(parts);
+  const mp0 = massProps(parts, geom0);
+  return {
+    t: t ?? 0,
+    body,
+    pos,
+    vel,
+    quat,
+    angVel: new Vector3(),
+    throttle: 0,
+    landed: !!landed,
+    dead: false,
+    parts,
+    geom: geom0,
+    sections: computeSections(parts),
+    massProps: mp0,
+    controls: { pitch: 0, yaw: 0, roll: 0 },
+    translate: { x: 0, y: 0, z: 0 },
+    sas: false,
+    sasMode: 'hold',
+    sasTarget: quat.clone(),
+  };
+}
+
 export class SimSession {
   constructor(opts = {}) {
-    this.st = null;
-    this.plan = [];
-    this.stageIdx = 0;
+    this.vessels = [];
+    this.activeId = null;
+    this.targetId = null;
+    this.weld = null;
+    this.dockState = 'free';
+    this._idSeq = 1;
     this.events = [];
     this.lastEvents = [];
-    this.craftName = null;
-    this.liftedOff = false;
     this.workshop = new Workshop(opts.workshop ?? {});
     this.lastDesign = null;
     this.warpIdx = 0;
@@ -50,8 +99,63 @@ export class SimSession {
     this.lang = 'en';
   }
 
+  activeVessel() {
+    if (!this.activeId) return null;
+    return this.vessels.find((v) => v.id === this.activeId) ?? null;
+  }
+
+  vesselById(id) {
+    if (id == null) return null;
+    return this.vessels.find((v) => v.id === id) ?? null;
+  }
+
+  get st() {
+    return this.activeVessel()?.st ?? null;
+  }
+
+  set st(value) {
+    const v = this.activeVessel();
+    if (v) v.st = value;
+  }
+
+  get plan() {
+    return this.activeVessel()?.plan ?? [];
+  }
+
+  set plan(value) {
+    const v = this.activeVessel();
+    if (v) v.plan = value;
+  }
+
+  get stageIdx() {
+    return this.activeVessel()?.stageIdx ?? 0;
+  }
+
+  set stageIdx(value) {
+    const v = this.activeVessel();
+    if (v) v.stageIdx = value;
+  }
+
+  get liftedOff() {
+    return this.activeVessel()?.liftedOff ?? false;
+  }
+
+  set liftedOff(value) {
+    const v = this.activeVessel();
+    if (v) v.liftedOff = !!value;
+  }
+
+  get craftName() {
+    return this.activeVessel()?.name ?? null;
+  }
+
+  set craftName(value) {
+    const v = this.activeVessel();
+    if (v) v.name = value;
+  }
+
   hasFlight() {
-    return this.st != null;
+    return this.activeVessel() != null;
   }
 
   newFlight(craftName = 'Mun Express') {
@@ -68,35 +172,227 @@ export class SimSession {
 
   /** Same pad spawn as newFlight, from an arbitrary VAB design. */
   newFlightFromDesign(design) {
-    if (!design || !Array.isArray(design.stack)) {
-      throw new Error('Invalid design: expected { name, stack, radials }');
-    }
-    const d = structuredClone(design);
-    d.radials ??= [];
+    const d = resolveDesign(design);
     const parts = buildVesselParts(d);
     const geom0 = stackGeometry(parts);
     const mp0 = massProps(parts, geom0);
     const quat0 = new Quaternion().setFromUnitVectors(Y, PAD_DIR);
-
-    this.st = {
-      t: 0, body: 'kerbin',
+    const st = makeState({
+      parts,
+      body: 'kerbin',
       pos: PAD_DIR.clone().multiplyScalar(BODIES.kerbin.radius + PAD_ALTITUDE + 0.7 + mp0.comY),
       vel: new Vector3(),
-      quat: quat0.clone(), angVel: new Vector3(),
-      throttle: 0, landed: true, dead: false,
-      parts, geom: geom0, sections: computeSections(parts), massProps: mp0,
-      controls: { pitch: 0, yaw: 0, roll: 0 },
-      sas: false, sasMode: 'hold', sasTarget: quat0.clone(),
+      quat: quat0,
+      t: 0,
+      landed: true,
+    });
+    st.sas = false;
+    const vessel = {
+      id: 'active',
+      name: d.name || 'Untitled Craft',
+      design: structuredClone(d),
+      st,
+      plan: buildStagePlan(parts),
+      stageIdx: 0,
+      liftedOff: false,
     };
-    this.plan = buildStagePlan(parts);
-    this.stageIdx = 0;
+    this.vessels = [vessel];
+    this.activeId = 'active';
+    this.targetId = null;
+    this.weld = null;
+    this.dockState = 'free';
     this.events = [];
     this.lastEvents = [];
-    this.craftName = d.name || 'Untitled Craft';
-    this.liftedOff = false;
     this.lastDesign = structuredClone(d);
     this.warpIdx = 0;
     return this.telemetry();
+  }
+
+  /**
+   * Place a ship in a Kepler orbit (circular OK: ap=pe).
+   * Equatorial plane, true anomaly from +X, same convention as existing orbits.
+   */
+  spawnOrbital(design, opts = {}) {
+    const d = resolveDesign(design);
+    const body = opts.body || 'kerbin';
+    if (!BODIES[body]) throw new Error(`Unknown body "${body}"`);
+    const ap = opts.ap_m ?? opts.ap;
+    const pe = opts.pe_m ?? opts.pe ?? ap;
+    if (ap == null || pe == null) throw new Error('spawnOrbital requires ap_m and pe_m');
+    const t0 = this.st?.t ?? 0;
+    const kv = stateFromKepler(body, { ap_m: ap, pe_m: pe, ta_deg: opts.ta_deg ?? 0 });
+    const parts = buildVesselParts(d);
+    for (const p of parts) {
+      if (p.def.engine) p.ignited = true;
+    }
+    const east = new Vector3(0, 1, 0).cross(kv.pos.clone().normalize());
+    if (east.lengthSq() < 1e-12) east.set(0, 0, -1);
+    east.normalize();
+    const quat = new Quaternion().setFromUnitVectors(Y, kv.vel.lengthSq() > 1 ? kv.vel.clone().normalize() : east);
+    const st = makeState({
+      parts,
+      body,
+      pos: kv.pos,
+      vel: kv.vel,
+      quat,
+      t: t0,
+      landed: false,
+    });
+    st.sas = true;
+    st.sasMode = 'hold';
+    st.sasTarget.copy(quat);
+    const id = opts.id != null ? String(opts.id) : String(this._idSeq++);
+    if (this.vesselById(id)) throw new Error(`Vessel id "${id}" already exists`);
+    const vessel = {
+      id,
+      name: opts.name || d.name || `Vessel ${id}`,
+      design: structuredClone(d),
+      st,
+      plan: buildStagePlan(parts),
+      stageIdx: 0,
+      liftedOff: true,
+    };
+    this.vessels.push(vessel);
+    if (!this.activeId) this.activeId = id;
+    return { id: vessel.id, name: vessel.name, ...this.telemetry() };
+  }
+
+  listVessels() {
+    return this.vessels.map((v) => {
+      const st = v.st;
+      const alt = st.pos.length() - BODIES[st.body].radius;
+      let situation = 'flight';
+      if (st.dead) situation = 'dead';
+      else if (st.landed && !v.liftedOff) situation = 'prelaunch';
+      else if (st.landed) situation = 'landed';
+      return {
+        id: v.id,
+        name: v.name,
+        body: st.body,
+        alt_m: alt,
+        situation,
+        active: v.id === this.activeId,
+      };
+    });
+  }
+
+  setTarget(id) {
+    if (id == null || id === '' || id === 'null') {
+      this.targetId = null;
+      return { target: null, ...this.telemetry() };
+    }
+    const v = this.vesselById(String(id));
+    if (!v) throw new Error(`Unknown vessel "${id}"`);
+    this.targetId = v.id;
+    return { target: this.targetId, ...this.telemetry() };
+  }
+
+  setTranslate({ x, y, z } = {}) {
+    this.requireFlight();
+    const tr = this.st.translate ?? (this.st.translate = { x: 0, y: 0, z: 0 });
+    if (x != null) tr.x = clamp(x, -1, 1);
+    if (y != null) tr.y = clamp(y, -1, 1);
+    if (z != null) tr.z = clamp(z, -1, 1);
+    return { translate: { ...tr }, ...this.telemetry() };
+  }
+
+  relativeNav() {
+    const act = this.activeVessel();
+    const tgt = this.vesselById(this.targetId);
+    if (!act || !tgt || tgt.id === act.id || tgt.st.body !== act.st.body) {
+      return {
+        target: this.targetId,
+        range_m: null,
+        closing_ms: null,
+        rel_speed_ms: null,
+        phase_deg: null,
+      };
+    }
+    const rel = tgt.st.pos.clone().sub(act.st.pos);
+    const range = rel.length();
+    const relVel = tgt.st.vel.clone().sub(act.st.vel);
+    const closing = range > 1e-6 ? relVel.dot(rel.clone().normalize()) : 0;
+    const rv = act.st.pos.clone().normalize();
+    const rm = tgt.st.pos.clone().normalize();
+    const cr = new Vector3().crossVectors(rv, rm);
+    let phase = Math.atan2(cr.y, rv.dot(rm)) * 180 / Math.PI;
+    if (phase < 0) phase += 360;
+    return {
+      target: tgt.id,
+      range_m: range,
+      closing_ms: closing,
+      rel_speed_ms: relVel.length(),
+      phase_deg: phase,
+    };
+  }
+
+  pairForDock() {
+    const act = this.activeVessel();
+    if (!act) return null;
+    if (this.targetId) {
+      const tgt = this.vesselById(this.targetId);
+      if (tgt && tgt.id !== act.id) return { a: act, b: tgt };
+    }
+    const other = this.vessels.find((v) => v.id !== act.id);
+    return other ? { a: act, b: other } : null;
+  }
+
+  tryAutoDock() {
+    if (this.weld || this.dockState === 'hard') return;
+    const pair = this.pairForDock();
+    if (!pair) return;
+    if (pair.a.st.body !== pair.b.st.body) return;
+    const ev = evaluateCapture(pair.a.st, pair.b.st);
+    if (ev.ok) this.hardDock(pair.a, pair.b);
+  }
+
+  hardDock(a, b) {
+    this.weld = weldFromStates(a.id, a.st, b.id, b.st);
+    this.dockState = 'hard';
+    applyWeld(a.st, b.st, this.weld);
+  }
+
+  dock() {
+    this.requireFlight();
+    if (this.weld) return { docked: true, dockState: 'hard', ...this.telemetry() };
+    const pair = this.pairForDock();
+    if (!pair) throw new Error('Need a second vessel (set a target) to dock');
+    const ev = evaluateCapture(pair.a.st, pair.b.st);
+    if (ev.ok) {
+      this.hardDock(pair.a, pair.b);
+      return {
+        docked: true,
+        dockState: 'hard',
+        dist: ev.dist,
+        axisAng: ev.axisAng,
+        closing: ev.closing,
+        ...this.telemetry(),
+      };
+    }
+    return {
+      docked: false,
+      dockState: this.dockState,
+      dist: ev.dist,
+      axisAng: ev.axisAng,
+      closing: ev.closing,
+      reason: ev.reason,
+      ...this.telemetry(),
+    };
+  }
+
+  undock() {
+    this.requireFlight();
+    if (!this.weld) return { dockState: 'free', undocked: false, ...this.telemetry() };
+    const a = this.vesselById(this.weld.a);
+    const b = this.vesselById(this.weld.b);
+    if (a && b) {
+      const axis = new Vector3(0, 1, 0).applyQuaternion(a.st.quat);
+      b.st.pos.addScaledVector(axis, 0.45);
+      b.st.vel.copy(a.st.vel).addScaledVector(axis, 0.2);
+    }
+    this.weld = null;
+    this.dockState = 'free';
+    return { dockState: 'free', undocked: true, ...this.telemetry() };
   }
 
   launchWorkshop() {
@@ -106,13 +402,13 @@ export class SimSession {
   }
 
   revert() {
-    this.st = null;
-    this.plan = [];
-    this.stageIdx = 0;
+    this.vessels = [];
+    this.activeId = null;
+    this.targetId = null;
+    this.weld = null;
+    this.dockState = 'free';
     this.events = [];
     this.lastEvents = [];
-    this.craftName = null;
-    this.liftedOff = false;
     this.warpIdx = 0;
     return { reverted: true, workshop: this.workshop.snapshot() };
   }
@@ -162,6 +458,7 @@ export class SimSession {
 
   refreshMass() {
     const st = this.st;
+    if (!st) return;
     st.geom = stackGeometry(st.parts);
     st.sections = computeSections(st.parts);
     st.massProps = massProps(st.parts, st.geom);
@@ -216,6 +513,7 @@ export class SimSession {
     const agl = alt - terrainH - (st.massProps?.comY ?? 0);
     const speed = st.vel.length();
     const vspeed = st.vel.dot(up);
+    const nav = this.relativeNav();
 
     const snap = {
       t: st.t,
@@ -248,6 +546,15 @@ export class SimSession {
       mapOpen: this.mapOpen,
       cam: { ...this.cam },
       lang: this.lang,
+      vessels: this.listVessels(),
+      activeId: this.activeId,
+      target: nav.target,
+      range_m: nav.range_m,
+      closing_ms: nav.closing_ms,
+      rel_speed_ms: nav.rel_speed_ms,
+      phase_deg: nav.phase_deg,
+      dockState: this.dockState,
+      translate: { ...(st.translate ?? { x: 0, y: 0, z: 0 }) },
     };
 
     try {
@@ -391,28 +698,125 @@ export class SimSession {
     return { chutes: 'armed', parts: n, ...this.telemetry() };
   }
 
-  physicsAdvance(seconds = 1, dt = DEFAULT_DT) {
-    this.requireFlight();
-    const simTime = Math.min(STEP_CAP_S, Math.max(0, Number(seconds) || 0));
-    const h = dt > 0 ? dt : DEFAULT_DT;
-    const n = Math.round(simTime / h);
-    const collected = [];
-    for (let i = 0; i < n; i++) {
-      physicsStep(this.st, h, this.events);
-      this.st.t += h;
-      for (const ev of this.events) {
-        collected.push(serializeEvent(ev));
-        if (ev.type === 'liftoff') this.liftedOff = true;
-        if (ev.type === 'crashed') this.st.dead = true;
-        if (ev.type === 'overheat' && ev.part?.def?.pod) this.st.dead = true;
-      }
-      this.lastEvents = this.events.splice(0, this.events.length);
-      if (this.st.dead) break;
+  vesselCanRails(v) {
+    if (!v || v.st.landed || v.st.dead) return false;
+    const st = v.st;
+    const thrusting = st.throttle > 0 && st.parts.some((p) => p.alive && p.ignited && p.def.engine);
+    const translating = st.translate && (st.translate.x || st.translate.y || st.translate.z);
+    const alt = st.pos.length() - BODIES[st.body].radius;
+    if (thrusting || translating || alt < (BODIES[st.body].atmoHeight || 0) + 2000) return false;
+    return true;
+  }
+
+  consumeEvents(v, evs, collected) {
+    for (const ev of evs) {
+      collected.push(serializeEvent(ev));
+      if (ev.type === 'liftoff') v.liftedOff = true;
+      if (ev.type === 'crashed') v.st.dead = true;
+      if (ev.type === 'overheat' && ev.part?.def?.pod) v.st.dead = true;
     }
+  }
+
+  railsVessel(v, h, collected) {
+    const st = v.st;
+    const body = BODIES[st.body];
+    let el;
+    try {
+      el = elementsFromState(st.pos, st.vel, body.mu, st.t);
+    } catch {
+      const evs = [];
+      physicsStep(st, h, evs);
+      st.t += h;
+      this.consumeEvents(v, evs, collected);
+      return;
+    }
+    st.t += h;
+    const { pos, vel } = propagate(el, st.t);
+    if (pos.length() - body.radius < 22_000) {
+      st.t -= h;
+      const evs = [];
+      physicsStep(st, h, evs);
+      st.t += h;
+      this.consumeEvents(v, evs, collected);
+      return;
+    }
+    st.pos.copy(pos);
+    st.vel.copy(vel);
+    const soiEvents = [];
+    checkSOI(st, soiEvents);
+    for (const ev of soiEvents) collected.push({ type: ev.type, body: ev.body });
+  }
+
+  tickAll(h, { railsOk }, collected) {
+    const active = this.activeVessel();
+    for (const v of this.vessels) {
+      if (this.weld && v.id === this.weld.b) continue;
+      const isActive = v.id === this.activeId;
+      if (!isActive) {
+        v.st.throttle = 0;
+        v.st.translate = { x: 0, y: 0, z: 0 };
+        v.st.controls.pitch = 0;
+        v.st.controls.yaw = 0;
+        v.st.controls.roll = 0;
+        if (!v.st.sas) {
+          v.st.sas = true;
+          v.st.sasMode = 'hold';
+          v.st.sasTarget.copy(v.st.quat);
+        }
+      }
+      const dist = active && !isActive ? v.st.pos.distanceTo(active.st.pos) : 0;
+      const useRails = (railsOk || dist > RAILS_DIST_M) && this.vesselCanRails(v);
+      if (useRails) this.railsVessel(v, h, collected);
+      else {
+        const evs = [];
+        physicsStep(v.st, h, evs);
+        v.st.t += h;
+        this.consumeEvents(v, evs, collected);
+      }
+    }
+    if (this.weld) {
+      const a = this.vesselById(this.weld.a);
+      const b = this.vesselById(this.weld.b);
+      if (a && b) applyWeld(a.st, b.st, this.weld);
+      else {
+        this.weld = null;
+        this.dockState = 'free';
+      }
+    }
+    this.tryAutoDock();
+  }
+
+  advanceAll(seconds, { forceRails = false, dt = DEFAULT_DT } = {}) {
+    this.requireFlight();
+    const cap = Math.min(STEP_CAP_S, Math.max(0, Number(seconds) || 0));
+    const t0 = this.st.t;
+    const collected = [];
+    const railsWanted = forceRails || this.warpIdx > 3;
+    if (railsWanted && this.vesselCanRails(this.activeVessel())) {
+      const step = Math.min(10, Math.max(1, cap / 20));
+      while (this.st.t - t0 < cap - 1e-9) {
+        const h = Math.min(step, cap - (this.st.t - t0));
+        this.tickAll(h, { railsOk: true }, collected);
+        if (this.st.dead) break;
+      }
+    } else {
+      const h = dt > 0 ? dt : DEFAULT_DT;
+      const n = Math.round(cap / h);
+      for (let i = 0; i < n; i++) {
+        this.tickAll(h, { railsOk: this.warpIdx > 3 }, collected);
+        if (this.st.dead) break;
+      }
+    }
+    this.lastEvents = collected;
     const tlm = this.telemetry();
     tlm.events = collected;
-    tlm.stepped_s = n * h;
+    tlm.stepped_s = this.st.t - t0;
+    tlm.coast = railsWanted && this.vesselCanRails(this.activeVessel()) ? 'rails' : 'physics';
     return tlm;
+  }
+
+  physicsAdvance(seconds = 1, dt = DEFAULT_DT) {
+    return this.advanceAll(seconds, { forceRails: false, dt });
   }
 
   step(seconds = 1, dt = DEFAULT_DT) {
@@ -423,49 +827,30 @@ export class SimSession {
 
   /** On-rails coast when engines are off and out of atmosphere; else physics. */
   coast(seconds) {
-    const st = this.requireFlight();
-    const cap = Math.min(STEP_CAP_S, Math.max(0, Number(seconds) || 0));
-    const body = BODIES[st.body];
-    const alt = this.alt();
-    const thrusting = st.throttle > 0 && st.parts.some((p) => p.alive && p.ignited && p.def.engine);
-    if (st.landed || st.dead || thrusting || alt < (body.atmoHeight || 0) + 2000) {
-      return this.physicsAdvance(cap);
-    }
-    let el;
-    try {
-      el = elementsFromState(st.pos, st.vel, body.mu, st.t);
-    } catch {
-      return this.physicsAdvance(cap);
-    }
-    const collected = [];
-    const t0 = st.t;
-    const dt = Math.min(10, Math.max(1, cap / 20));
-    while (st.t - t0 < cap) {
-      st.t += dt;
-      const { pos, vel } = propagate(el, st.t);
-      if (pos.length() - BODIES[st.body].radius < 22_000) {
-        st.t -= dt;
-        const remain = cap - (st.t - t0);
-        const rest = this.physicsAdvance(remain);
-        rest.events = collected.concat(rest.events || []);
-        rest.coast = 'fell-back-to-step';
-        return rest;
-      }
-      st.pos.copy(pos);
-      st.vel.copy(vel);
-      const soiEvents = [];
-      checkSOI(st, soiEvents);
-      if (soiEvents.length) {
-        for (const ev of soiEvents) collected.push({ type: ev.type, body: ev.body });
-        el = elementsFromState(st.pos, st.vel, BODIES[st.body].mu, st.t);
-      }
-    }
-    this.lastEvents = collected;
-    const tlm = this.telemetry();
-    tlm.events = collected;
-    tlm.stepped_s = st.t - t0;
-    tlm.coast = 'rails';
-    return tlm;
+    return this.advanceAll(seconds, { forceRails: true });
+  }
+
+  captureVesselBlock(v, slot) {
+    return {
+      id: v.id,
+      name: v.name,
+      design: {
+        name: v.design?.name ?? v.name ?? '',
+        stack: [...(v.design?.stack ?? [])],
+        radials: structuredClone(v.design?.radials ?? []),
+      },
+      snapshot: serializeSnapshot(v.st, { tag: slot, craft: v.name }),
+      stageIdx: v.stageIdx,
+      liftedOff: !!v.liftedOff,
+      sas: !!v.st.sas,
+      sasMode: v.st.sasMode ?? 'hold',
+      controls: {
+        pitch: v.st.controls?.pitch ?? 0,
+        yaw: v.st.controls?.yaw ?? 0,
+        roll: v.st.controls?.roll ?? 0,
+      },
+      translate: { ...(v.st.translate ?? { x: 0, y: 0, z: 0 }) },
+    };
   }
 
   captureSave(name) {
@@ -488,9 +873,10 @@ export class SimSession {
     }
     let flight = null;
     let mode = 'vab';
+    let vessels = null;
     if (this.hasFlight()) {
       mode = 'flight';
-      const designSrc = this.lastDesign ?? this.workshop.design;
+      const designSrc = this.lastDesign ?? this.activeVessel()?.design ?? this.workshop.design;
       const design = {
         name: designSrc.name ?? this.craftName ?? '',
         stack: [...(designSrc.stack ?? [])],
@@ -513,6 +899,7 @@ export class SimSession {
         cam: { ...this.cam },
         liftedOff: !!this.liftedOff,
       };
+      vessels = this.vessels.map((v) => this.captureVesselBlock(v, slot));
     }
     return buildSave({
       name: slot,
@@ -521,7 +908,55 @@ export class SimSession {
       workshop,
       crafts,
       flight,
+      vessels,
+      activeId: this.activeId,
+      targetId: this.targetId,
+      weld: serializeWeld(this.weld),
+      dockState: this.dockState,
     });
+  }
+
+  applyVesselRecord(rec) {
+    const design = rec.design ?? { name: rec.name, stack: ['pod-mk1'], radials: [] };
+    const d = resolveDesign(design);
+    const parts = buildVesselParts(d);
+    const quat0 = new Quaternion();
+    const st = makeState({
+      parts,
+      body: 'kerbin',
+      pos: new Vector3(),
+      vel: new Vector3(),
+      quat: quat0,
+      t: 0,
+      landed: true,
+    });
+    if (rec.snapshot) applySnapshotToState(st, rec.snapshot);
+    st.geom = stackGeometry(st.parts);
+    st.sections = computeSections(st.parts);
+    st.massProps = massProps(st.parts, st.geom);
+    if (rec.sas != null) st.sas = !!rec.sas;
+    if (rec.sasMode) st.sasMode = rec.sasMode;
+    if (rec.controls) {
+      st.controls.pitch = rec.controls.pitch ?? 0;
+      st.controls.yaw = rec.controls.yaw ?? 0;
+      st.controls.roll = rec.controls.roll ?? 0;
+    }
+    if (rec.translate) {
+      st.translate = {
+        x: rec.translate.x ?? 0,
+        y: rec.translate.y ?? 0,
+        z: rec.translate.z ?? 0,
+      };
+    }
+    return {
+      id: String(rec.id ?? this._idSeq++),
+      name: rec.name || d.name || 'Vessel',
+      design: structuredClone(d),
+      st,
+      plan: buildStagePlan(st.parts),
+      stageIdx: Number(rec.stageIdx) || 0,
+      liftedOff: !!rec.liftedOff,
+    };
   }
 
   applySave(doc) {
@@ -548,28 +983,46 @@ export class SimSession {
 
     if (doc.lang === 'en' || doc.lang === 'zh') this.setLang(doc.lang);
 
-    if (doc.mode === 'flight' && doc.flight?.design) {
-      const f = doc.flight;
-      this.newFlightFromDesign(f.design);
-      if (f.craftName) this.craftName = f.craftName;
-      if (f.snapshot) applySnapshotToState(this.st, f.snapshot);
-      this.refreshMass();
-      if (f.stageIdx != null) this.stageIdx = Number(f.stageIdx) || 0;
-      if (f.warpIdx != null) this.warpIdx = Number(f.warpIdx) || 0;
-      if (f.sas != null) this.st.sas = !!f.sas;
-      if (f.sasMode) this.st.sasMode = f.sasMode;
-      if (f.controls) {
-        this.st.controls.pitch = f.controls.pitch ?? 0;
-        this.st.controls.yaw = f.controls.yaw ?? 0;
-        this.st.controls.roll = f.controls.roll ?? 0;
+    const multi = Array.isArray(doc.vessels) && doc.vessels.length > 0;
+    if (doc.mode === 'flight' && (multi || doc.flight?.design)) {
+      if (multi) {
+        this.vessels = doc.vessels.map((rec) => this.applyVesselRecord(rec));
+        this.activeId = doc.activeId && this.vesselById(doc.activeId)
+          ? doc.activeId
+          : this.vessels[0].id;
+        this.targetId = doc.targetId && this.vesselById(doc.targetId) ? doc.targetId : null;
+        this.weld = hydrateWeld(doc.weld);
+        this.dockState = doc.dockState ?? (this.weld ? 'hard' : 'free');
+        if (this.weld) {
+          const a = this.vesselById(this.weld.a);
+          const b = this.vesselById(this.weld.b);
+          if (a && b) applyWeld(a.st, b.st, this.weld);
+        }
+      } else {
+        const f = doc.flight;
+        this.newFlightFromDesign(f.design);
+        if (f.craftName) this.craftName = f.craftName;
+        if (f.snapshot) applySnapshotToState(this.st, f.snapshot);
+        this.refreshMass();
+        if (f.stageIdx != null) this.stageIdx = Number(f.stageIdx) || 0;
+        if (f.sas != null) this.st.sas = !!f.sas;
+        if (f.sasMode) this.st.sasMode = f.sasMode;
+        if (f.controls) {
+          this.st.controls.pitch = f.controls.pitch ?? 0;
+          this.st.controls.yaw = f.controls.yaw ?? 0;
+          this.st.controls.roll = f.controls.roll ?? 0;
+        }
+        if (f.liftedOff != null) this.liftedOff = !!f.liftedOff;
       }
-      if (f.mapOpen != null) this.mapOpen = !!f.mapOpen;
-      if (f.cam) {
+      const f = doc.flight;
+      if (f?.warpIdx != null) this.warpIdx = Number(f.warpIdx) || 0;
+      if (f?.mapOpen != null) this.mapOpen = !!f.mapOpen;
+      if (f?.cam) {
         if (f.cam.az != null) this.cam.az = Number(f.cam.az);
         if (f.cam.el != null) this.cam.el = Number(f.cam.el);
         if (f.cam.dist != null) this.cam.dist = Number(f.cam.dist);
       }
-      if (f.liftedOff != null) this.liftedOff = !!f.liftedOff;
+      this.lastDesign = structuredClone(this.activeVessel()?.design ?? this.lastDesign);
       return this.telemetry();
     }
 

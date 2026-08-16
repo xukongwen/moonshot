@@ -1,0 +1,162 @@
+{
+  "tag": "agent-fly-window",
+  "t": 9901296.513930876,
+  "body": "kerbin",
+  "pos": [
+    -353030.4763871202,
+    3.835591852713382e-10,
+    -620750.842884001
+  ],
+  "vel": [
+    -1866.8246666156056,
+    -9.505094017266693e-13,
+    1189.9503525478285
+  ],
+  "quat": [
+    -0.5774692758920845,
+    0,
+    0.40807993751307026,
+    0.7071067811865477
+  ],
+  "throttle": 0,
+  "landed": false,
+  "dead": false,
+  "craft": "Duna Hauler",
+  "parts": [
+    {
+      "key": "s56",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 0
+    },
+    {
+      "key": "s57",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": "stowed",
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 1
+    },
+    {
+      "key": "s58",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 2
+    },
+    {
+      "key": "s59",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 3
+    },
+    {
+      "key": "s60",
+      "fuel": 4000,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 4
+    },
+    {
+      "key": "s61",
+      "fuel": 2000,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "s62",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 6
+    },
+    {
+      "key": "s63",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 7
+    },
+    {
+      "key": "s64",
+      "fuel": 1552.6810888534164,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 8
+    },
+    {
+      "key": "s65",
+      "fuel": 1552.6810888534164,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 9
+    },
+    {
+      "key": "s66",
+      "fuel": 1552.6810888534164,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 10
+    },
+    {
+      "key": "s67",
+      "fuel": 1552.6810888534164,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 11
+    },
+    {
+      "key": "s68",
+      "fuel": 776.3405444267082,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 12
+    },
+    {
+      "key": "s69",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 13
+    },
+    {
+      "key": "r81",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": false,
+      "alive": true,
+      "stackIndex": 5
+    }
+  ]
+}

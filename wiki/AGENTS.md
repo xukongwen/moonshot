@@ -39,3 +39,4 @@ tags: [wiki, agents]
 ## 打板
 
 用户说「打板」= 收 wiki + npm run release + 提交并推送到自己的 fork。没说打板不要推送。
+打板 / release 必须把版本写到 README（脚本会改，不要手改）。

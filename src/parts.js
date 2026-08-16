@@ -58,6 +58,12 @@ export const PARTS = {
     dragArea: 0.4, maxTemp: 2200, shape: 'engine',
     desc: 'Gimballed workhorse lifter engine.',
   },
+  'eng-raven': {
+    name: 'R-40 "Raven"', category: 'Engines', size: 1.25, mass: 900, length: 1.3,
+    engine: { thrustVac: 120_000, ispVac: 360, ispSL: 90, gimbal: 3, throttleable: true },
+    dragArea: 0.35, maxTemp: 2000, shape: 'engine',
+    desc: 'Vacuum transfer / kick stage. Hopeless at sea level.',
+  },
   'eng-titan': {
     name: 'T-900 "Titan"', category: 'Engines', size: 2.5, mass: 6000, length: 2.4,
     engine: { thrustVac: 1_400_000, ispVac: 305, ispSL: 280, gimbal: 2, throttleable: true },
@@ -113,8 +119,8 @@ export const PARTS = {
   },
   'chute': {
     name: 'Mk2 Parachute', category: 'Utility', size: 1.25, mass: 100, length: 0.35,
-    chute: { dragArea: 280 }, dragArea: 0.15, maxTemp: 1100, shape: 'chute',
-    desc: 'Deploys below 2.5 km and under 300 m/s. Pack it on top.',
+    chute: { dragArea: 280 }, dragArea: 0.15, maxTemp: 2000, shape: 'chute',
+    desc: 'Deploys below 2.5 km and under 300 m/s. Packed, it survives being mid-stack on reentry; do not put it windward.',
   },
   'legs': {
     name: 'LT-2 Landing Legs ×4', category: 'Utility', size: 1.25, mass: 150, length: 1.6,

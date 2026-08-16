@@ -43,6 +43,7 @@ export class VAB {
     $('load-select').onchange = (e) => { if (e.target.value) this.load(e.target.value); };
     $('btn-stock-hopper').onclick = () => this.loadStock('Suborbital Hopper');
     $('btn-stock-mun').onclick = () => this.loadStock('Mun Express');
+    $('btn-stock-duna').onclick = () => this.loadStock('Duna Hauler');
     $('btn-launch').onclick = () => this.launch();
     $('craft-name').value = this.design.name;
     $('craft-name').oninput = (e) => { this.design.name = e.target.value || t('vab.untitled'); };

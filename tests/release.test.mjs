@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { bumpVersion, planRelease } from "../scripts/release.mjs";
+import { bumpVersion, planRelease, applyReadmeVersion } from "../scripts/release.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 let failures = 0;
@@ -75,6 +75,18 @@ const parts = String(pkg.version).split(".").map(Number);
 const expectedNext = `${parts[0]}.${parts[1]}.${parts[2] + 1}`;
 const mentionsNext = dryOut.includes(expectedNext) || dryOut.includes("0.1.1") || /skip/i.test(dryOut);
 check(`--dry-run mentions ${expectedNext} or 0.1.1 or skip`, mentionsNext, dryOut.slice(0, 300));
+
+
+const replaced = applyReadmeVersion("前言\n当前打板：**v0.1.2**\n后记", "0.1.3");
+check("applyReadmeVersion replaces stamp", replaced.includes("当前打板：**v0.1.3**") && !replaced.includes("当前打板：**v0.1.2**"));
+const inserted = applyReadmeVersion("## 版本\n\n旧说明。\n", "0.2.0");
+check("applyReadmeVersion inserts under heading", inserted.includes("当前打板：**v0.2.0**") && inserted.indexOf("## 版本") < inserted.indexOf("当前打板：**v0.2.0**"));
+const readmeText = readFileSync(join(root, "README.md"), "utf8");
+check(
+  "README.md on disk has current stamp",
+  readmeText.includes("当前打板：**v" + pkg.version + "**"),
+  pkg.version
+);
 
 if (failures) {
   console.error(`\n${failures} failure(s)`);

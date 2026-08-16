@@ -15,6 +15,7 @@ tags: [version, release]
 
 `package.json` 从 `0.1.0` 起。第一次真实发布是 `0.1.1`，之后较大交付变成 `0.1.2`、`0.1.88`……可以持续很多年。
 游戏顶栏显示 `v` + package.json version（装配间和飞行）。
+每次发布会把版本写到 README 的 `当前打板：**vX.Y.Z**`。
 
 - **0** 锁定非正式版。升到 1.x 等于出正式版，必须用户亲口说「出正式版」。脚本没有把仓库升到 1.0 的开关。
 - **era** 极少换代。默认 `npm run release` 不加 era。只有用户明确说换代才 `--era`（例如 0.1.12 → 0.2.0）。
@@ -27,6 +28,7 @@ tags: [version, release]
 scripts/release.mjs
 tests/release.test.mjs
 CHANGELOG.md
+README.md
 wiki/releases/
 package.json 的 release 脚本
 

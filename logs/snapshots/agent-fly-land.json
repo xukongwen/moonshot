@@ -1,0 +1,99 @@
+{
+  "tag": "agent-fly-land",
+  "t": 16561076.66393074,
+  "body": "duna",
+  "pos": [
+    144241.29807971363,
+    3.651306746268897e-8,
+    -286143.4830356138
+  ],
+  "vel": [
+    0,
+    0,
+    0
+  ],
+  "quat": [
+    -0.6314198390581529,
+    0,
+    -0.31829072692071864,
+    0.7071067811865878
+  ],
+  "throttle": 0,
+  "landed": true,
+  "dead": false,
+  "craft": "Duna Hauler",
+  "parts": [
+    {
+      "key": "s56",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 0
+    },
+    {
+      "key": "s57",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": "deployed",
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 1
+    },
+    {
+      "key": "s58",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 2
+    },
+    {
+      "key": "s59",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 3
+    },
+    {
+      "key": "s60",
+      "fuel": 3899.269772352781,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 4
+    },
+    {
+      "key": "s61",
+      "fuel": 1949.6348861763904,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "s62",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 6
+    },
+    {
+      "key": "r81",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": true,
+      "alive": true,
+      "stackIndex": 5
+    }
+  ]
+}

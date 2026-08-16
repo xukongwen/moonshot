@@ -1,0 +1,99 @@
+{
+  "tag": "agent-fly-home",
+  "t": 33463694.469789006,
+  "body": "kerbin",
+  "pos": [
+    80779564.3744049,
+    -0.000013425624068108144,
+    -23291150.743198395
+  ],
+  "vel": [
+    -1312.8366608563692,
+    1.4444115300166089e-11,
+    338.0508403902304
+  ],
+  "quat": [
+    0.2225522326421387,
+    0,
+    0.671170994416474,
+    0.707106781186548
+  ],
+  "throttle": 0,
+  "landed": false,
+  "dead": false,
+  "craft": "Duna Hauler",
+  "parts": [
+    {
+      "key": "s0",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 0
+    },
+    {
+      "key": "s1",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": "stowed",
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 1
+    },
+    {
+      "key": "s2",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 2
+    },
+    {
+      "key": "s3",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 3
+    },
+    {
+      "key": "s4",
+      "fuel": 885.2842167074166,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 4
+    },
+    {
+      "key": "s5",
+      "fuel": 442.6421083537083,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "s6",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 6
+    },
+    {
+      "key": "r25",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": false,
+      "alive": true,
+      "stackIndex": 5
+    }
+  ]
+}

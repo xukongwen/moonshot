@@ -22,6 +22,7 @@ DUNA_LOG.md
 mcp/duna-hohmann.mjs
 wiki/modules/hohmann.md
 wiki/adr/2026-08-15-ejection-asymptote.md
+wiki/missions/duna-landing.md
 
 ## 边界
 
@@ -31,3 +32,4 @@ wiki/adr/2026-08-15-ejection-asymptote.md
 ## 已知问题
 
 有限推力 TDI 的 vInf 低于理想 918。
+着陆与 Duna Hauler 见 duna-landing.md，不要把本页的 519 kg 捕获写成已经着陆。

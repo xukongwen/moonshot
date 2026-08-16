@@ -11,6 +11,7 @@ import {
   listBrowserSaves, writeBrowserSave, readBrowserSave,
 } from './save.js';
 import { VERSION } from './version.js';
+import { api as agentApi, bind as bindAgent } from './agent-ui.js';
 
 const app = document.getElementById('app');
 
@@ -284,7 +285,8 @@ async function boot() {
     flight.start(design);
     return true;
   }
-  window.__moonshot = { flight, vab, setLang, getLang, saveGame, loadGame, version: VERSION, enterFlight };
+  bindAgent();
+  window.__moonshot = { flight, vab, setLang, getLang, saveGame, loadGame, version: VERSION, enterFlight, agent: agentApi };
 
   document.getElementById('btn-lang').onclick = toggleLang;
   document.getElementById('btn-lang-flight').onclick = toggleLang;

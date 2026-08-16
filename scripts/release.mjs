@@ -16,6 +16,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = path.resolve(__dirname, "..");
 const PKG_PATH = path.join(REPO_ROOT, "package.json");
 const CHANGELOG_PATH = path.join(REPO_ROOT, "CHANGELOG.md");
+const README_PATH = path.join(REPO_ROOT, "README.md");
 const INDEX_PATH = path.join(REPO_ROOT, "wiki/index.md");
 const LOG_PATH = path.join(REPO_ROOT, "wiki/log.md");
 const RELEASES_DIR = path.join(REPO_ROOT, "wiki/releases");
@@ -157,6 +158,25 @@ function changelogCommits(commits) {
   return (commits || []).filter((c) => !SKIP_SUBJECT.test(c.subject || ""));
 }
 
+
+export function applyReadmeVersion(text, next) {
+  const stamp = `当前打板：**v${next}**`;
+  if (/当前打板：\*\*v\d+\.\d+\.\d+\*\*/.test(text)) {
+    return text.replace(/当前打板：\*\*v\d+\.\d+\.\d+\*\*/, stamp);
+  }
+  const line = `${stamp}（非正式预发布，\`0.<era>.<build>\`）。记录见 [CHANGELOG.md](./CHANGELOG.md)。`;
+  if (/^## 版本/m.test(text)) {
+    return text.replace(/^(## 版本)[ \t]*\n*/m, `$1\n\n${line}\n`);
+  }
+  const trimmed = text.replace(/\s*$/, "");
+  return `${trimmed}\n\n## 版本\n\n${line}\n`;
+}
+
+function writeReadmeVersion(next) {
+  const text = fs.readFileSync(README_PATH, "utf8");
+  fs.writeFileSync(README_PATH, applyReadmeVersion(text, next));
+}
+
 function writePackageVersion(next) {
   // Game UI reads package.json via src/version.js — next release updates the top-bar label.
   const pkg = JSON.parse(fs.readFileSync(PKG_PATH, "utf8"));
@@ -220,6 +240,7 @@ CHANGELOG.md
 wiki/releases/v${next}.md
 wiki/modules/versioning.md
 package.json version 字段
+README.md 当前打板行
 scripts/release.mjs
 
 ## 边界
@@ -341,6 +362,7 @@ function main() {
 
   const date = todayShanghai();
   writePackageVersion(plan.next);
+  writeReadmeVersion(plan.next);
   writeChangelog(plan.next, date, commits);
   writeReleasePage(plan.next, date, commits);
   writeLogLine(plan.next, date);

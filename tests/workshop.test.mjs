@@ -43,6 +43,10 @@ function deepEqual(a, b) {
   w.loadStock('Mun Express');
   const ok = w.validateLaunch();
   check('Mun Express ok', ok.ok === true, ok.error);
+  w.loadStock('Duna Hauler');
+  const okD = w.validateLaunch();
+  check('Duna Hauler ok', okD.ok === true, okD.error);
+  check('Duna Hauler in STOCK', Object.keys(STOCK).includes('Duna Hauler'));
 }
 
 // ---- 3. save/load roundtrip via temp crafts path ----
@@ -117,6 +121,10 @@ function deepEqual(a, b) {
   check('ksp_vab_launch', names.includes('ksp_vab_launch'));
   check('ksp_coast', names.includes('ksp_coast'));
   check('ksp_new_flight kept', names.includes('ksp_new_flight'));
+  check('ksp_plan', names.includes('ksp_plan'));
+  check('ksp_redesign', names.includes('ksp_redesign'));
+  check('ksp_agent_get', names.includes('ksp_agent_get'));
+  check('ksp_agent_plan', names.includes('ksp_agent_plan'));
 }
 
 // unknown part error

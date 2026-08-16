@@ -1,0 +1,66 @@
+{
+  "craft": "Mun Express",
+  "stack": [
+    "pod-mk1",
+    "chute",
+    "heat-shield",
+    "decoupler-s",
+    "tank-m",
+    "tank-s",
+    "eng-kestrel",
+    "decoupler-s",
+    "tank-l",
+    "tank-l",
+    "tank-m",
+    "eng-sparrow",
+    "decoupler-l",
+    "adapter",
+    "tank-xl",
+    "tank-xl",
+    "tank-xl",
+    "eng-titan"
+  ],
+  "radials": [
+    {
+      "part": "legs",
+      "sym": 1,
+      "host": 5
+    },
+    {
+      "part": "legs",
+      "sym": 1,
+      "host": 0
+    },
+    {
+      "part": "fins",
+      "sym": 1,
+      "host": 16
+    }
+  ],
+  "mun": {
+    "body": "mun",
+    "speed": 2.865122253395518,
+    "t": 50422.5070919929,
+    "fuel": 1250.6245761805578,
+    "water": false
+  },
+  "kerbin": {
+    "body": "kerbin",
+    "speed": 10.735803776338994,
+    "t": 94861.38938320123,
+    "fuel": 0,
+    "water": false
+  },
+  "snaps": [
+    {
+      "tag": "mun-landed",
+      "path": "/workspace/moonshot/logs/snapshots/mun-landed.json"
+    },
+    {
+      "tag": "mun-kerbin-return",
+      "path": "/workspace/moonshot/logs/snapshots/mun-kerbin-return.json"
+    }
+  ],
+  "failures": 0,
+  "met": 94861.38938320123
+}

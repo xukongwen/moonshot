@@ -1,0 +1,582 @@
+{
+  "startedAt": "2026-08-16T02:16:44.209Z",
+  "snapshot": "home (Kerbin encounter → capture + chute land; do not light jettisoned Raven)",
+  "craft": "Duna Hauler",
+  "stack": [
+    "pod-mk1",
+    "chute",
+    "heat-shield",
+    "decoupler-s",
+    "tank-l",
+    "tank-m",
+    "eng-sparrow",
+    "decoupler-s",
+    "tank-l",
+    "tank-l",
+    "tank-l",
+    "tank-l",
+    "tank-m",
+    "eng-raven",
+    "decoupler-l",
+    "adapter",
+    "tank-xl",
+    "tank-xl",
+    "tank-xl",
+    "tank-xl",
+    "tank-xl",
+    "tank-xl",
+    "tank-xl",
+    "tank-xl",
+    "eng-titan"
+  ],
+  "radials": [
+    {
+      "part": "legs",
+      "sym": 1,
+      "host": 5
+    },
+    {
+      "part": "fins",
+      "sym": 1,
+      "host": 23
+    },
+    {
+      "part": "srb",
+      "sym": 6,
+      "host": 23
+    }
+  ],
+  "transfer": "4× tank-l + 1× tank-m Raven",
+  "lifter": "8× tank-xl Titan + 6 SRB",
+  "alsoStock": "Duna Hauler Light = same 4-tank + Raven stack",
+  "raven": {
+    "id": "eng-raven",
+    "name": "R-40 \"Raven\"",
+    "size": 1.25,
+    "mass": 900,
+    "length": 1.3,
+    "thrustVac": 120000,
+    "ispVac": 360,
+    "ispSL": 90,
+    "gimbal": 3,
+    "throttleable": true,
+    "dragArea": 0.35,
+    "maxTemp": 2000,
+    "shape": "engine"
+  },
+  "padTwrSL": 1.2053763669858246,
+  "padWetKg": 206010,
+  "vInfTarget": 826.0537900264135,
+  "planOk": true,
+  "planText": "duna-roundtrip  OK\n  ok kerbin_ascent    lifter   need  4200  have  6945  margin   2745  paid lifter 3720+transfer 480\n  ok duna_ejection    transfer need  1200  have  2745  margin   1545\n  ok duna_capture     transfer need   450  have  1545  margin   1095\n  ok duna_land        lander   need   900  have  3832  margin   2932\n  ok duna_ascent      lander   need  1800  have  2932  margin   1132\n  ok duna_return      lander   need   800  have  1132  margin    332",
+  "planPhases": [
+    {
+      "id": "kerbin_ascent",
+      "role": "lifter",
+      "need": 4200,
+      "have": 6944.906612740446,
+      "margin": 2744.906612740446,
+      "paid": {
+        "lifter": 3719.584996694289,
+        "transfer": 480.4150033057108
+      }
+    },
+    {
+      "id": "duna_ejection",
+      "role": "transfer",
+      "need": 1200,
+      "have": 2744.906612740446,
+      "margin": 1544.9066127404458,
+      "paid": null
+    },
+    {
+      "id": "duna_capture",
+      "role": "transfer",
+      "need": 450,
+      "have": 1544.9066127404458,
+      "margin": 1094.9066127404458,
+      "paid": null
+    },
+    {
+      "id": "duna_land",
+      "role": "lander",
+      "need": 900,
+      "have": 3831.822896999284,
+      "margin": 2931.822896999284,
+      "paid": null
+    },
+    {
+      "id": "duna_ascent",
+      "role": "lander",
+      "need": 1800,
+      "have": 2931.822896999284,
+      "margin": 1131.8228969992838,
+      "paid": null
+    },
+    {
+      "id": "duna_return",
+      "role": "lander",
+      "need": 800,
+      "have": 1131.8228969992838,
+      "margin": 331.8228969992838,
+      "paid": null
+    }
+  ],
+  "change": "Home from Kerbin encounter: lander capture at Pe, drop Pe into atmo, chute+pod land. No Raven.",
+  "llm": false,
+  "invented": false,
+  "nodes": [
+    {
+      "nodeId": "ascent",
+      "ok": true,
+      "stub": false,
+      "thought": "入轨完成。轨道 72 × 144 km，剩油 12987 kg，级 1。",
+      "nextId": "window",
+      "t": 597.5000000000043,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false,
+      "peKm": 71.55859444974014,
+      "apKm": 143.96642193416193,
+      "orbitText": "72 × 144 km",
+      "fuelKg": 12987.064899840374,
+      "transferFuelKg": 6987.064899840374,
+      "landerName": "S-7 \"Sparrow\"",
+      "transferName": "R-40 \"Raven\"",
+      "ignited": [
+        "R-40 \"Raven\""
+      ],
+      "stageIdx": 1,
+      "vInf": 0,
+      "wallMs": 4751
+    },
+    {
+      "nodeId": "window",
+      "ok": true,
+      "stub": false,
+      "thought": "窗口到了。相位 44.4°（目标 44.4°）。剩油 12987 kg。",
+      "nextId": "escape",
+      "t": 9901296.513930876,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false,
+      "peKm": 71.55859444974001,
+      "apKm": 143.96642193416216,
+      "orbitText": "72 × 144 km",
+      "fuelKg": 12987.064899840374,
+      "transferFuelKg": 6987.064899840374,
+      "landerName": "S-7 \"Sparrow\"",
+      "transferName": "R-40 \"Raven\"",
+      "ignited": [
+        "R-40 \"Raven\""
+      ],
+      "stageIdx": 1,
+      "vInf": 0,
+      "wallMs": 26
+    },
+    {
+      "nodeId": "escape",
+      "ok": true,
+      "stub": false,
+      "thought": "逃逸完成。在 kerbin，v∞ 861（目标 918）。轨道 101 × ∞ km，剩油 8149 kg。",
+      "nextId": "coast",
+      "t": 9901514.86393123,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false,
+      "peKm": 100.5657504086938,
+      "apKm": null,
+      "orbitText": "101 × ∞ km",
+      "fuelKg": 8148.511469259878,
+      "transferFuelKg": 2148.5114692598777,
+      "landerName": "S-7 \"Sparrow\"",
+      "transferName": "R-40 \"Raven\"",
+      "ignited": [
+        "R-40 \"Raven\""
+      ],
+      "stageIdx": 1,
+      "vInf": 861.4871561191802,
+      "wallMs": 13,
+      "vInfTarget": 918.3458304101223
+    },
+    {
+      "nodeId": "coast",
+      "ok": true,
+      "stub": false,
+      "thought": "滑行到 duna。轨道 -171 × ∞ km，剩油 7945 kg。",
+      "nextId": "capture",
+      "t": 16505240.863931188,
+      "body": "duna",
+      "landed": false,
+      "dead": false,
+      "peKm": -170.80782166626358,
+      "apKm": null,
+      "orbitText": "-171 × ∞ km",
+      "fuelKg": 7944.5682266642925,
+      "transferFuelKg": 1944.5682266642925,
+      "landerName": "S-7 \"Sparrow\"",
+      "transferName": "R-40 \"Raven\"",
+      "ignited": [
+        "R-40 \"Raven\""
+      ],
+      "stageIdx": 1,
+      "vInf": 821.3675602646612,
+      "wallMs": 246,
+      "vInfTarget": 918.3458304101223,
+      "ca_m": null,
+      "encPe_m": null,
+      "enc": false
+    },
+    {
+      "nodeId": "capture",
+      "ok": true,
+      "stub": false,
+      "thought": "捕获到 duna。轨道 -248 × 319 km，剩油 6000 kg。",
+      "nextId": "jettison",
+      "t": 16561068.103930797,
+      "body": "duna",
+      "landed": false,
+      "dead": false,
+      "peKm": -247.71946853963834,
+      "apKm": 318.7303913239527,
+      "orbitText": "-248 × 319 km",
+      "fuelKg": 6000,
+      "transferFuelKg": 0,
+      "landerName": "S-7 \"Sparrow\"",
+      "transferName": "R-40 \"Raven\"",
+      "ignited": [
+        "R-40 \"Raven\""
+      ],
+      "stageIdx": 1,
+      "vInf": 0,
+      "wallMs": 14,
+      "vInfTarget": 918.3458304101223
+    },
+    {
+      "nodeId": "jettison",
+      "ok": true,
+      "stub": false,
+      "thought": "丢掉转移级（TD-12 Decoupler、FT-800 Tank、FT-800 Tank、FT-800 Tank、FT-800 Tank、FT-400 Tank、R-40 \"Raven\"）。还剩 Mk1 Command Pod、Mk2 Parachute、AB-1 Heat Shield、TD-12 Decoupler、FT-800 Tank、FT-400 Tank。剩油 6000 kg。",
+      "nextId": "land",
+      "t": 16561068.103930797,
+      "body": "duna",
+      "landed": false,
+      "dead": false,
+      "peKm": -247.71946853963834,
+      "apKm": 318.7303913239527,
+      "orbitText": "-248 × 319 km",
+      "fuelKg": 6000,
+      "transferFuelKg": 0,
+      "landerName": "S-7 \"Sparrow\"",
+      "transferName": null,
+      "ignited": [
+        "S-7 \"Sparrow\""
+      ],
+      "stageIdx": 1,
+      "vInf": 0,
+      "wallMs": 1
+    },
+    {
+      "nodeId": "land",
+      "ok": true,
+      "stub": false,
+      "thought": "落到 duna。剩油 5849 kg。",
+      "nextId": "rise",
+      "t": 16561076.66393074,
+      "body": "duna",
+      "landed": true,
+      "dead": false,
+      "peKm": null,
+      "apKm": null,
+      "orbitText": "—",
+      "fuelKg": 5848.904658529171,
+      "transferFuelKg": 0,
+      "landerName": "S-7 \"Sparrow\"",
+      "transferName": null,
+      "ignited": [
+        "S-7 \"Sparrow\""
+      ],
+      "stageIdx": 1,
+      "vInf": 0,
+      "wallMs": 3
+    },
+    {
+      "nodeId": "rise",
+      "ok": true,
+      "stub": false,
+      "thought": "上升入轨。轨道 59 × 130 km，剩油 2590 kg。",
+      "nextId": "home",
+      "t": 16561631.013932098,
+      "body": "duna",
+      "landed": false,
+      "dead": false,
+      "peKm": 58.94114656021929,
+      "apKm": 130.1492609933681,
+      "orbitText": "59 × 130 km",
+      "fuelKg": 2590.246325752682,
+      "transferFuelKg": 0,
+      "landerName": "S-7 \"Sparrow\"",
+      "transferName": null,
+      "ignited": [
+        "S-7 \"Sparrow\""
+      ],
+      "stageIdx": 1,
+      "vInf": 0,
+      "wallMs": 102
+    },
+    {
+      "nodeId": "home",
+      "ok": true,
+      "stub": false,
+      "thought": "回家：落到 Kerbin。触地 1.18 m/s。剩油 317 kg。",
+      "nextId": "home",
+      "t": 33546363.70510801,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false,
+      "peKm": null,
+      "apKm": null,
+      "orbitText": "—",
+      "fuelKg": 317.07720958735143,
+      "transferFuelKg": 0,
+      "landerName": "S-7 \"Sparrow\"",
+      "transferName": null,
+      "ignited": [
+        "S-7 \"Sparrow\""
+      ],
+      "stageIdx": 1,
+      "vInf": 0,
+      "wallMs": 288,
+      "vInfTarget": 826.0537900264135,
+      "captureOrbit": "572 × 1985 km",
+      "captureFuelKg": 493.7097918701371,
+      "agl_m": -1.0915091053220749e-10,
+      "speed_ms": 0,
+      "mass_t": 3.117077209587351,
+      "chute": {
+        "name": "Mk2 Parachute",
+        "state": "deployed",
+        "alive": true
+      },
+      "landerOnly": true,
+      "touchdownSpeed": 1.1771819510314352
+    }
+  ],
+  "snapshots": {
+    "pad": {
+      "tag": "agent-fly-pad",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-pad.json",
+      "t": 0,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false
+    },
+    "ascent": {
+      "tag": "agent-fly-ascent",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-ascent.json",
+      "t": 597.5000000000043,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false
+    },
+    "window": {
+      "tag": "agent-fly-window",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-window.json",
+      "t": 9901296.513930876,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false
+    },
+    "escape": {
+      "tag": "agent-fly-escape",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-escape.json",
+      "t": 9901514.86393123,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false
+    },
+    "coast": {
+      "tag": "agent-fly-coast",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-coast.json",
+      "t": 16505240.863931188,
+      "body": "duna",
+      "landed": false,
+      "dead": false
+    },
+    "capture": {
+      "tag": "agent-fly-capture",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-capture.json",
+      "t": 16561068.103930797,
+      "body": "duna",
+      "landed": false,
+      "dead": false
+    },
+    "jettison": {
+      "tag": "agent-fly-jettison",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-jettison.json",
+      "t": 16561068.103930797,
+      "body": "duna",
+      "landed": false,
+      "dead": false
+    },
+    "land": {
+      "tag": "agent-fly-land",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-land.json",
+      "t": 16561076.66393074,
+      "body": "duna",
+      "landed": true,
+      "dead": false
+    },
+    "rise": {
+      "tag": "agent-fly-rise",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-rise.json",
+      "t": 16561631.013932098,
+      "body": "duna",
+      "landed": false,
+      "dead": false
+    },
+    "home": {
+      "tag": "agent-fly-home",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-home.json",
+      "t": 33463694.469789006,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false
+    },
+    "kerbinCapture": {
+      "tag": "agent-fly-kerbin-capture",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-kerbin-capture.json",
+      "t": 33522621.797896124,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false
+    },
+    "kerbinLand": {
+      "tag": "agent-fly-kerbin-land",
+      "path": "/workspace/moonshot/logs/snapshots/agent-fly-kerbin-land.json",
+      "t": 33546363.70510801,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false
+    }
+  },
+  "stopped": null,
+  "verdict": "home: landed on kerbin AGL 0 m, touchdown 1.18 m/s, fuel 317 kg, capture 572 × 1985 km, chute deployed, lander-only Sparrow.",
+  "priorHome": {
+    "nodeId": "home",
+    "ok": true,
+    "stub": false,
+    "thought": "回家：Kerbin 相遇（kerbin）。轨道 572 × ∞ km，剩油 1328 kg。",
+    "nextId": "home",
+    "t": 33463694.469789006,
+    "body": "kerbin",
+    "landed": false,
+    "dead": false,
+    "peKm": 572.4500268667724,
+    "apKm": null,
+    "orbitText": "572 × ∞ km",
+    "fuelKg": 1327.9263250611248,
+    "transferFuelKg": 0,
+    "landerName": "S-7 \"Sparrow\"",
+    "transferName": null,
+    "ignited": [
+      "S-7 \"Sparrow\""
+    ],
+    "stageIdx": 1,
+    "vInf": 1324.3123006479689,
+    "wallMs": 696,
+    "vInfTarget": 826.0537900264135
+  },
+  "priorRise": {
+    "nodeId": "rise",
+    "ok": false,
+    "stub": false,
+    "thought": "上升失败：近拱点 48 km × 远拱点 54 km。剩油 2935 kg。",
+    "nextId": "rise",
+    "t": 16561505.963932201,
+    "body": "duna",
+    "landed": false,
+    "dead": false,
+    "peKm": 48.39260258535663,
+    "apKm": 53.93800875991228,
+    "orbitText": "48 × 54 km",
+    "fuelKg": 2935.1764186643745,
+    "transferFuelKg": 0,
+    "landerName": "S-7 \"Sparrow\"",
+    "transferName": null,
+    "ignited": [
+      "S-7 \"Sparrow\""
+    ],
+    "stageIdx": 1,
+    "vInf": 0,
+    "wallMs": 58
+  },
+  "prior": {
+    "startedAt": "2026-08-16T01:54:52.767Z",
+    "finishedAt": "2026-08-16T01:54:57.320Z",
+    "verdict": "failed on ascent: 入轨失败：船毁了。剩油 14292 kg。",
+    "nodes": [
+      {
+        "nodeId": "ascent",
+        "ok": false,
+        "stub": false,
+        "thought": "入轨失败：船毁了。剩油 14292 kg。",
+        "nextId": "ascent",
+        "t": 593.2500000000082,
+        "body": "kerbin",
+        "landed": false,
+        "dead": true,
+        "peKm": -600,
+        "apKm": 0.01299490694317501,
+        "orbitText": "-600 × 0 km",
+        "fuelKg": 14292.301652452632,
+        "transferFuelKg": 14292.301652452632,
+        "landerName": "S-7 \"Sparrow\"",
+        "transferName": "R-40 \"Raven\"",
+        "ignited": [
+          "R-40 \"Raven\""
+        ],
+        "stageIdx": 3,
+        "vInf": 0,
+        "wallMs": 4534
+      }
+    ]
+  },
+  "capture": {
+    "ok": true,
+    "reason": null,
+    "orbitText": "572 × 1985 km",
+    "peKm": 571.850312507337,
+    "apKm": 1984.8627859373646,
+    "fuelKg": 493.7097918701371,
+    "body": "kerbin",
+    "landed": false,
+    "dead": false,
+    "ignited": [
+      "S-7 \"Sparrow\""
+    ],
+    "wallMs": 32
+  },
+  "howFar": {
+    "dunaBody": true,
+    "landerOnlyTouchdown": true,
+    "riseOrbit": "59 × 130 km",
+    "kerbinReturn": true,
+    "kerbinCaptured": true,
+    "kerbinLanded": true,
+    "captureOrbit": "572 × 1985 km",
+    "stopped": null
+  },
+  "finishedAt": "2026-08-16T02:16:44.557Z",
+  "shots": [
+    "logs/shots/agent-fly-ascent.png",
+    "logs/shots/agent-fly-escape.png",
+    "logs/shots/agent-fly-coast.png",
+    "logs/shots/agent-fly-capture.png",
+    "logs/shots/agent-fly-land.png",
+    "logs/shots/agent-fly-rise.png",
+    "logs/shots/agent-fly-home.png",
+    "logs/shots/agent-fly-kerbin-capture.png",
+    "logs/shots/agent-fly-kerbin-land.png"
+  ]
+}

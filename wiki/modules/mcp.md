@@ -1,6 +1,6 @@
 ---
 title: mcp
-updated: 2026-08-15
+updated: 2026-08-16
 status: active
 tags: [mcp, vab]
 ---
@@ -18,14 +18,14 @@ DOM-free 车间：mcp/workshop.mjs。无头飞船在 mcp/crafts.json。浏览器
 发射校验：必须有 command pod 和 engine。
 测试 tests/workshop.test.mjs 会从空车间重建 Mun Express。
 
-44 个工具：原飞行/VAB/存档加上 ksp_vessels、ksp_spawn_orbital、ksp_target、ksp_translate、ksp_dock、ksp_undock。ksp_vab_save 仍只存飞船。
+52 个工具：原飞行/VAB/存档、交汇对接、ksp_plan / ksp_redesign，加上 A6 `ksp_agent_*`（get / toggle / plan / step / revert / check）。与游戏内面板同一套函数，stdio 无 DOM。ksp_vab_save 仍只存飞船。
 
 ## 关键入口
 
 工具表：wiki/api/mcp-tools.md
 车间：mcp/workshop.mjs
-会话：mcp/session.mjs
-测试：tests/workshop.test.mjs · tests/saves.test.mjs
+会话：mcp/session.mjs · mcp/agent.mjs
+测试：tests/workshop.test.mjs · tests/saves.test.mjs · tests/agent-mcp.test.mjs
 
 ## 边界
 

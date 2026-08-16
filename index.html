@@ -23,6 +23,7 @@
         <span class="spacer"></span>
         <button id="btn-stock-hopper" class="ghost" data-i18n="vab.stockHopper">Stock: Suborbital Hopper</button>
         <button id="btn-stock-mun" class="ghost" data-i18n="vab.stockMun">Stock: Mun Express</button>
+        <button id="btn-stock-duna" class="ghost" data-i18n="vab.stockDuna">Stock: Duna Hauler</button>
         <button id="btn-lang" class="ghost">中文</button>
         <button id="btn-launch" class="launch" data-i18n="vab.launch">LAUNCH ▶</button>
       </div>
@@ -49,6 +50,11 @@
         <h3><span data-i18n="vab.staging">STAGING &amp; Δv</span> <span class="dim" data-i18n="vab.vacuum">(vacuum)</span></h3>
         <div id="stage-stats"></div>
         <div id="craft-stats"></div>
+        <div id="vab-agent-row" class="agent-input-row">
+          <input id="vab-agent-goal" spellcheck="false" data-i18n-placeholder="agent.goalHint" placeholder="去火星再回来" />
+          <button id="btn-vab-plan" data-i18n="agent.planBtn">规划</button>
+        </div>
+        <div id="vab-agent-thought" class="dim"></div>
       </div>
     </div>
 
@@ -63,6 +69,7 @@
         <button id="btn-warp-down">◀</button>
         <button id="btn-warp-up">▶</button>
         <button id="btn-map" data-i18n="flight.map">Map [M]</button>
+        <button id="btn-agent" data-i18n="agent.toggle">Agent [O]</button>
         <button id="btn-help" data-i18n="flight.keys">Keys [H]</button>
         <button id="btn-lang-flight" class="ghost">中文</button>
         <button id="btn-flight-save" data-i18n="save.game">Save game</button>
@@ -76,9 +83,39 @@
         <div id="resource-bars"></div>
       </div>
 
-      <div id="orbit-panel" class="panel">
-        <h3 id="orbit-title">ORBIT — KERBIN</h3>
-        <div id="orbit-data"></div>
+      <div id="flight-right">
+        <div id="orbit-panel" class="panel">
+          <h3 id="orbit-title">ORBIT — KERBIN</h3>
+          <div id="orbit-data"></div>
+        </div>
+
+        <div id="agent-panel" class="panel">
+          <h3 data-i18n="agent.title">AGENT</h3>
+          <div class="agent-input-row">
+            <input id="agent-goal-input" spellcheck="false" data-i18n-placeholder="agent.goalHint" placeholder="去火星再回来" />
+            <button id="btn-agent-plan" data-i18n="agent.planBtn">规划</button>
+            <button id="btn-agent-step" data-i18n="agent.stepBtn">走一步</button>
+            <button id="btn-agent-revert" data-i18n="agent.revertBtn">回退</button>
+            <button id="btn-agent-check" data-i18n="agent.checkBtn">检查</button>
+          </div>
+          <div class="agent-block">
+            <div class="dim" data-i18n="agent.goal">GOAL</div>
+            <div id="agent-goal-text"></div>
+          </div>
+          <div class="agent-block">
+            <div class="dim" data-i18n="agent.node">NODE</div>
+            <div id="agent-node-text"></div>
+          </div>
+          <div class="agent-block">
+            <div class="dim" data-i18n="agent.plan">PLAN</div>
+            <div id="agent-plan-list"></div>
+          </div>
+          <div class="agent-block agent-thought-block">
+            <div class="dim" data-i18n="agent.thought">THOUGHT</div>
+            <div id="agent-thought"></div>
+            <div id="agent-thoughts" class="dim"></div>
+          </div>
+        </div>
       </div>
 
       <div id="bottom-cluster">
@@ -137,6 +174,7 @@
           <tr><td>P</td><td data-i18n="flight.help.chutes">arm / deploy parachutes</td></tr>
           <tr><td>, / .</td><td data-i18n="flight.help.warp">time warp down / up</td></tr>
           <tr><td>M</td><td data-i18n="flight.help.map">map view</td></tr>
+          <tr><td>O</td><td data-i18n="flight.help.agent">toggle agent panel</td></tr>
           <tr><td>L</td><td data-i18n="flight.help.lang">toggle language</td></tr>
           <tr><td>F5</td><td data-i18n="flight.help.f5">quicksave</td></tr>
           <tr><td>F9</td><td data-i18n="flight.help.f9">load save</td></tr>

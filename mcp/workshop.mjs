@@ -131,6 +131,20 @@ export class Workshop {
     return this.snapshot();
   }
 
+  /** Replace the current VAB design (used by ksp_redesign). */
+  applyDesign(design) {
+    if (!design || !Array.isArray(design.stack)) {
+      throw new Error('applyDesign requires { name, stack, radials }');
+    }
+    this.design = {
+      name: design.name || this.design.name,
+      stack: [...design.stack],
+      radials: (design.radials ?? []).map((r) => ({ part: r.part, sym: r.sym, host: r.host })),
+    };
+    this.selected = -1;
+    return this.snapshot();
+  }
+
   stats() {
     const stages = stagingStats(this.design);
     const parts = buildVesselParts(this.design);

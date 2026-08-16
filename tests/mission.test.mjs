@@ -274,10 +274,25 @@ for (let i = 0; i < 400_000; i++) {
   log(`fuel after capture: ${fuelLeft().toFixed(0)} kg, orbit ${((e.rp - BODIES.mun.radius) / 1000).toFixed(0)} × ${((e.ra - BODIES.mun.radius) / 1000).toFixed(0)} km`);
   evt('MOI', `Mun orbit insertion — ${((e.rp - BODIES.mun.radius) / 1000).toFixed(0)} × ${((e.ra - BODIES.mun.radius) / 1000).toFixed(0)} km`);
 
-  // coast to the new low point
+  // circularize at the low point so landing is not a 2 Mm-Ap suicide burn
   const tPe2 = timeToPeriapsis(els(), st.t);
-  if (isFinite(tPe2) && tPe2 > 30) coast(() => false, tPe2 - 15, 2);
-  log(`descent start: alt ${(alt() / 1000).toFixed(1)} km, speed ${st.vel.length().toFixed(0)} m/s`);
+  if (isFinite(tPe2) && tPe2 > 20) coast(() => false, tPe2 - 12, 2);
+  st.throttle = 1;
+  for (let i = 0; i < 40_000; i++) {
+    point(st.vel.clone().negate());
+    step(0.05);
+    const e2 = els();
+    if (e2.a > 0 && e2.ra - BODIES.mun.radius < 40_000) break;
+    if (alt() < 20_000) break;
+    const lit = st.parts.find((p) => p.ignited && p.alive && p.def.engine && !p.def.engine.srb);
+    if (lit) {
+      const secs = computeSections(st.parts);
+      if (!st.parts.some((p) => p.def.fuel && !p.def.engine && p.fuel > 0.5 &&
+          secs.get(p.stackIndex) === secs.get(lit.stackIndex))) stage();
+    }
+  }
+  st.throttle = 0;
+  log(`descent start: alt ${(alt() / 1000).toFixed(1)} km, speed ${st.vel.length().toFixed(0)} m/s, ${((els().rp-BODIES.mun.radius)/1000).toFixed(0)} × ${((els().ra-BODIES.mun.radius)/1000).toFixed(0)} km`);
   evt('PDI', `Powered descent initiation — alt ${(alt() / 1000).toFixed(1)} km, velocity ${st.vel.length().toFixed(0)} m/s`);
 }
 
@@ -296,13 +311,14 @@ for (let i = 0; i < 400_000; i++) {
     const vH = st.vel.clone().addScaledVector(u, -vUp);
     const speed = st.vel.length();
 
-    // staging: if the sparrow runs dry, drop to the kestrel lander stage
+    // staging: drop a dry transfer while still high so the lander can brake
     const secs = computeSections(st.parts);
-    const sparrow = st.parts.find((p) => p.def.name.includes('Sparrow'));
-    if (sparrow?.ignited) {
+    const lit = st.parts.find((p) => p.ignited && p.alive && p.def.engine && !p.def.engine.srb);
+    if (lit) {
       const feed = st.parts.filter((p) => p.def.fuel && !p.def.engine && p.fuel > 0.5 &&
-        secs.get(p.stackIndex) === secs.get(sparrow.stackIndex));
+        secs.get(p.stackIndex) === secs.get(lit.stackIndex));
       if (!feed.length) stage();
+      else if (feed.reduce((s, p) => s + p.fuel, 0) < 80 && aglNow > 2500) stage();
     }
 
     const mp = st.massProps ?? massProps(st.parts, stackGeometry(st.parts));
@@ -311,19 +327,19 @@ for (let i = 0; i < 400_000; i++) {
       .filter((p) => p.alive && p.ignited && p.def.engine)
       .reduce((s, p) => s + p.def.engine.thrustVac * p.sym, 0) || 24_000;
     const maxAcc = maxThrust / mp.m;
-    const brake = Math.max(0.1, 0.62 * (maxAcc - g));
-    const vAllow = Math.sqrt(Math.max(0, 2 * brake * Math.max(0, aglNow - 8))) + 4;
+    const brake = Math.max(0.1, 0.45 * Math.max(0.2, maxAcc - g));
+    const vAllow = Math.sqrt(Math.max(0, 2 * brake * Math.max(0, aglNow - 15))) + 3;
 
     if (vH.length() > 4 && aglNow > 2000) {
       // kill horizontal velocity first, slight up-bias
       point(vH.clone().negate().addScaledVector(u, vH.length() * 0.25));
       st.throttle = 1;
-    } else if (speed > vAllow) {
+    } else if (speed > vAllow || (aglNow < 400 && speed > 8)) {
       point(st.vel.clone().negate());
       st.throttle = 1;
     } else {
       point(u);
-      st.throttle = 0;
+      st.throttle = aglNow < 80 && speed > 3 ? 0.25 : 0;
     }
     step(0.04);
     landedEv = lastEvents.find((ev) => ev.type === 'landed');

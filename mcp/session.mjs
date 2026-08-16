@@ -10,11 +10,15 @@ import { elementsFromState, propagate, findMunEncounter, munTransferPhase, state
 import { heightAt } from '../src/terrain.js';
 import { setLang } from '../src/i18n.js';
 import { Workshop } from './workshop.mjs';
-import { serializeSnapshot, applySnapshotToState } from './snapshot.mjs';
+import { serializeSnapshot, applySnapshotToState, readSnapshot } from './snapshot.mjs';
 import { buildSave, validateSave } from '../src/save.js';
 import {
   evaluateCapture, applyWeld, weldFromStates, serializeWeld, hydrateWeld,
 } from '../src/docking.js';
+import {
+  freshAgent, agentGet, agentToggle, agentPlan, agentStep, agentRevert, agentCheck,
+  agentIdle,
+} from './agent.mjs';
 
 const Y = new Vector3(0, 1, 0);
 const STEP_CAP_S = 120;
@@ -97,7 +101,15 @@ export class SimSession {
     this.mapOpen = false;
     this.cam = { az: 0.5, el: 0.25, dist: 28 };
     this.lang = 'en';
+    this.agent = freshAgent();
   }
+
+  agentGet() { return agentGet(this); }
+  agentToggle(force) { return agentToggle(this, force); }
+  agentPlan(text) { return agentPlan(this, text); }
+  agentStep() { return agentStep(this); }
+  agentRevert(nodeId) { return agentRevert(this, nodeId); }
+  agentCheck() { return agentCheck(this); }
 
   activeVessel() {
     if (!this.activeId) return null;
@@ -205,6 +217,47 @@ export class SimSession {
     this.lastEvents = [];
     this.lastDesign = structuredClone(d);
     this.warpIdx = 0;
+    if (this.agent) this.agent = agentIdle(this.agent);
+    return this.telemetry();
+  }
+
+  /**
+   * Rebuild the stage plan from parts still attached and skip already-fired
+   * events (ignited engines / already-jettisoned sections).
+   */
+  resyncPlan() {
+    this.requireFlight();
+    this.plan = buildStagePlan(this.st.parts);
+    this.stageIdx = 0;
+    while (this.stageIdx < this.plan.length) {
+      const ev = this.plan[this.stageIdx];
+      if (ev.chutes) break;
+      if (ev.decouple != null) {
+        const hasBelow = this.st.parts.some((p) => p.alive && p.stackIndex >= ev.decouple);
+        if (!hasBelow) { this.stageIdx++; continue; }
+      }
+      if (ev.ignite.length) {
+        const allLit = ev.ignite.every((k) => {
+          const p = this.st.parts.find((q) => q.key === k);
+          return !p || p.ignited;
+        });
+        if (allLit) { this.stageIdx++; continue; }
+      }
+      break;
+    }
+    return { stageIdx: this.stageIdx, stages: this.plan.length };
+  }
+
+  /** Load a flight snapshot (object or path). Rebuilds staging from remaining parts. */
+  loadSnapshot(snapOrPath, { craft } = {}) {
+    const snap = typeof snapOrPath === 'string' ? readSnapshot(snapOrPath) : snapOrPath;
+    const name = craft || snap.craft || 'Mun Express';
+    if (!this.st || this.craftName !== name) this.newFlight(name);
+    applySnapshotToState(this.st, snap);
+    if (snap.craft) this.craftName = snap.craft;
+    this.liftedOff = !snap.landed || snap.t > 0;
+    this.resyncPlan();
+    this.refreshMass();
     return this.telemetry();
   }
 
@@ -410,6 +463,7 @@ export class SimSession {
     this.events = [];
     this.lastEvents = [];
     this.warpIdx = 0;
+    if (this.agent) this.agent = agentIdle(this.agent);
     return { reverted: true, workshop: this.workshop.snapshot() };
   }
 

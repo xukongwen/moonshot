@@ -9,26 +9,35 @@ tags: [mission, mun]
 
 ## 目的
 
-指向库存登月船与相关测试，不把整份飞行日志贴进来。
+指向库存登月船与往返测试。表面只要着陆器，不要把转移级一起放下。
 
 ## 当前判断
 
-库存船 Mun Express。自动驾驶入口 tests/mission.test.mjs。
-历史记录（ROUNDTRIP_LOG）：LKO 74 x 90 km，Mun 24 x 2107 km。早期往返再入坠毁，不要把「已经回家」写成当前事实。
-当前 mission.test 是否必过、落点与剩余燃料，以 tests/mission.test.mjs 和它写出的 FLIGHT_LOG.md 为准，本页不另断言。
+库存 Mun Express：短着陆器是 pod + chute + heat-shield + tank-m + tank-s + Kestrel，腿在着陆器罐和返回舱。
+低 Mun 轨道先丢掉 Sparrow 转移级，再动力下降。不要在 Sparrow 上着陆再分离。
+
+tests/mun-return.test.mjs 一次通过（数字以 logs/mun-return-result.json 为准）：
+Mun 2.87 m/s，剩 1251 kg，MET 14:00:22；Kerbin 10.74 m/s，MET 26:21:01。
+截图 logs/shots/mun-landed.png（短栈，无 Sparrow / Titan）。快照 logs/snapshots/mun-landed.json。
+
+早期 ROUNDTRIP_LOG 再入坠毁不要写成当前事实。mission.test.mjs 仍是只去 Mun 的历史入口。
 
 ## 关键入口
 
-tests/mission.test.mjs
+tests/mun-return.test.mjs
+tests/lib/autopilot.mjs（dropToLander、tkiFromMun、kerbinReentry）
+src/stock.js
+logs/mun-return-result.json
+logs/shots/mun-landed.png
 FLIGHT_LOG.md
 ROUNDTRIP_LOG.md
-mcp/roundtrip.mjs
 
 ## 边界
 
-不要把某一次成功着陆或某一次坠毁推广成永远如此。
+不要把某一次成功着陆推广成永远如此。
 不要发明新的轨道数字。
+不要为了省燃料改回「转移级着陆」。
 
 ## 已知问题
 
-往返再入曾在 ROUNDTRIP_LOG 里失败。回家不是已交付能力。
+着陆器腿在画面里不明显，截图里看起来像坐在喷口上。

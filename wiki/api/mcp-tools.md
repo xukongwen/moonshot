@@ -1,13 +1,13 @@
 ---
 title: MCP tools
-updated: 2026-08-15
+updated: 2026-08-16
 status: active
 tags: [api, mcp]
 ---
 
 # MCP tools
 
-agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 44 个。
+agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 52 个。
 
 | 工具 | 含义 |
 |---|---|
@@ -55,6 +55,14 @@ agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 44 个。
 | ksp_translate | RCS 平移杆量，体轴 -1..1（+y 机头） |
 | ksp_dock | 尝试捕获；门槛满足即硬焊 |
 | ksp_undock | 拆开焊接并给一点分离 |
+| ksp_plan | 用 mun-roundtrip / duna-roundtrip 的 Δv 预算给当前 VAB 或库存船打分，不飞 |
+| ksp_redesign | 按预算给缺油的级加罐或 SRB；VAB 当前设计写回车间，库存名只返回新设计不改 stock.js |
+| ksp_agent_get | 读 agent 面板状态：visible、goal、missionId、结点、当前刀、思考、running、有快照的结点、plan.ok / fail。不编油和 Δv |
+| ksp_agent_toggle | 开/关 agent 面板（只改 flag；无头无 DOM） |
+| ksp_agent_plan | 粗目标 → mun/duna 总图，与面板「规划」相同。有船用当前船，否则库存 |
+| ksp_agent_step | 走一步然后停，不连刀。不是 ksp_step |
+| ksp_agent_revert | 回退到已完成结点快照。不是 ksp_revert（回 VAB） |
+| ksp_agent_check | 跑 A5 检查并追加思考 |
 
 `ksp_telemetry` 在有目标且同一 SOI 时多：`target`、`range_m`、`closing_ms`（负=接近）、`rel_speed_ms`、`dockState`。
 

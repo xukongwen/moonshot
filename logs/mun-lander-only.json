@@ -1,0 +1,22 @@
+{
+  "mun": {
+    "body": "mun",
+    "speed": 2.865122253395518,
+    "t": 50422.5070919929,
+    "fuel": 1250.6245761805578,
+    "water": false
+  },
+  "names": [
+    "Mk1 Command Pod",
+    "Mk2 Parachute",
+    "AB-1 Heat Shield",
+    "TD-12 Decoupler",
+    "FT-400 Tank",
+    "FT-100 Tank",
+    "K-1 \"Kestrel\"",
+    "LT-2 Landing Legs ×4",
+    "LT-2 Landing Legs ×4"
+  ],
+  "length": 5.449999999999999,
+  "mass": 3450.6245761805576
+}

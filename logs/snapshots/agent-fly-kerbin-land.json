@@ -1,0 +1,99 @@
+{
+  "tag": "agent-fly-kerbin-land",
+  "t": 33546363.70510801,
+  "body": "kerbin",
+  "pos": [
+    592253.1212474393,
+    2.7721536942896213e-7,
+    -96134.22008904934
+  ],
+  "vel": [
+    0,
+    0,
+    0
+  ],
+  "quat": [
+    -0.11329439190467057,
+    0,
+    -0.6979716188805386,
+    0.7071067811867108
+  ],
+  "throttle": 0,
+  "landed": true,
+  "dead": false,
+  "craft": "Duna Hauler",
+  "parts": [
+    {
+      "key": "s0",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 0
+    },
+    {
+      "key": "s1",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": "deployed",
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 1
+    },
+    {
+      "key": "s2",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 2
+    },
+    {
+      "key": "s3",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": false,
+      "stackIndex": 3
+    },
+    {
+      "key": "s4",
+      "fuel": 211.38480639156762,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 4
+    },
+    {
+      "key": "s5",
+      "fuel": 105.69240319578381,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "s6",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 6
+    },
+    {
+      "key": "r25",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": true,
+      "alive": true,
+      "stackIndex": 5
+    }
+  ]
+}

@@ -27,6 +27,7 @@ check("active-memory contains L1", active.includes("L1"));
 
 const force = [
   "wiki/Moonshot 宪法.md",
+  "wiki/游戏内Agent计划.md",
   "wiki/Wiki Auto-Curator 架构.md",
   "wiki/modules/patched-conics.md",
   "wiki/modules/hohmann.md",

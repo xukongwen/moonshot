@@ -25,6 +25,7 @@ import { MapView } from './map.js';
 import { Navball } from './navball.js';
 import { SoundFX } from './sound.js';
 import { t, bodyName, getLang } from './i18n.js';
+import { loadDemoIfEmpty } from './agent-ui.js';
 
 const WARP_LEVELS = [1, 2, 3, 4, 10, 100, 1000, 10000, 100000];
 const PHYS_DT = 0.02;
@@ -130,6 +131,13 @@ export class Flight {
   // -------------------------------------------------------------------------
 
   start(design) {
+    if (typeof this.pilotCancel === 'function') {
+      const fn = this.pilotCancel;
+      this.pilotCancel = null;
+      this.pilot = null;
+      fn();
+    }
+    this.pilot = null;
     this.design = design;
     this.cleanupVessel();
     this.debris?.forEach((d) => this.scene.remove(d.group));
@@ -182,6 +190,7 @@ export class Flight {
     HUD.msg(t('msg.pad', { name: design.name }));
     HUD.setSituation(t('sit.prelaunch', { body: getLang() === 'en' ? bodyName('kerbin').toUpperCase() : bodyName('kerbin') }));
     HUD.stages(this.plan, 0, this.st.parts, this.st.sections);
+    loadDemoIfEmpty();
   }
 
   /**
@@ -346,6 +355,13 @@ export class Flight {
   }
 
   stop() {
+    if (typeof this.pilotCancel === 'function') {
+      const fn = this.pilotCancel;
+      this.pilotCancel = null;
+      this.pilot = null;
+      fn();
+    }
+    this.pilot = null;
     this.active = false;
     this.cleanupVessel();
     this.debris?.forEach((d) => this.scene.remove(d.group));
@@ -772,6 +788,9 @@ export class Flight {
     if (!this.active) return;
     dt = Math.min(dt, 0.1);
     this.handleHeldKeys(dt);
+    if (typeof this.pilot === 'function') {
+      try { this.pilot(dt); } catch (err) { console.error(err); this.pilot = null; }
+    }
     const st = this.st;
 
     if (!st.dead) {

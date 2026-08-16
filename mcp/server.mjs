@@ -9,6 +9,7 @@ import { SimSession, WARP_LEVELS } from './session.mjs';
 import { listPartsCatalog } from './workshop.mjs';
 import { STOCK } from '../src/stock.js';
 import { listSaves, writeSave, readSave, deleteSave } from './saves.mjs';
+import { planMission, redesignForBudget } from '../src/plan.js';
 
 const session = new SimSession();
 
@@ -17,7 +18,7 @@ const CRAFTS = Object.keys(STOCK);
 export const TOOLS = [
   {
     name: 'ksp_new_flight',
-    description: 'Start a new flight on the Kerbin pad with a stock craft (Launch from VAB with Mun Express / Hopper). Resets the current session.',
+    description: 'Start a new flight on the Kerbin pad with a stock craft (Mun Express, Duna Hauler, Suborbital Hopper). Resets the current session.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -217,7 +218,7 @@ export const TOOLS = [
   },
   {
     name: 'ksp_vab_stock',
-    description: 'Click Stock: Suborbital Hopper or Stock: Mun Express — load a built-in craft into the VAB.',
+    description: 'Click a Stock button — load a built-in craft (Suborbital Hopper, Mun Express, Duna Hauler) into the VAB.',
     inputSchema: {
       type: 'object',
       properties: {
@@ -435,6 +436,92 @@ export const TOOLS = [
     description: 'Split a welded pair and apply a tiny separation.',
     inputSchema: { type: 'object', properties: {} },
   },
+  {
+    name: 'ksp_plan',
+    description: 'Score a craft against a mission Δv budget (mun-roundtrip or duna-roundtrip). Pass craft for a stock name, or omit to use the current VAB design. Does not fly.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        mission: {
+          type: 'string',
+          enum: ['mun-roundtrip', 'duna-roundtrip'],
+          description: 'Mission id',
+        },
+        craft: {
+          type: 'string',
+          enum: CRAFTS,
+          description: 'Optional stock craft; default is the current VAB design',
+        },
+      },
+      required: ['mission'],
+    },
+  },
+  {
+    name: 'ksp_redesign',
+    description: 'Patch tanks/SRBs until the mission budget passes, or stop at maxSteps. VAB current design is updated in-session; a stock name returns the new design and does not overwrite src/stock.js.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        mission: {
+          type: 'string',
+          enum: ['mun-roundtrip', 'duna-roundtrip'],
+          description: 'Mission id',
+        },
+        craft: {
+          type: 'string',
+          enum: CRAFTS,
+          description: 'Optional stock craft; default is the current VAB design',
+        },
+      },
+      required: ['mission'],
+    },
+  },
+  {
+    name: 'ksp_agent_get',
+    description: 'Read the in-game agent panel: visible, goal, missionId, nodes, current node, thoughts, running, which nodes have snapshots, plan.ok / fail summary. Same state as the panel. Does not invent fuel or Δv.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_agent_toggle',
+    description: 'Open or close the agent panel (state flag; in the browser the DOM follows, headless stdio has no HUD). Omit open to toggle.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        open: { type: 'boolean', description: 'true = open, false = close; omit to toggle' },
+      },
+    },
+  },
+  {
+    name: 'ksp_agent_plan',
+    description: 'Type a coarse goal and press 规划 — map to mun-roundtrip / duna-roundtrip and write the master plan. Uses the current craft if the session has one, else stock for the mission. Same as the panel.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: 'Coarse goal, e.g. 去火星再回来' },
+      },
+      required: ['text'],
+    },
+  },
+  {
+    name: 'ksp_agent_step',
+    description: 'Press 走一步 — run the current plan node, then stop. Does not chain. Headless: window / coast / jettison / already-in-orbit ascent use session muscles; pad ascent is a real physics loop (not a fake orbit); stub nodes stay honest. Not ksp_step.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_agent_revert',
+    description: 'Press 回退 on the agent panel — restore a finished node snapshot (omit nodeId = previous). Not ksp_revert (that returns to the VAB).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        nodeId: { type: 'string', description: 'Finished node id; omit for the previous snapshot' },
+      },
+    },
+  },
+  {
+    name: 'ksp_agent_check',
+    description: 'Press 检查 — run the A5 checker and append thoughts (transfer dry, lander early, budget, dead / suborbital). Same as the panel.',
+    inputSchema: { type: 'object', properties: {} },
+  },
 ];
 
 function log(...args) {
@@ -446,6 +533,23 @@ function textResult(obj, isError = false) {
   const result = { content: [{ type: 'text', text }] };
   if (isError) result.isError = true;
   return result;
+}
+
+function resolveBudgetDesign(args, w) {
+  if (args.craft) {
+    const src = STOCK[args.craft];
+    if (!src) {
+      throw new Error(`Unknown craft "${args.craft}". Available: ${Object.keys(STOCK).join(', ')}`);
+    }
+    const d = structuredClone(src);
+    d.name = args.craft;
+    d.radials ??= [];
+    return { design: d, source: 'stock', craft: args.craft };
+  }
+  if (!w.design.stack.length) {
+    throw new Error('No VAB design. Pass craft (Mun Express | Duna Hauler | Suborbital Hopper) or build in the VAB.');
+  }
+  return { design: w.design, source: 'vab', craft: w.design.name };
 }
 
 export function callTool(name, args = {}) {
@@ -574,6 +678,38 @@ export function callTool(name, args = {}) {
       return session.dock();
     case 'ksp_undock':
       return session.undock();
+    case 'ksp_plan': {
+      if (!args.mission) throw new Error('ksp_plan requires mission (mun-roundtrip|duna-roundtrip)');
+      const resolved = resolveBudgetDesign(args, w);
+      const plan = planMission(resolved.design, args.mission);
+      return { source: resolved.source, craft: resolved.craft, ...plan };
+    }
+    case 'ksp_redesign': {
+      if (!args.mission) throw new Error('ksp_redesign requires mission (mun-roundtrip|duna-roundtrip)');
+      const resolved = resolveBudgetDesign(args, w);
+      const red = redesignForBudget(resolved.design, args.mission);
+      if (resolved.source === 'vab') w.applyDesign(red.design);
+      return {
+        source: resolved.source,
+        craft: resolved.craft,
+        appliedToVab: resolved.source === 'vab',
+        stockUnchanged: resolved.source === 'stock',
+        ...red,
+      };
+    }
+    case 'ksp_agent_get':
+      return session.agentGet();
+    case 'ksp_agent_toggle':
+      return session.agentToggle(args.open);
+    case 'ksp_agent_plan':
+      if (args.text == null) throw new Error('ksp_agent_plan requires text');
+      return session.agentPlan(args.text);
+    case 'ksp_agent_step':
+      return session.agentStep();
+    case 'ksp_agent_revert':
+      return session.agentRevert(args.nodeId);
+    case 'ksp_agent_check':
+      return session.agentCheck();
     default:
       throw new Error(`Unknown tool: ${name}`);
   }

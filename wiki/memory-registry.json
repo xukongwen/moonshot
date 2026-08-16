@@ -1,9 +1,21 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-15T13:00:29.437Z",
+  "generatedAt": "2026-08-16T02:25:40.510Z",
   "activeCap": 15,
   "logKeepDays": 14,
   "entries": [
+    {
+      "path": "wiki/2026-08-16-agent-duna-往返.md",
+      "title": "2026-08-16 agent Duna 往返",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "记下第一次走游戏内 agent 路径（一刀一刀，不是一条龙脚本）的 Duna 着陆并回家。数字只来自 `logs/agent-fly-duna-result.json`。瑕疵照写。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T02:24:36.429Z",
+      "compactionState": "full"
+    },
     {
       "path": "wiki/adr/2026-08-15-ejection-asymptote.md",
       "title": "ADR：逃逸点火对准双曲线渐近线",
@@ -37,7 +49,7 @@
       "summaryOneLiner": "永远说中文。不要把整份 log 或 index 变更流水倒进聊天。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:35:16.305Z",
+      "mtime": "2026-08-15T13:13:45.371Z",
       "compactionState": "full"
     },
     {
@@ -46,10 +58,10 @@
       "memoryTier": "active",
       "memoryStatus": "living",
       "decayClass": "protocol",
-      "summaryOneLiner": "agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 44 个。",
+      "summaryOneLiner": "agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 52 个。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:59:19.246Z",
+      "mtime": "2026-08-16T00:29:09.161Z",
       "compactionState": "full"
     },
     {
@@ -61,7 +73,7 @@
       "summaryOneLiner": "先读 [`active-memory.md`](./active-memory.md)、[`memory-registry.json`](./memory-registry.json)、[`lint-report.md`](./lint-report.md)。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T12:59:44.507Z",
+      "mtime": "2026-08-16T02:25:40.393Z",
       "compactionState": "full"
     },
     {
@@ -73,7 +85,7 @@
       "summaryOneLiner": "<!-- wiki-auto-curator:near-window -->",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T12:59:44.507Z",
+      "mtime": "2026-08-16T02:25:40.393Z",
       "compactionState": "full"
     },
     {
@@ -85,7 +97,19 @@
       "summaryOneLiner": "指向已飞通的行星转移，不把整份日志贴进 wiki。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:03:21.243Z",
+      "mtime": "2026-08-15T14:13:27.988Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/missions/duna-landing.md",
+      "title": "任务：Duna / 火星着陆",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "指向库存 Duna Hauler 与着陆测试。霍曼转移本身见 duna-hohmann.md。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T02:24:50.325Z",
       "compactionState": "full"
     },
     {
@@ -94,10 +118,34 @@
       "memoryTier": "cold",
       "memoryStatus": "living",
       "decayClass": "plan",
-      "summaryOneLiner": "指向库存登月船与相关测试，不把整份飞行日志贴进来。",
+      "summaryOneLiner": "指向库存登月船与往返测试。表面只要着陆器，不要把转移级一起放下。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:03:26.959Z",
+      "mtime": "2026-08-15T14:13:56.584Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/modules/art.md",
+      "title": "art",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "概念图和以后的原画住在 art/，不和飞行截图 logs/shots 混。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-15T13:31:58.445Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/modules/flight-planning.md",
+      "title": "flight-planning",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "Score a craft against a mission dV budget before ignition. If it fails, redesign in the VAB.",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T01:58:34.002Z",
       "compactionState": "full"
     },
     {
@@ -109,7 +157,7 @@
       "summaryOneLiner": "记录 Kerbin 到 Duna 霍曼窗口、逃逸点火约定，以及已飞通的一次捕获。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:02:39.935Z",
+      "mtime": "2026-08-16T02:24:50.325Z",
       "compactionState": "full"
     },
     {
@@ -133,7 +181,7 @@
       "summaryOneLiner": "说明无头 MCP 如何覆盖原版人类操作：飞行、VAB、地图、语言。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:59:19.246Z",
+      "mtime": "2026-08-16T00:29:19.405Z",
       "compactionState": "full"
     },
     {
@@ -146,6 +194,18 @@
       "successor": null,
       "lastReferencedAt": null,
       "mtime": "2026-08-15T11:02:34.739Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/modules/play-loop.md",
+      "title": "play-loop",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "总图 + 分步 + 回退：起飞前一张总图，短脚本做肌肉，agent 在命名结点上检查并计划下一刀。错误可以是难度；中途能停、能看、能改，出错回到更早结点。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T02:24:50.325Z",
       "compactionState": "full"
     },
     {
@@ -169,7 +229,7 @@
       "summaryOneLiner": "说明 Moonshot 的长期预发布版本：`0.<era>.<build>`。agent 只加 build，不把中间位当成经典 Semver 的 minor。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:39:08.192Z",
+      "mtime": "2026-08-15T13:13:41.971Z",
       "compactionState": "full"
     },
     {
@@ -181,7 +241,7 @@
       "summaryOneLiner": "给 agent 一份不可漂移的仓库级判断：这是什么、代码与 wiki 谁说了算、哪些事默认不做。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T12:59:04.991Z",
+      "mtime": "2026-08-15T13:21:12.161Z",
       "compactionState": "full"
     },
     {
@@ -221,6 +281,18 @@
       "compactionState": "full"
     },
     {
+      "path": "wiki/releases/v0.1.4.md",
+      "title": "v0.1.4",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "episodic",
+      "summaryOneLiner": "记录预发布 `v0.1.4`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T02:25:40.393Z",
+      "compactionState": "full"
+    },
+    {
       "path": "wiki/SCHEMA.md",
       "title": "Wiki SCHEMA",
       "memoryTier": "cold",
@@ -229,7 +301,7 @@
       "summaryOneLiner": "规定 Moonshot wiki 的目录、页形和收尾同步。Wiki 编译知识，不替代代码。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:22:37.961Z",
+      "mtime": "2026-08-15T13:31:58.445Z",
       "compactionState": "full"
     },
     {
@@ -247,13 +319,37 @@
     {
       "path": "wiki/交汇对接架构计划.md",
       "title": "交汇对接架构计划",
-      "memoryTier": "active",
-      "memoryStatus": "living",
+      "memoryTier": "cold",
+      "memoryStatus": "done",
       "decayClass": "plan",
       "summaryOneLiner": "北极星：世界里至少两艘船。人（和 agent）能选定目标、交汇、对接。每一刀的人类新操作都要有 MCP。R1–R6 已验收：交汇 2336 m / 8.34 m/s；硬对接可分离；截图 rdv-map / rdv-hud / rdv-close / dock-hard。版本将是 0.1.3。",
       "successor": null,
       "lastReferencedAt": null,
       "mtime": "2026-08-15T12:59:04.991Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/总体计划.md",
+      "title": "总体计划",
+      "memoryTier": "active",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "把「KSP + 动物之森 + 我的世界」收成一份会改的北极星，避免三款游戏平铺。这是长期方向，不是本周任务单。想法会随时更新，以本页和用户最新口说为准。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T02:24:50.325Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/游戏内Agent计划.md",
+      "title": "游戏内Agent计划",
+      "memoryTier": "active",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "游戏内能看见 agent 如何规划、如何思考。人提粗需求（「去火星再回来」），agent 写出总图、拆刀、一刀一刀飞。可看、可停、出错回到更早结点。无头 MCP 仍给外部 agent 用。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T02:24:50.325Z",
       "compactionState": "full"
     }
   ]

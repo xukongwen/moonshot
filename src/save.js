@@ -109,6 +109,7 @@ export function snapshotFromState(st, { tag = 'save', craft = null } = {}) {
     throttle: st.throttle ?? 0,
     landed: !!st.landed,
     dead: !!st.dead,
+    ec: st.ec ?? null,
     craft: craft ?? null,
     parts: (st.parts ?? []).map((p) => ({
       key: p.key,

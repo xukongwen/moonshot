@@ -9,6 +9,7 @@ import { heightAt } from './terrain.js';
 import {
   stackGeometry, computeSections, massProps, centerOfPressure, burn, partY,
 } from './vessel.js';
+import { wheelsLive, paySAS, SAS_EC_DEADBAND_DEG, stepEC } from './power.js';
 
 const Y = new THREE.Vector3(0, 1, 0);
 const tmp1 = new THREE.Vector3(), tmp2 = new THREE.Vector3(), tmp3 = new THREE.Vector3();
@@ -73,6 +74,9 @@ export function physicsStep(st, dt, events) {
     stepAttitude(st, dt, { mp, copY, qDyn, press, thrust, perEngine, dragF, noseWorld, up });
   }
 
+  // ---- EC generation (realtime). Rails/warp use stepECOnRails. ----
+  stepEC(st, dt, st.t);
+
   // ---- translation ----
   let crashed = null;
   if (!st.landed) {
@@ -85,7 +89,8 @@ export function physicsStep(st, dt, events) {
     if (r2 - body.radius - th2 - clearance <= 0 && st.vel.dot(up2) <= 0) {
       const impact = st.vel.length();
       const legsOK = st.parts.some((p) => p.alive && p.def.legs && p.legsDown);
-      const limit = legsOK ? 12 : 6;
+      const chuteOK = st.parts.some((p) => p.alive && p.def.chute && p.chuteState === "deployed");
+      const limit = legsOK ? 12 : chuteOK ? 10 : 6;
       st.pos.copy(up2).multiplyScalar(body.radius + th2 + clearance);
       st.vel.set(0, 0, 0);
       st.angVel.set(0, 0, 0);
@@ -177,7 +182,8 @@ function stepAttitude(st, dt, env) {
     gimbalT += f * Math.sin((p.def.engine.gimbal * Math.PI) / 180) * Math.abs(partY(st.geom, p) - mp.comY);
   }
   const finT = mp.finArea * qDyn * 0.012 * Math.max(1, mp.comY * 0.6);
-  const avail = mp.podTorque + gimbalT + finT;
+  const wheels = wheelsLive(st) ? mp.podTorque : 0;
+  const avail = wheels + gimbalT + finT;
 
   const torque = new THREE.Vector3();
 
@@ -196,6 +202,11 @@ function stepAttitude(st, dt, env) {
     sasTorque(st, avail, mp, torque, noseWorld);
   }
 
+  // SAS / wheel input costs EC. Deadband (~0.5°) is free. Empty EC: wheels already 0.
+  if (wheels > 0 && (hasInput || (st.sas && sasErrorAngle(st, noseWorld) > SAS_EC_DEADBAND_DEG * Math.PI / 180))) {
+    paySAS(st, dt);
+  }
+
   // aerodynamic restoring torque: drag acts at the centre of pressure
   if (qDyn > 1) {
     const lever = tmp2.copy(noseWorld).multiplyScalar(copY - mp.comY);
@@ -212,6 +223,21 @@ function stepAttitude(st, dt, env) {
     const dq = new THREE.Quaternion().setFromAxisAngle(tmp2.copy(st.angVel).divideScalar(w), w * dt);
     st.quat.premultiply(dq).normalize();
   }
+}
+
+function sasErrorAngle(st, noseWorld) {
+  let targetQ = st.sasTarget;
+  if (st.sasMode === 'prograde' || st.sasMode === 'retrograde') {
+    const dir = st.vel.clone();
+    if (dir.lengthSq() < 4) return 0;
+    dir.normalize();
+    if (st.sasMode === 'retrograde') dir.negate();
+    const dq = new THREE.Quaternion().setFromUnitVectors(noseWorld, dir);
+    targetQ = dq.multiply(st.quat);
+  }
+  if (!targetQ) return 0;
+  const err = targetQ.clone().multiply(st.quat.clone().invert());
+  return 2 * Math.acos(THREE.MathUtils.clamp(Math.abs(err.w), -1, 1));
 }
 
 function sasTorque(st, avail, mp, torque, noseWorld) {

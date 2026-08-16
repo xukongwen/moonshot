@@ -1,0 +1,32 @@
+{
+  "version": "0.1.6",
+  "at": "2026-08-16T08:22:58.417Z",
+  "display": ":3",
+  "craft": "Mun Express",
+  "orbit": "80 km circular kerbin",
+  "setup": "stock hang sym 2 at 90°/270°, shared face at Kerbol, SAS off, legs stowed, coplanar wings",
+  "method": "headed Chrome channel=chrome canvas.toDataURL + HUD colorkey overlay",
+  "cam": {
+    "out": 5.2,
+    "up": 3.4,
+    "side": 0.35
+  },
+  "path": "logs/shots/panel-coplanar.png",
+  "bytes": 572692,
+  "real3d": true,
+  "composited": true,
+  "sceneBytes": 657834,
+  "telemetry": {
+    "ec": 250,
+    "ecCap": 250,
+    "ecGen": 1.6001600138804453,
+    "eclipsed": null,
+    "panelW": 2.0002000173505565,
+    "wheelsLive": true,
+    "body": "kerbin",
+    "alt": 80000
+  },
+  "hudEc": "电 250 / 250",
+  "situation": "轨道飞行 — 科比因",
+  "errors": []
+}

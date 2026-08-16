@@ -1,0 +1,104 @@
+{
+  "version": "0.1.6",
+  "at": "2026-08-16T07:14:31.854Z",
+  "display": ":3",
+  "craft": "Mun Express",
+  "orbit": "80 km circular kerbin",
+  "method": "headed Chrome channel=chrome canvas.toDataURL + HUD colorkey overlay",
+  "shots": {
+    "day": {
+      "path": "logs/shots/e6-day-panel.png",
+      "bytes": 412023,
+      "real3d": true,
+      "looks3d": true,
+      "composited": true,
+      "sceneBytes": 390438,
+      "cam": {
+        "out": 3.6,
+        "up": 0.6,
+        "lookIn": 0.2
+      },
+      "craft": "Mun Express",
+      "orbit": "80 km circular kerbin",
+      "setup": "placeBySun day, stock hang, panel faced at Kerbol, SAS off",
+      "telemetry": {
+        "ec": 250,
+        "ecCap": 250,
+        "ecGen": 0.8000800069402226,
+        "eclipsed": null,
+        "panelW": 1.0001000086752783,
+        "wheelsLive": true,
+        "body": "kerbin",
+        "alt": 80000
+      },
+      "hudEc": "电 250 / 250",
+      "hudEcColor": "",
+      "situation": "轨道飞行 — 科比因",
+      "t": 0.02,
+      "sas": false
+    },
+    "night": {
+      "path": "logs/shots/e6-night-drain.png",
+      "bytes": 194736,
+      "real3d": true,
+      "looks3d": true,
+      "composited": true,
+      "sceneBytes": 128284,
+      "cam": {
+        "out": 3.6,
+        "up": 0.6,
+        "lookIn": 0.2
+      },
+      "craft": "Mun Express",
+      "orbit": "80 km circular kerbin",
+      "setup": "placeBySun night, stock hang, panel faced at Kerbol, SAS off",
+      "telemetry": {
+        "ec": 250,
+        "ecCap": 250,
+        "ecGen": 0,
+        "eclipsed": "kerbin",
+        "panelW": 0,
+        "wheelsLive": true,
+        "body": "kerbin",
+        "alt": 80000
+      },
+      "hudEc": "电 250 / 250",
+      "hudEcColor": "",
+      "situation": "轨道飞行 — 科比因",
+      "t": 0,
+      "sas": false
+    },
+    "sasDead": {
+      "path": "logs/shots/e6-sas-dead.png",
+      "bytes": 411986,
+      "real3d": true,
+      "looks3d": true,
+      "composited": true,
+      "sceneBytes": 390438,
+      "cam": {
+        "out": 3.6,
+        "up": 0.6,
+        "lookIn": 0.2
+      },
+      "craft": "Mun Express",
+      "orbit": "80 km circular kerbin",
+      "setup": "placeBySun day, stock hang, panel faced at Kerbol, SAS on, ec=0",
+      "telemetry": {
+        "ec": 0,
+        "ecCap": 250,
+        "ecGen": 0.8000800069402226,
+        "eclipsed": null,
+        "panelW": 1.0001000086752783,
+        "wheelsLive": false,
+        "body": "kerbin",
+        "alt": 80000
+      },
+      "hudEc": "电 0 / 250",
+      "hudEcColor": "rgb(255, 80, 64)",
+      "situation": "轨道飞行 — 科比因",
+      "t": 0,
+      "sas": true
+    }
+  },
+  "errors": []
+}

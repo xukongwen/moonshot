@@ -1,6 +1,6 @@
 ---
 title: Mun Express
-updated: 2026-08-15
+updated: 2026-08-16
 status: active
 tags: [mission, mun]
 ---
@@ -13,7 +13,7 @@ tags: [mission, mun]
 
 ## 当前判断
 
-库存 Mun Express：短着陆器是 pod + chute + heat-shield + tank-m + tank-s + Kestrel，腿在着陆器罐和返回舱；Titan 段最下一节 XL 也有 LT-2（助推回收 R2）。
+库存 Mun Express：短着陆器是 pod + chute + heat-shield + tank-m + tank-s + Kestrel，一条 LT-2 环在着陆器 tank-s（host 5），收起贴罐。返回舱不挂腿；decouple: 3 之后是 pod+chute+shield，再入靠伞。Titan 段最下一节 XL 是 LT-25（host 16）。指挥舱 host 0 两块 OX-STAT（`sym: 2`，90°/270°，共面）+ 一块 Z-100；助推 host 16 再一块 Z-100。图 `logs/shots/panel-coplanar.png` · `legs-stowed-pod.png`。
 低 Mun 轨道先丢掉 Sparrow 转移级，再动力下降。不要在 Sparrow 上着陆再分离。
 
 tests/mun-return.test.mjs 一次通过（数字以 logs/mun-return-result.json 为准）：

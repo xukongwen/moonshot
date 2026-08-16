@@ -36,6 +36,7 @@ const FORCE_ACTIVE = [
   "wiki/总体计划.md",
   "wiki/游戏内Agent计划.md",
   "wiki/助推回收计划.md",
+  "wiki/电力计划.md",
   "wiki/Wiki Auto-Curator 架构.md",
   "wiki/modules/patched-conics.md",
   "wiki/modules/hohmann.md",

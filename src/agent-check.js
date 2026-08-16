@@ -9,6 +9,9 @@ import { formatBudgetFail } from './agent-goal.js';
 const DRY_KG = 1;
 const DANGER_IDS = new Set(['capture', 'land']);
 
+/** Absolute pool. Night+low fires only when `eclipsed` is set AND `ec < EC_LOW`. */
+export const EC_LOW = 20;
+
 function loc(lang) {
   return lang === 'en' ? 'en' : 'zh';
 }
@@ -244,6 +247,45 @@ function thoughtPreStep(label, fuelKg, lang) {
   return en ? `Next cut: ${name}.` : `下一刀：${name}。`;
 }
 
+function fmtEc(n) {
+  return Number.isFinite(n) ? String(Math.round(n)) : null;
+}
+
+/** Night + low EC. Names eclipsed body, ec, ecCap. No sunrise guess. */
+function thoughtEcLowNight(check, lang) {
+  const body = check.eclipsed;
+  const ec = fmtEc(check.ec) ?? String(check.ec);
+  const cap = fmtEc(check.ecCap);
+  const en = loc(lang) === 'en';
+  if (cap != null) {
+    return en
+      ? `Eclipsed by ${body}, EC ${ec} / ${cap}.`
+      : `在 ${body} 影子里，电量 ${ec} / ${cap}。`;
+  }
+  return en
+    ? `Eclipsed by ${body}, EC ${ec}.`
+    : `在 ${body} 影子里，电量 ${ec}。`;
+}
+
+/** SAS / reaction wheels dead. Real ec if present; does not invent a pool. */
+function thoughtSasDead(check, lang) {
+  const en = loc(lang) === 'en';
+  const ec = fmtEc(check.ec);
+  if (ec != null) {
+    return en ? `EC ${ec}, SAS dead.` : `电量 ${ec}，SAS 死了。`;
+  }
+  return en ? 'SAS dead.' : 'SAS 死了。';
+}
+
+function isEcLow(check) {
+  return Number.isFinite(check?.ec) && check.ec < EC_LOW;
+}
+
+function isSasDead(check) {
+  if (check?.wheelsLive === false) return true;
+  return Number.isFinite(check?.ec) && check.ec <= 0;
+}
+
 /**
  * @param {{
  *   check?: object,
@@ -271,6 +313,8 @@ export function runChecks(input = {}) {
     landerEarly: false,
     dead: false,
     suborbital: false,
+    ecLowNight: false,
+    sasDead: false,
   };
 
   const budget = plan && plan.ok === false ? plan.fail?.[0] : null;
@@ -311,6 +355,16 @@ export function runChecks(input = {}) {
         }
       }
     }
+  }
+
+  // E5: night + low EC; SAS dead. Real check fields only. No sunrise time.
+  if (check.eclipsed && isEcLow(check)) {
+    thoughts.push(thoughtEcLowNight(check, lang));
+    flags.ecLowNight = true;
+  }
+  if (isSasDead(check)) {
+    thoughts.push(thoughtSasDead(check, lang));
+    flags.sasDead = true;
   }
 
   if (when === 'pre-step' && thoughts.length === 0 && current) {

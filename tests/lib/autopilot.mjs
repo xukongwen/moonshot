@@ -12,6 +12,8 @@ import {
   planetPhaseDeg, hohmannTransfer, ejectionDeltaV,
 } from '../../src/orbits.js';
 import { serializeSnapshot, writeSnapshot } from '../../mcp/snapshot.mjs';
+import { stepECOnRails } from '../../src/power.js';
+
 
 const Y = new Vector3(0, 1, 0);
 
@@ -227,9 +229,11 @@ export class Autopilot {
         try {
           el = elementsFromState(st.pos, st.vel, BODIES[st.body].mu, st.t);
         } catch {
+          stepECOnRails(st, step);
           break;
         }
       }
+      stepECOnRails(st, step);
     }
     return pred ? !!pred() : true;
   }

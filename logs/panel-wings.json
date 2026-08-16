@@ -1,0 +1,32 @@
+{
+  "version": "0.1.6",
+  "at": "2026-08-16T08:07:59.995Z",
+  "display": ":3",
+  "craft": "Mun Express",
+  "orbit": "80 km circular kerbin",
+  "setup": "stock hang sym 2 at 90°/270°, identity quat, SAS off, legs stowed, side wings",
+  "method": "headed Chrome channel=chrome canvas.toDataURL + HUD colorkey overlay",
+  "cam": {
+    "out": 4.5,
+    "up": 6.5,
+    "side": 0.25
+  },
+  "path": "logs/shots/panel-wings.png",
+  "bytes": 487363,
+  "real3d": true,
+  "composited": true,
+  "sceneBytes": 566604,
+  "telemetry": {
+    "ec": 250,
+    "ecCap": 250,
+    "ecGen": 0.8000800069402226,
+    "eclipsed": null,
+    "panelW": 1.0001000086752783,
+    "wheelsLive": true,
+    "body": "kerbin",
+    "alt": 80000
+  },
+  "hudEc": "电 250 / 250",
+  "situation": "轨道飞行 — 科比因",
+  "errors": []
+}

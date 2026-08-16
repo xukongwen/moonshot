@@ -50,6 +50,9 @@ const DUNA_HAULER_LIGHT = {
     { part: 'legs-xl', sym: 1, host: 23 },
     { part: 'fins', sym: 1, host: 23 },
     { part: 'srb', sym: 6, host: 23 },
+    { part: 'panel-oxstat', sym: 2, host: 0, attachAngle: Math.PI / 2 },
+    { part: 'batt-z100', sym: 1, host: 0, attachAngle: Math.PI },
+    { part: 'batt-z100', sym: 1, host: 23, attachAngle: Math.PI / 4 },
   ],
 };
 
@@ -60,10 +63,12 @@ export const STOCK = {
   },
   'Mun Express': {
     // Short lander: tank-m + tank-s + Kestrel. Transfer is staged away in
-    // low Mun orbit BEFORE descent. Legs on the lander tank and the pod
-    // (pod legs survive the reentry jettison). Do NOT land on the Sparrow.
-    // Booster recovery: LT-25 (legs-xl) on the last XL (host 16) so the
-    // Titan section can land. Lander keeps LT-2. Same safeSpeed 12.
+    // low Mun orbit BEFORE descent. One LT-2 ring on the lander tank-s
+    // (host 5). After decouple: 3 the capsule is pod+chute+shield and
+    // lands on the chute (home was ~1.2 m/s; impact without legs is 6 m/s).
+    // Do NOT land on the Sparrow. Booster recovery: LT-25 (legs-xl) on the
+    // last XL (host 16). One lander-scale ring on the lander, one LT-25
+    // on the booster. Same safeSpeed 12.
     stack: [
       'pod-mk1', 'chute', 'heat-shield', 'decoupler-s', 'tank-m', 'tank-s', 'eng-kestrel',
       'decoupler-s', 'tank-l', 'tank-l', 'tank-m', 'eng-sparrow',
@@ -71,9 +76,11 @@ export const STOCK = {
     ],
     radials: [
       { part: 'legs', sym: 1, host: 5 },
-      { part: 'legs', sym: 1, host: 0 },
       { part: 'legs-xl', sym: 1, host: 16 },
       { part: 'fins', sym: 1, host: 16 },
+      { part: 'panel-oxstat', sym: 2, host: 0, attachAngle: Math.PI / 2 },
+      { part: 'batt-z100', sym: 1, host: 0, attachAngle: Math.PI },
+      { part: 'batt-z100', sym: 1, host: 16, attachAngle: Math.PI / 4 },
     ],
   },
   'Mun Reuser': {
@@ -82,6 +89,9 @@ export const STOCK = {
     // capture died transfer-dry with lander 4500 kg unused.
     // 6L / 7L / 4-stage / 5L+2M all failed ascent. Do not add tanks.
     // Capture may finish on Kestrel if Falcon is dry. Do NOT land on Falcon.
+    // One LT-2 ring on the lander tank-s (host 5). After decouple: 3 the
+    // capsule is pod+chute+shield and lands on the chute. LT-25 on last XL
+    // (host 19). One lander-scale ring on the lander, one LT-25 on the booster.
     stack: [
       'pod-mk1', 'chute', 'heat-shield', 'decoupler-s', 'tank-l', 'tank-s', 'eng-kestrel',
       'decoupler-s', 'tank-l', 'tank-l', 'tank-l', 'tank-l', 'tank-l', 'tank-m', 'eng-falcon',
@@ -89,10 +99,12 @@ export const STOCK = {
     ],
     radials: [
       { part: 'legs', sym: 1, host: 5 },
-      { part: 'legs', sym: 1, host: 0 },
       { part: 'legs-xl', sym: 1, host: 19 },
       { part: 'fins', sym: 1, host: 19 },
       { part: 'srb', sym: 2, host: 19 },
+      { part: 'panel-oxstat', sym: 2, host: 0, attachAngle: Math.PI / 2 },
+      { part: 'batt-z100', sym: 1, host: 0, attachAngle: Math.PI },
+      { part: 'batt-z100', sym: 1, host: 19, attachAngle: Math.PI / 4 },
     ],
   },
   'Duna Hauler Light': DUNA_HAULER_LIGHT,

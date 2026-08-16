@@ -140,7 +140,15 @@ export function buildPartMesh(p, hostR = DESIGN_HOST_R) {
     }
     case 'legs': {
       // LT-2: small lander legs. Authored for 1.25 m — do not fatten on XL hosts.
+      // Stow along the tank (foot up the stack), not the old 1.25 rad A-frame
+      // (~1.52 m out, 0.50 m down). Same axis as LT-25: tangent, +θ swings
+      // local −Y toward +radial. Inner foot edge hugs 1.25 m skin + 0.08
+      // (radialAttachR clearance): attachR + L sinθ + footR cosθ = hostR + 0.08.
       const attachR = radialAttachR(0.62, hostR, 0.08);
+      const footR = 0.17;
+      const hugC = DESIGN_HOST_R + 0.08 - attachR;
+      const hugHyp = Math.hypot(L, footR);
+      const stowAngle = Math.PI - Math.asin(hugC / hugHyp) - Math.atan2(footR, L);
       for (let i = 0; i < 4; i++) {
         const leg = new THREE.Group();
         const strut = new THREE.Mesh(new THREE.BoxGeometry(0.09, L, 0.09), mat(GRAY));
@@ -151,11 +159,11 @@ export function buildPartMesh(p, hostR = DESIGN_HOST_R) {
         const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
         leg.position.set(Math.cos(a) * attachR, L * 0.4, Math.sin(a) * attachR);
         leg.userData.axis = new THREE.Vector3(-Math.sin(a), 0, Math.cos(a));
-        leg.userData.stowAngle = 1.25;
+        leg.userData.stowAngle = stowAngle;
         leg.userData.deployAngle = -0.32;
         leg.userData.strutLen = L;
         leg.userData.attachR = attachR;
-        leg.userData.footR = 0.17;
+        leg.userData.footR = footR;
         leg.name = `leg${i}`;
         g.add(leg);
       }
@@ -267,6 +275,68 @@ export function buildPartMesh(p, hostR = DESIGN_HOST_R) {
       }
       break;
     }
+    case 'panel': {
+      // OX-STAT: static side wing (already extended, no deploy).
+      // Local +X = span (radial out after wrap rotation.y = -a)
+      // Local +Y = chord (stack)
+      // Local +Z = thickness; painted PV grid/rim sit on +Z
+      // After wrap, local +Z → vessel (-sin a, 0, cos a) (tangent).
+      // A sym pair is one plane: the painted face is instance 0's tangent
+      // for every inst. The opposite attach (a-a0≈π) maps +Z the other
+      // way, so buildVesselGroup also does rotateX(π) (span stays out).
+      const span = 2.2, chord = 0.60, thick = 0.04;
+      const PV = 0x1a4a7a, GRID = 0x5aa0d0, RIM = 0xc5ccd3;
+      const wing = new THREE.Group();
+      wing.add(new THREE.Mesh(
+        new THREE.BoxGeometry(span, chord, thick),
+        mat(PV, { rough: 0.38, metal: 0.22, extra: { side: THREE.DoubleSide } }),
+      ));
+      const rimT = 0.018;
+      const rimZ = thick / 2 + 0.002;
+      const rimMat = mat(RIM, { metal: 0.72, rough: 0.28 });
+      const rimN = new THREE.Mesh(new THREE.BoxGeometry(span + 0.012, rimT, 0.008), rimMat);
+      rimN.position.set(0, chord / 2 - rimT / 2, rimZ);
+      const rimS = new THREE.Mesh(new THREE.BoxGeometry(span + 0.012, rimT, 0.008), rimMat);
+      rimS.position.set(0, -chord / 2 + rimT / 2, rimZ);
+      const rimE = new THREE.Mesh(new THREE.BoxGeometry(rimT, chord - rimT * 1.5, 0.008), rimMat);
+      rimE.position.set(span / 2 - rimT / 2, 0, rimZ);
+      const rimW = new THREE.Mesh(new THREE.BoxGeometry(rimT, chord - rimT * 1.5, 0.008), rimMat);
+      rimW.position.set(-span / 2 + rimT / 2, 0, rimZ);
+      wing.add(rimN, rimS, rimE, rimW);
+      // Grid along the span: more cells along X than Y.
+      const cols = 10, rows = 3;
+      const insetX = span * 0.90, insetY = chord * 0.90;
+      for (let i = 0; i <= rows; i++) {
+        const y = -insetY / 2 + (i / rows) * insetY;
+        const hz = new THREE.Mesh(new THREE.BoxGeometry(insetX, 0.008, 0.005), mat(GRID));
+        hz.position.set(0, y, thick / 2 + 0.0015);
+        wing.add(hz);
+      }
+      for (let j = 0; j <= cols; j++) {
+        const x = -insetX / 2 + (j / cols) * insetX;
+        const v = new THREE.Mesh(new THREE.BoxGeometry(0.008, insetY, 0.005), mat(GRID));
+        v.position.set(x, 0, thick / 2 + 0.0015);
+        wing.add(v);
+      }
+      // Inner edge on the tank: box is centered, so shift +span/2 along local X.
+      // (buildVesselGroup overwrites g.position, so offset lives on the child.)
+      wing.position.x = span / 2;
+      g.add(wing);
+      const stub = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.05, 0.05), mat(GRAY));
+      stub.position.x = 0.04;
+      g.add(stub);
+      break;
+    }
+    case 'battery': {
+      // Small KSP-ish Z-100 brick. Local +X radial out after wrap rotation.
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.18, 0.20), mat(ORANGE)));
+      const capT = new THREE.Mesh(new THREE.BoxGeometry(0.125, 0.035, 0.205), mat(YELLOW));
+      capT.position.y = 0.07;
+      const capB = new THREE.Mesh(new THREE.BoxGeometry(0.125, 0.035, 0.205), mat(YELLOW));
+      capB.position.y = -0.07;
+      g.add(capT, capB);
+      break;
+    }
     default:
       g.add(cyl(r, r, L, GRAY));
   }
@@ -310,11 +380,30 @@ export function buildVesselGroup(parts) {
         mesh.position.y = y;
         wrap.add(mesh);
       } else {
+        const a0 = Number.isFinite(p.attachAngle) ? p.attachAngle : 0;
+        const wafer = p.def.shape === 'panel' || p.def.shape === 'battery';
         for (let i = 0; i < p.sym; i++) {
-          const a = (i / p.sym) * Math.PI * 2;
+          const a = a0 + (i / p.sym) * Math.PI * 2;
           const inst = i === 0 ? mesh : buildPartMesh(p, hostR);
-          const offset = hostR + p.def.size / 2;
+          // panel halfOut ~0: attach at host skin; the mesh offset (span/2) does the rest
+          const halfOut = p.def.shape === 'panel' ? 0
+            : p.def.shape === 'battery' ? 0.07
+            : p.def.size / 2;
+          const offset = hostR + halfOut;
           inst.position.set(Math.cos(a) * offset, y, Math.sin(a) * offset);
+          if (wafer) {
+            inst.rotation.y = -a;
+            // Opposite attach: rotation.y = -a sends local +Z to the
+            // other tangent. Extra local rotateX(PI) — not Euler x+y,
+            // which folds span into the tank — puts the grid on the
+            // shared face. Span stays local +X = radial out; chord -Y.
+            if (p.def.shape === 'panel') {
+              const da = a - a0;
+              if (Math.abs(Math.sin(da)) < 1e-6 && Math.cos(da) < 0) {
+                inst.rotateX(Math.PI);
+              }
+            }
+          }
           wrap.add(inst);
           if (p.def.engine) {
             positions.push(new THREE.Vector3(Math.cos(a) * offset, y - p.def.length / 2, Math.sin(a) * offset));

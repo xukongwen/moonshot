@@ -1,0 +1,186 @@
+{
+  "version": "0.1.6",
+  "ships": {
+    "Mun Express": {
+      "name": "Mun Express",
+      "lastXlHost": 16,
+      "legsXlHost": 16,
+      "pad_ecCap": 250,
+      "pad_ec": 250,
+      "power_parts": [
+        {
+          "id": "panel-oxstat",
+          "host": 0,
+          "attachAngle": 1.5707963267948966,
+          "attachAngle_deg": 90,
+          "sym": 1
+        },
+        {
+          "id": "batt-z100",
+          "host": 0,
+          "attachAngle": 3.141592653589793,
+          "attachAngle_deg": 180,
+          "sym": 1
+        },
+        {
+          "id": "batt-z100",
+          "host": 16,
+          "attachAngle": 0.7853981633974483,
+          "attachAngle_deg": 45,
+          "sym": 1
+        }
+      ],
+      "remnant_after_booster": {
+        "ecCap": 150,
+        "ec": 150,
+        "titanGone": true,
+        "power_parts": [
+          {
+            "id": "panel-oxstat",
+            "host": 0,
+            "attachAngle": 1.5707963267948966,
+            "attachAngle_deg": 90,
+            "sym": 1
+          },
+          {
+            "id": "batt-z100",
+            "host": 0,
+            "attachAngle": 3.141592653589793,
+            "attachAngle_deg": 180,
+            "sym": 1
+          }
+        ],
+        "panel_oxstat_host0": true
+      }
+    },
+    "Mun Reuser": {
+      "name": "Mun Reuser",
+      "lastXlHost": 19,
+      "legsXlHost": 19,
+      "pad_ecCap": 250,
+      "pad_ec": 250,
+      "power_parts": [
+        {
+          "id": "panel-oxstat",
+          "host": 0,
+          "attachAngle": 1.5707963267948966,
+          "attachAngle_deg": 90,
+          "sym": 1
+        },
+        {
+          "id": "batt-z100",
+          "host": 0,
+          "attachAngle": 3.141592653589793,
+          "attachAngle_deg": 180,
+          "sym": 1
+        },
+        {
+          "id": "batt-z100",
+          "host": 19,
+          "attachAngle": 0.7853981633974483,
+          "attachAngle_deg": 45,
+          "sym": 1
+        }
+      ],
+      "remnant_after_booster": {
+        "ecCap": 150,
+        "ec": 150,
+        "titanGone": true,
+        "power_parts": [
+          {
+            "id": "panel-oxstat",
+            "host": 0,
+            "attachAngle": 1.5707963267948966,
+            "attachAngle_deg": 90,
+            "sym": 1
+          },
+          {
+            "id": "batt-z100",
+            "host": 0,
+            "attachAngle": 3.141592653589793,
+            "attachAngle_deg": 180,
+            "sym": 1
+          }
+        ],
+        "panel_oxstat_host0": true
+      }
+    },
+    "Duna Hauler": {
+      "name": "Duna Hauler",
+      "lastXlHost": 23,
+      "legsXlHost": 23,
+      "pad_ecCap": 250,
+      "pad_ec": 250,
+      "power_parts": [
+        {
+          "id": "panel-oxstat",
+          "host": 0,
+          "attachAngle": 1.5707963267948966,
+          "attachAngle_deg": 90,
+          "sym": 1
+        },
+        {
+          "id": "batt-z100",
+          "host": 0,
+          "attachAngle": 3.141592653589793,
+          "attachAngle_deg": 180,
+          "sym": 1
+        },
+        {
+          "id": "batt-z100",
+          "host": 23,
+          "attachAngle": 0.7853981633974483,
+          "attachAngle_deg": 45,
+          "sym": 1
+        }
+      ],
+      "remnant_after_booster": {
+        "ecCap": 150,
+        "ec": 150,
+        "titanGone": true,
+        "power_parts": [
+          {
+            "id": "panel-oxstat",
+            "host": 0,
+            "attachAngle": 1.5707963267948966,
+            "attachAngle_deg": 90,
+            "sym": 1
+          },
+          {
+            "id": "batt-z100",
+            "host": 0,
+            "attachAngle": 3.141592653589793,
+            "attachAngle_deg": 180,
+            "sym": 1
+          }
+        ],
+        "panel_oxstat_host0": true
+      }
+    }
+  },
+  "express_80km_day_unrotated": {
+    "craft": "Mun Express",
+    "orbit": "80 km circular kerbin",
+    "setup": "stock hang, identity quat, SAS off, physicsStep dt=0.1 — NOT sun-faced",
+    "attachAngle": 1.5707963267948966,
+    "attachAngle_deg": 90,
+    "n": [
+      6.123233995736766e-17,
+      0,
+      1
+    ],
+    "sun": [
+      0.9999999999999999,
+      0,
+      1.2247080352683887e-16
+    ],
+    "n_dot_sun": 1.8370314348420651e-16,
+    "flux": 1.0000999525102392,
+    "eclipsed": null,
+    "ecGen": 1.469772123137847e-16,
+    "panelW": 1.8372151539223087e-16,
+    "start_ec": 250,
+    "ec_after_10s": 250,
+    "note": "gen may be near 0 if the 90° panel does not face Kerbol at identity quat; unrotated number only"
+  }
+}

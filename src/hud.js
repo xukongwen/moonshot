@@ -3,6 +3,7 @@
 import { fmtTime, fmtDist, BODIES } from './constants.js';
 import { feedTanks } from './vessel.js';
 import { t, bodyName, getLang, stageLabel } from './i18n.js';
+import { ecCap } from './power.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -40,6 +41,15 @@ export const HUD = {
     $('ro-speed').textContent = `${info.alt > 60_000 ? t('hud.orb') : t('hud.srf')} ${info.speed.toFixed(info.speed < 100 ? 1 : 0)} m/s`;
     $('ro-mode').textContent = info.alt > 60_000 ? t('hud.orbVel') : t('hud.srfVel');
     $('ro-mass').textContent = `${t('hud.mass')} ${(st.massProps.m / 1000).toFixed(2)} t`;
+    const ecEl = $('ro-ec');
+    if (ecEl) {
+      const cap = ecCap(st);
+      const ec = st.ec ?? 0;
+      ecEl.textContent = `${t('hud.ec')} ${ec.toFixed(0)} / ${cap.toFixed(0)}`;
+      if (ec <= 0 || cap <= 0) ecEl.style.color = '#ff5040';
+      else if (ec < 0.2 * cap) ecEl.style.color = '#ffae42';
+      else ecEl.style.color = '';
+    }
     const tf = info.maxTempFrac;
     const el = $('ro-temp');
     if (tf > 0.85) { el.textContent = t('hud.tempCrit'); el.style.color = '#ff5040'; }

@@ -20,6 +20,7 @@ import {
   agentIdle,
 } from './agent.mjs';
 import { isTitanVessel, isDroppedBooster, runRecoverMuscle } from '../src/agent-burns.js';
+import { fillEC, splitEC, ecTelemetry, stepECOnRails } from '../src/power.js';
 
 const Y = new Vector3(0, 1, 0);
 const STEP_CAP_S = 120;
@@ -65,7 +66,7 @@ function resolveDesign(design) {
 function makeState({ parts, body, pos, vel, quat, t, landed }) {
   const geom0 = stackGeometry(parts);
   const mp0 = massProps(parts, geom0);
-  return {
+  const st = {
     t: t ?? 0,
     body,
     pos,
@@ -85,6 +86,8 @@ function makeState({ parts, body, pos, vel, quat, t, landed }) {
     sasMode: 'hold',
     sasTarget: quat.clone(),
   };
+  fillEC(st);
+  return st;
 }
 
 export class SimSession {
@@ -395,6 +398,7 @@ export class SimSession {
     st.sas = true;
     st.sasMode = 'hold';
     st.sasTarget.copy(st.quat);
+    splitEC(parentSt, st);
     const id = `stage-${this._idSeq++}`;
     const vessel = {
       id,
@@ -678,6 +682,7 @@ export class SimSession {
       phase_deg: nav.phase_deg,
       dockState: this.dockState,
       translate: { ...(st.translate ?? { x: 0, y: 0, z: 0 }) },
+      ...ecTelemetry(st),
     };
 
     try {
@@ -875,6 +880,7 @@ export class SimSession {
     const soiEvents = [];
     checkSOI(st, soiEvents);
     for (const ev of soiEvents) collected.push({ type: ev.type, body: ev.body });
+    stepECOnRails(st, h);
   }
 
   tickAll(h, { railsOk }, collected) {

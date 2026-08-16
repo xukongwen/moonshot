@@ -165,7 +165,7 @@ export function runAscent(flight, lang) {
     if (st.landed) flight.stage?.();
 
     const t0 = st.t;
-    flight.pilot = () => {
+    flight.pilot = (dt = 0) => {
       if (!flight.active || !flight.st) {
         finish({ ok: false, thought: thoughtFromCheck('ascent-fail', checkOf(flight), null, loc) });
         return;
@@ -180,7 +180,7 @@ export function runAscent(flight, lang) {
         return;
       }
       const tick = ascentTick(cur, { plan: flight.plan, stageIdx: flight.stageIndex });
-      pointState(cur, tick.dir);
+      pointState(cur, tick.dir, dt);
       cur.sas = false;
       flight.setThrottle?.(tick.throttle);
       if (tick.stage) {

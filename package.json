@@ -1,13 +1,13 @@
 {
   "name": "moonshot",
   "private": true,
-  "version": "0.1.6",
+  "version": "0.1.1.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node tests/orbits.test.mjs && node tests/system.test.mjs && node tests/hohmann.test.mjs && node tests/workshop.test.mjs && node tests/wiki-curator.test.mjs && node tests/release.test.mjs && node tests/saves.test.mjs && node tests/vessels.test.mjs && node tests/booster-stage.test.mjs && node tests/booster-reserve.test.mjs && node tests/booster-boostback.test.mjs && node tests/booster-r4.test.mjs && node tests/booster-r5.test.mjs && node tests/booster-r6.test.mjs && node tests/rendezvous.test.mjs && node tests/docking.test.mjs && node tests/plan.test.mjs && node tests/agent-ui.test.mjs && node tests/agent-goal.test.mjs && node tests/agent-step.test.mjs && node tests/agent-revert.test.mjs && node tests/agent-check.test.mjs && node tests/agent-mcp.test.mjs && node tests/mun-return.test.mjs && node tests/duna-landing.test.mjs",
+    "test": "node tests/orbits.test.mjs && node tests/system.test.mjs && node tests/hohmann.test.mjs && node tests/workshop.test.mjs && node tests/wiki-curator.test.mjs && node tests/release.test.mjs && node tests/saves.test.mjs && node tests/vessels.test.mjs && node tests/booster-stage.test.mjs && node tests/booster-reserve.test.mjs && node tests/booster-boostback.test.mjs && node tests/booster-r4.test.mjs && node tests/booster-r5.test.mjs && node tests/booster-r6.test.mjs && node tests/power-e1.test.mjs && node tests/power-e2.test.mjs && node tests/power-e3.test.mjs && node tests/power-e4.test.mjs && node tests/power-e5.test.mjs && node tests/power-e6.test.mjs && node tests/legs-stow.test.mjs && node tests/rendezvous.test.mjs && node tests/docking.test.mjs && node tests/plan.test.mjs && node tests/agent-ui.test.mjs && node tests/agent-goal.test.mjs && node tests/agent-step.test.mjs && node tests/agent-revert.test.mjs && node tests/agent-check.test.mjs && node tests/agent-mcp.test.mjs && node tests/mun-return.test.mjs && node tests/duna-landing.test.mjs",
     "mission": "node tests/mission.test.mjs",
     "plan": "node scripts/plan.mjs",
     "smoke": "node scripts/smoke.mjs",

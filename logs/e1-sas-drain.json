@@ -1,0 +1,17 @@
+{
+  "craft": "Mun Express",
+  "body": "kerbin",
+  "orbit": "80 km circular kerbin",
+  "setup": "SAS hold, 90° error reasserted each step, physicsStep dt=0.1",
+  "start_ec": 50,
+  "ecCap": 50,
+  "ec_after_10s": 45.000000000000284,
+  "t_after_10s": 9.99999999999998,
+  "ec_after_100s": 7.021744297119881e-13,
+  "t_after_100s": 99.9999999999986,
+  "wheelsLive": false,
+  "time_to_empty_s": 99.9999999999986,
+  "sas_ec_per_s": 0.5,
+  "landed": false,
+  "dead": false
+}

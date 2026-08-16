@@ -1,11 +1,12 @@
 #!/usr/bin/env node
 /**
- * Moonshot 预发布版本：0.<era>.<build>
+ * Moonshot 预发布版本：0.<era>.<minor>.<build>
  * 0 锁定非正式版。默认只加 build。不 commit、不 push。
  *
  *   node scripts/release.mjs
- *   node scripts/release.mjs --build|--era|--force|--dry-run|--tag
- *   --major 永远拒绝
+ *   node scripts/release.mjs --build|--minor|--era|--force|--dry-run|--tag
+ *   --minor 仅当用户说「大版本」；--era 仅当用户说「换代」
+ *   --major 永远拒绝（除非用户说「出正式版」，现在永远不）
  */
 import fs from "node:fs";
 import path from "node:path";
@@ -46,17 +47,22 @@ const SIGNIFICANT_PATHS = [
 const CHANGELOG_HEADER = `\
 # Changelog
 
-版本格式是 \`0.<era>.<build>\`，不是经典 Semver（不要把中间位当成「大功能」）。
+版本格式是 \`0.<era>.<minor>.<build>\`，不是经典 Semver。
 
 - **0**（主版本）锁定为非正式版。脚本拒绝任何升到 1.x 的操作。升到 1.x 等于出正式版，必须用户亲口说「出正式版」。
-- **era**（中间位）是代际，从 1 起。默认发布不加 era。只有用户明确要求换代时才用 \`--era\`（例如 0.1.12 → 0.2.0）。
-- **build**（末位）是日常递增值。每次较大交付 +1：0.1.1、0.1.2、0.1.88…
+- **era**（第二位）是代际，从 1 起。只有用户明确说「换代」才用 \`--era\`（例如 0.1.1.8 → 0.2.1.0）。
+- **minor**（第三位）是大版本。只有用户明确说「大版本」才用 \`--minor\`（例如 0.1.1.8 → 0.1.2.0）。
+- **build**（末位）是日常打板。默认发布只加 build：0.1.1.1、0.1.1.2…
 `;
 
 function parseVersion(version) {
-  const m = String(version ?? "").trim().match(/^(\d+)\.(\d+)\.(\d+)$/);
+  const m = String(version ?? "").trim().match(/^(\d+)\.(\d+)\.(\d+)(?:\.(\d+))?$/);
   if (!m) throw new Error(`invalid version: ${version}`);
-  return { major: Number(m[1]), era: Number(m[2]), build: Number(m[3]) };
+  if (m[4] !== undefined) {
+    return { major: Number(m[1]), era: Number(m[2]), minor: Number(m[3]), build: Number(m[4]) };
+  }
+  // 3-part 0.E.B → { major:0, era:E, minor: missing }
+  return { major: Number(m[1]), era: Number(m[2]), minor: null, build: Number(m[3]) };
 }
 
 function assertUnofficial(major, nextMajor) {
@@ -66,25 +72,27 @@ function assertUnofficial(major, nextMajor) {
 }
 
 export function bumpVersion(version, kind) {
-  const { major, era, build } = parseVersion(version);
+  const { major, era, minor, build } = parseVersion(version);
   assertUnofficial(major, major);
   if (kind === "major") {
     throw new Error(MAJOR_REFUSE);
   }
+  let next;
   if (kind === "era") {
     if (major !== 0) throw new Error(MAJOR_REFUSE);
-    const next = `0.${era + 1}.0`;
-    const parsed = parseVersion(next);
-    assertUnofficial(parsed.major, parsed.major);
-    return next;
+    next = `0.${era + 1}.1.0`;
+  } else if (kind === "minor") {
+    const nextMinor = minor == null ? 1 : minor + 1;
+    next = `0.${era}.${nextMinor}.0`;
+  } else if (kind === "build") {
+    // First build from 3-part 0.1.6 → 0.1.1.1 (do not become 0.1.7)
+    next = minor == null ? `${major}.${era}.1.1` : `${major}.${era}.${minor}.${build + 1}`;
+  } else {
+    throw new Error(`unknown kind: ${kind}`);
   }
-  if (kind === "build") {
-    const next = `${major}.${era}.${build + 1}`;
-    const parsed = parseVersion(next);
-    assertUnofficial(parsed.major, parsed.major);
-    return next;
-  }
-  throw new Error(`unknown kind: ${kind}`);
+  const parsed = parseVersion(next);
+  assertUnofficial(parsed.major, parsed.major);
+  return next;
 }
 
 function pathSignificant(file) {
@@ -159,12 +167,16 @@ function changelogCommits(commits) {
 }
 
 
+const README_STAMP_RE = /当前打板：\*\*v\d+\.\d+\.\d+(?:\.\d+)?\*\*/;
+
 export function applyReadmeVersion(text, next) {
   const stamp = `当前打板：**v${next}**`;
-  if (/当前打板：\*\*v\d+\.\d+\.\d+\*\*/.test(text)) {
-    return text.replace(/当前打板：\*\*v\d+\.\d+\.\d+\*\*/, stamp);
+  if (README_STAMP_RE.test(text)) {
+    text = text.replace(README_STAMP_RE, stamp);
+    text = text.replace(/`0\.<era>\.<build>`/g, "`0.<era>.<minor>.<build>`");
+    return text;
   }
-  const line = `${stamp}（非正式预发布，\`0.<era>.<build>\`）。记录见 [CHANGELOG.md](./CHANGELOG.md)。`;
+  const line = `${stamp}（非正式预发布，\`0.<era>.<minor>.<build>\`）。记录见 [CHANGELOG.md](./CHANGELOG.md)。`;
   if (/^## 版本/m.test(text)) {
     return text.replace(/^(## 版本)[ \t]*\n*/m, `$1\n\n${line}\n`);
   }
@@ -223,11 +235,11 @@ tags: [release]
 
 ## 目的
 
-记录预发布 \`v${next}\`（\`0.<era>.<build>\`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。
+记录预发布 \`v${next}\`（\`0.<era>.<minor>.<build>\`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。
 
 ## 当前判断
 
-这是非正式版。主版本锁在 0。本次只加 build，没有换代。
+这是非正式版。主版本锁在 0。默认只加 build；大版本要用户说「大版本」，换代要用户说「换代」。
 升到 1.x 等于出正式版，必须用户亲口说「出正式版」。
 
 提交：
@@ -245,7 +257,7 @@ scripts/release.mjs
 
 ## 边界
 
-不 commit、不 push。不要把本次当成 1.x。不要自行 \`--era\`。
+不 commit、不 push。不要把本次当成 1.x。不要自行 \`--minor\` 或 \`--era\`。
 `;
   fs.writeFileSync(dest, body);
 }
@@ -308,7 +320,7 @@ function parseArgs(argv) {
     force: args.includes("--force"),
     tag: args.includes("--tag"),
     major: args.includes("--major"),
-    kind: args.includes("--era") ? "era" : "build",
+    kind: args.includes("--era") ? "era" : args.includes("--minor") ? "minor" : "build",
   };
 }
 

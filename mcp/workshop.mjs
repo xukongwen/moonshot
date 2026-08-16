@@ -32,7 +32,8 @@ export class Workshop {
 
   addStackPart(id, at) {
     const def = requirePart(id);
-    if (def.radial && !def.decoupler && (id === 'srb' || id === 'fins' || id === 'legs' || id === 'legs-xl')) {
+    if (def.radial && !def.decoupler && (id === 'srb' || id === 'fins' || id === 'legs' || id === 'legs-xl'
+        || id === 'panel-oxstat' || id === 'batt-z100')) {
       throw new Error(t('vab.radialOnly', { name: def.name }));
     }
     const insert = at != null
@@ -74,7 +75,7 @@ export class Workshop {
     return this.snapshot();
   }
 
-  addRadial(part, sym, host) {
+  addRadial(part, sym, host, attachAngle) {
     requirePart(part);
     const h = host != null ? Number(host) : this.selected;
     if (!Number.isInteger(h) || h < 0 || !this.design.stack[h]) {
@@ -82,7 +83,9 @@ export class Workshop {
     }
     const def = PARTS[part];
     const n = (def.fins || def.legs) ? 1 : Math.max(1, Number(sym) || 1);
-    this.design.radials.push({ part, sym: n, host: h });
+    const rec = { part, sym: n, host: h };
+    if (Number.isFinite(attachAngle)) rec.attachAngle = attachAngle;
+    this.design.radials.push(rec);
     return this.snapshot();
   }
 
@@ -139,7 +142,11 @@ export class Workshop {
     this.design = {
       name: design.name || this.design.name,
       stack: [...design.stack],
-      radials: (design.radials ?? []).map((r) => ({ part: r.part, sym: r.sym, host: r.host })),
+      radials: (design.radials ?? []).map((r) => {
+        const rec = { part: r.part, sym: r.sym, host: r.host };
+        if (Number.isFinite(r.attachAngle)) rec.attachAngle = r.attachAngle;
+        return rec;
+      }),
     };
     this.selected = -1;
     return this.snapshot();
@@ -179,7 +186,11 @@ export class Workshop {
     return {
       name: this.design.name,
       stack: [...this.design.stack],
-      radials: this.design.radials.map((r) => ({ part: r.part, sym: r.sym, host: r.host })),
+      radials: this.design.radials.map((r) => {
+        const rec = { part: r.part, sym: r.sym, host: r.host };
+        if (Number.isFinite(r.attachAngle)) rec.attachAngle = r.attachAngle;
+        return rec;
+      }),
       selected: this.selected,
       stats: this.stats(),
       parts: this.design.stack.map((id, i) => ({

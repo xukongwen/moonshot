@@ -8,12 +8,12 @@ export const PARTS = {
   // ---- Pods ----
   'pod-mk1': {
     name: 'Mk1 Command Pod', category: 'Pods', size: 1.25, mass: 800, length: 1.1,
-    pod: { torque: 6000 }, dragArea: 0.6, maxTemp: 2200, shape: 'pod',
+    pod: { torque: 6000, ecCap: 50 }, dragArea: 0.6, maxTemp: 2200, shape: 'pod',
     desc: 'One brave pilot. Built-in reaction wheels and a reentry-rated hull.',
   },
   'pod-mk2': {
     name: 'Mk2 Command Module', category: 'Pods', size: 2.5, mass: 2700, length: 1.6,
-    pod: { torque: 16000 }, dragArea: 1.8, maxTemp: 2200, shape: 'pod',
+    pod: { torque: 16000, ecCap: 150 }, dragArea: 1.8, maxTemp: 2200, shape: 'pod',
     desc: 'Roomy three-seater. Stronger reaction wheels.',
   },
 
@@ -137,6 +137,16 @@ export const PARTS = {
     shield: { ablator: 200 }, dragArea: 0.7, maxTemp: 3400, shape: 'shield',
     desc: 'Ablative shield for reentry. Goes under the pod, blunt end first.',
   },
+  'panel-oxstat': {
+    name: 'OX-STAT Photovoltaic', category: 'Utility', size: 2.2, mass: 6, length: 0.6,
+    panel: { ecPerS: 0.8 }, radial: true, dragArea: 0.08, maxTemp: 1400, shape: 'panel',
+    desc: 'Static side-wing solar array (span out, not up the stack). 0.8 EC/s at Kerbin flux. No deploy.',
+  },
+  'batt-z100': {
+    name: 'Z-100 Rechargeable Battery', category: 'Utility', size: 0.2, mass: 8, length: 0.2,
+    ecCap: 100, radial: true, dragArea: 0.04, maxTemp: 1400, shape: 'battery',
+    desc: '100 EC radial brick. No generation, no deploy.',
+  },
 };
 
 export const CATEGORIES = ['Pods', 'Tanks', 'Engines', 'Coupling', 'Aero', 'Utility'];
@@ -165,5 +175,8 @@ export function partInfoHTML(def) {
     rows.push(`${t('part.thrust')} ${(def.engine.thrustVac / 1000).toFixed(0)} kN ${t('part.vac')}`);
     rows.push(`Isp ${def.engine.ispVac}s ${t('part.vac')} / ${def.engine.ispSL}s SL`);
   }
+  const cap = def.pod?.ecCap ?? def.ecCap;
+  if (cap) rows.push(`${cap} EC`);
+  if (def.panel?.ecPerS) rows.push(`${def.panel.ecPerS} EC/s (Kerbin flux)`);
   return `<b>${def.name}</b><br>${rows.join('<br>')}<br><i>${def.desc}</i>`;
 }

@@ -14,7 +14,7 @@
     "tank-l",
     "tank-l",
     "tank-m",
-    "eng-falcon",
+    "eng-raven",
     "decoupler-l",
     "adapter",
     "tank-xl",
@@ -34,6 +34,11 @@
       "host": 5
     },
     {
+      "part": "legs-xl",
+      "sym": 1,
+      "host": 23
+    },
+    {
       "part": "fins",
       "sym": 1,
       "host": 23
@@ -42,50 +47,46 @@
       "part": "srb",
       "sym": 6,
       "host": 23
+    },
+    {
+      "part": "panel-oxstat",
+      "sym": 2,
+      "host": 0
+    },
+    {
+      "part": "batt-z100",
+      "sym": 1,
+      "host": 0
+    },
+    {
+      "part": "batt-z100",
+      "sym": 1,
+      "host": 23
     }
   ],
   "budgetOk": true,
   "redesigned": false,
-  "twrSL": 1.201875927412757,
-  "wetKg": 206610,
-  "padLift": true,
-  "start": "pad",
-  "lko": {
-    "orbit": "72 × 90 km",
-    "fuel": 11209.880458011998,
-    "t": 454.35000000006903
-  },
-  "window": {
-    "targetDeg": 44.36114875836199,
-    "nowDeg": 44.397025279588746,
-    "errDeg": 0.03587652122678264,
-    "tT_d": 75.50929073274138,
-    "vInfDep": 918.3458304101223
-  },
-  "tdi": {
-    "dV": 1077.2342108375042,
-    "vInf": 864.0952783930862,
-    "vInfTarget": 918.3458304101223,
-    "body": "kerbin",
-    "orbit": "83 × ∞ km",
-    "fuel": 5968.078448985048
-  },
-  "midCourse": {
-    "ca0_m": 114241399.53338991,
-    "ca0": "114.24 Mm",
-    "dV": 40,
-    "dRad": -25,
-    "enc": true
-  },
-  "dunaPeKm": 723.0715679077416,
+  "twrSL": 1.2022949063259534,
+  "wetKg": 206538,
+  "padLift": false,
+  "start": "duna-orbit",
+  "lko": null,
+  "window": null,
+  "tdi": null,
+  "midCourse": null,
+  "dunaPeKm": null,
   "duna": {
     "body": "duna",
-    "speed": 9.582077081279081,
-    "t": 16648283.508410137,
-    "fuel": 1493.741048388733,
+    "speed": 9.996039801763706,
+    "t": 3822.0112912104128,
+    "fuel": 3023.3153678557496,
     "water": false
   },
-  "dunaOrbit": null,
+  "dunaOrbit": {
+    "orbit": "59 × 245 km",
+    "fuel": 771.9593115503842,
+    "t": 4684.3612912135495
+  },
   "kerbin": null,
   "snaps": [
     {
@@ -94,11 +95,10 @@
     }
   ],
   "notes": [
-    "return: duna ascent failed: -21 × 51 km"
+    "pad: CRASHED at 372.6 m/s, t=564s, body=kerbin alt=13",
+    "return: Failed to reach Kerbin SOI (body=kerbol)"
   ],
-  "dunaCapture": "723 × 44582 km",
-  "dunaCaptureFuel": 4622.053047854592,
-  "landerFuelBeforeDescent": 3863.029501499077,
+  "landerFuelBeforeDescent": 5982.265804991694,
   "landerParts": [
     "Mk1 Command Pod",
     "Mk2 Parachute",
@@ -107,9 +107,11 @@
     "FT-800 Tank",
     "FT-400 Tank",
     "S-7 \"Sparrow\"",
-    "LT-2 Landing Legs ×4"
+    "LT-2 Landing Legs ×4",
+    "OX-STAT Photovoltaic",
+    "Z-100 Rechargeable Battery"
   ],
   "landerOnly": true,
-  "met": 16648566.85841436,
+  "met": 22631350.519707687,
   "failures": 0
 }

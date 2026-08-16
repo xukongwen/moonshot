@@ -24,7 +24,7 @@ function deepEqual(a, b) {
   const w = new Workshop({ craftsPath: join(tmpdir(), 'moonshot-unused-crafts.json') });
   const stock = STOCK['Mun Express'];
   for (const id of stock.stack) w.addStackPart(id);
-  for (const r of stock.radials) w.addRadial(r.part, r.sym, r.host);
+  for (const r of stock.radials) w.addRadial(r.part, r.sym, r.host, r.attachAngle);
   const snap = w.snapshot();
   check('stack matches STOCK', deepEqual(snap.stack, stock.stack), JSON.stringify(snap.stack));
   check('radials match STOCK', deepEqual(snap.radials, stock.radials), JSON.stringify(snap.radials));

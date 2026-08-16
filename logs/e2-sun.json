@@ -1,0 +1,31 @@
+{
+  "craft": "pod-mk1 + panel-oxstat",
+  "body": "kerbin",
+  "orbit": "80 km circular kerbin",
+  "setup": "hand-built parts, sun-facing radial OX-STAT, SAS off, physicsStep dt=0.1",
+  "sun_from_getInertialState": true,
+  "flux_day": 1.0001000086752785,
+  "flux_night": 0.9999000063250741,
+  "eclipsed_day": null,
+  "eclipsed_night": "kerbin",
+  "ecGen_day": 0.8000800069402226,
+  "ecGen_night": 0,
+  "panelW_day": 1.0001000086752783,
+  "panelW_night": 0,
+  "n_dot_sun_day": 0.9999999999999999,
+  "ecCap": 50,
+  "start_ec": 0,
+  "ec_after_10s_day": 8.000799921887534,
+  "ec_after_10s_night": 0,
+  "t_after_10s_day": 9.99999999999998,
+  "t_after_10s_night": 9.99999999999998,
+  "eclipsed_after_10s_day": null,
+  "eclipsed_after_10s_night": "kerbin",
+  "landed_day": false,
+  "dead_day": false,
+  "formula": {
+    "rKerbin": 13599840256,
+    "rDuna": 20726155264,
+    "flux_duna_center": 0.4305564701040176
+  }
+}

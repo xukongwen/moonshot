@@ -1,0 +1,87 @@
+{
+  "craft": "pod-mk1 + panel-oxstat",
+  "body": "kerbin",
+  "orbit": "80 km circular kerbin, vel*1.002",
+  "setup": "placeBySun + face panel at sun; numbers from ecTelemetry / session.telemetry()",
+  "threshold": {
+    "ec_low": 20,
+    "rule": "eclipsed is set AND ec < 20",
+    "sas_dead": "ec <= 0 or wheelsLive === false"
+  },
+  "sentences": {
+    "night_low": {
+      "zh": "在 kerbin 影子里，电量 10 / 50。",
+      "en": "Eclipsed by kerbin, EC 10 / 50."
+    },
+    "sas_dead": {
+      "zh": "电量 0，SAS 死了。",
+      "en": "EC 0, SAS dead."
+    }
+  },
+  "telemetry": {
+    "day": {
+      "ec": 50,
+      "ecCap": 50,
+      "ecGen": 0.8000800069402226,
+      "eclipsed": null,
+      "panelW": 1.0001000086752783
+    },
+    "night": {
+      "ec": 50,
+      "ecCap": 50,
+      "ecGen": 0,
+      "eclipsed": "kerbin",
+      "panelW": 0
+    },
+    "day_session": {
+      "ec": 50,
+      "ecCap": 50,
+      "ecGen": 0.8000800069402226,
+      "eclipsed": null,
+      "panelW": 1.0001000086752783
+    },
+    "night_session": {
+      "ec": 50,
+      "ecCap": 50,
+      "ecGen": 0,
+      "eclipsed": "kerbin",
+      "panelW": 0
+    },
+    "fields": [
+      "ec",
+      "ecCap",
+      "ecGen",
+      "eclipsed",
+      "panelW"
+    ],
+    "extra": [
+      "wheelsLive"
+    ]
+  },
+  "checker": {
+    "night_low": {
+      "zh": [
+        "在 kerbin 影子里，电量 10 / 50。"
+      ],
+      "en": [
+        "Eclipsed by kerbin, EC 10 / 50."
+      ]
+    },
+    "night_full": {
+      "zh": [],
+      "en": []
+    },
+    "day_low": {
+      "zh": [],
+      "en": []
+    },
+    "ec_0": {
+      "zh": [
+        "电量 0，SAS 死了。"
+      ],
+      "en": [
+        "EC 0, SAS dead."
+      ]
+    }
+  }
+}

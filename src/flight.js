@@ -26,6 +26,7 @@ import { Navball } from './navball.js';
 import { SoundFX } from './sound.js';
 import { t, bodyName, getLang } from './i18n.js';
 import { loadDemoIfEmpty } from './agent-ui.js';
+import { fillEC, splitEC, stepECOnRails } from './power.js';
 
 const WARP_LEVELS = [1, 2, 3, 4, 10, 100, 1000, 10000, 100000];
 const PHYS_DT = 0.02;
@@ -161,6 +162,7 @@ export class Flight {
       sas: true, sasMode: 'hold', sasTarget: quat.clone(),
       elements: null,
     };
+    fillEC(this.st);
     this.plan = buildStagePlan(parts);
     this.stageIndex = 0;
     this.vessels = [{
@@ -251,6 +253,8 @@ export class Flight {
     st.geom = stackGeometry(st.parts);
     st.sections = computeSections(st.parts);
     st.massProps = massProps(st.parts, st.geom);
+    st.ec = snap.ec != null ? Number(snap.ec) : undefined;
+    fillEC(st);
 
     this.legsDeployed = st.parts.some((p) => p.legsDown);
     this.warpIdx = 0;
@@ -446,6 +450,7 @@ export class Flight {
       sas: true, sasMode: 'hold', sasTarget: quat.clone(),
       elements: null,
     };
+    fillEC(st);
     if (!this.vessels) this.vessels = [];
     const id = opts.id != null ? String(opts.id) : String(this._idSeq++);
     const vessel = {
@@ -741,6 +746,7 @@ export class Flight {
       sas: true, sasMode: 'hold', sasTarget: st.quat.clone(),
       elements: null,
     };
+    splitEC(st, bst);
     if (!this.vessels) this.vessels = [];
     const id = `stage-${this._idSeq++}`;
     const vessel = {
@@ -897,6 +903,7 @@ export class Flight {
             v.st.t += h;
             const pv = propagate(el, v.st.t);
             v.st.pos.copy(pv.pos); v.st.vel.copy(pv.vel);
+            stepECOnRails(v.st, h);
           } catch {
             physicsStep(v.st, h, events);
             v.st.t += h;
@@ -927,8 +934,9 @@ export class Flight {
   railsStep(dt) {
     const st = this.st;
     const warp = WARP_LEVELS[this.warpIdx];
-    st.t += dt * warp;
-    if (this.flags.liftoff) st.met += dt * warp;
+    const simDt = dt * warp;
+    st.t += simDt;
+    if (this.flags.liftoff) st.met += simDt;
     if (!st.landed && st.elements) {
       const { pos, vel } = propagate(st.elements, st.t);
       st.pos.copy(pos); st.vel.copy(vel);
@@ -951,7 +959,9 @@ export class Flight {
       // gentle cooldown on rails
       for (const p of st.parts) p.temp = Math.max(4, p.temp - 5 * dt * Math.min(warp, 100));
     }
-    this.stepOtherVessels(dt * warp);
+    // Same EC step as realtime, scaled by warp dt. One eval at the new state.
+    stepECOnRails(st, simDt);
+    this.stepOtherVessels(simDt);
     this.milestones();
   }
 

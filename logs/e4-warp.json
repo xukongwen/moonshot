@@ -1,0 +1,105 @@
+{
+  "craft": "pod-mk1 + panel-oxstat",
+  "body": "kerbin",
+  "orbit": "80 km circular kerbin",
+  "method": "coastRailsOnState (same stepECOnRails helper as flight.railsStep / stepOtherVessels propagate / session.railsVessel)",
+  "setup": "hand-built parts, sun-facing radial OX-STAT; vel*1.002 so propagate has a real e; one rails substep = simDt (same multiplier railsStep uses for st.t)",
+  "sun_from_getInertialState": true,
+  "one_eval_per_rails_substep": true,
+  "sas_flag": "st.sas",
+  "sas_during_warp": "pay if st.sas and error > 0.5° deadband (sasWouldPay); aligned hold is free; SAS off does not pay",
+  "sas_ec_per_s": 0.5,
+  "day": {
+    "start_ec": 0,
+    "simDt": 10,
+    "warp": 10,
+    "t": 0,
+    "ec": 0,
+    "ecCap": 50,
+    "ecGen": 0.8000800069402226,
+    "eclipsed": null,
+    "flux": 1.0001000086752785,
+    "panelW": 1.0001000086752783,
+    "after": {
+      "t": 10,
+      "ec": 8.000799620159679,
+      "ecCap": 50,
+      "ecGen": 0.800079962015968,
+      "eclipsed": null,
+      "flux": 1.0000999525332144,
+      "panelW": 1.0000999525199599
+    },
+    "ec_after": 8.000799620159679
+  },
+  "night": {
+    "start_ec": 40,
+    "simDt": 10,
+    "warp": 10,
+    "sas": false,
+    "t": 0,
+    "ec": 40,
+    "ecCap": 50,
+    "ecGen": 0,
+    "eclipsed": "kerbin",
+    "flux": 0.9999000063250741,
+    "panelW": 0,
+    "after": {
+      "t": 10,
+      "ec": 40,
+      "ecCap": 50,
+      "ecGen": 0,
+      "eclipsed": "kerbin",
+      "flux": 0.9999000624446686,
+      "panelW": 0
+    },
+    "ec_after": 40
+  },
+  "night_sas_paying": {
+    "start_ec": 50,
+    "simDt": 10,
+    "sas": true,
+    "sasMode": "hold",
+    "error_deg": 90,
+    "ec_after": 45,
+    "expect_drop": 5
+  },
+  "physics_vs_rails_day_10s": {
+    "physicsStep_ec": 8.000799921887765,
+    "rails_ec": 8.000799620159679,
+    "delta": -3.0172808607176194e-7,
+    "physics_t": 9.99999999999998,
+    "rails_t": 10
+  },
+  "pos_vel": {
+    "helper_pos_delta_m": 0,
+    "helper_vel_delta_mps": 0,
+    "coast_vs_propagate_pos_m": 0,
+    "coast_vs_propagate_vel_mps": 0
+  },
+  "terminator_chunk": {
+    "start_fromDayDeg": 80,
+    "simDt": 200,
+    "start": {
+      "t": 0,
+      "ec": 0,
+      "ecCap": 50,
+      "ecGen": 0.80001389025851,
+      "eclipsed": null,
+      "flux": 1.0000173628231377,
+      "panelW": 1.0000173628231375
+    },
+    "after": {
+      "t": 200,
+      "ec": 0,
+      "ecCap": 50,
+      "ecGen": 0,
+      "eclipsed": "kerbin",
+      "flux": 0.9999523183018652,
+      "panelW": 0
+    },
+    "note": "one 200 s rails substep; eclipse/gen evaluated at the end state"
+  },
+  "ecCap": 50,
+  "landed": false,
+  "dead": false
+}

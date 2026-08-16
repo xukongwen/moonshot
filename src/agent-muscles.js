@@ -10,6 +10,7 @@ import {
 } from './orbits.js';
 import { checkSOI } from './physics.js';
 import { snapshotFromState } from './save.js';
+import { paySAS, stepECOnRails, ecTelemetry } from './power.js';
 
 const Y = new Vector3(0, 1, 0);
 
@@ -60,6 +61,7 @@ export function readFlightCheck(st, { stageIdx = 0 } = {}) {
     dead: !!st?.dead,
     parts: names,
     orbitText: orb.text,
+    ...ecTelemetry(st),
   };
 }
 
@@ -67,12 +69,13 @@ export function captureFlightSnapshot(st, { tag = 'agent', craft = null } = {}) 
   return snapshotFromState(st, { tag, craft });
 }
 
-export function pointState(st, dir) {
+export function pointState(st, dir, dt = 0) {
   const v = dir.clone();
   if (v.lengthSq() < 1e-12) v.copy(st.pos).normalize();
   st.quat.setFromUnitVectors(Y, v.normalize());
   if (st.angVel?.set) st.angVel.set(0, 0, 0);
   if (st.sasTarget?.copy) st.sasTarget.copy(st.quat);
+  if (dt > 0) paySAS(st, dt);
 }
 
 /**
@@ -129,7 +132,7 @@ export function shouldStageDry(st, plan, stageIdx, { allowLander = true } = {}) 
     // 4-stage: Kestrel + Sparrow/Raven + Falcon. Circularize on Falcon;
     // do not steal the vacuum TLI/escape stage if Falcon goes dry first.
     // 3-stage Express (Kestrel + Sparrow) still lights Sparrow after Titan.
-    if (engines.length >= 3) {
+    if (engines.length >= 4) {
       const nextPart = st.parts.find((p) => p.alive && nxt.ignite.includes(p.key));
       if (/Sparrow|Raven/.test(nextPart?.def?.name || '')) {
         return { stage: false, reason: 'keep vacuum stage' };
@@ -291,9 +294,11 @@ export function coastRailsOnState(st, { maxS, pred = null, dt = 60 } = {}) {
       try {
         el = elementsFromState(st.pos, st.vel, BODIES[st.body].mu, st.t);
       } catch {
+        stepECOnRails(st, step);
         break;
       }
     }
+    stepECOnRails(st, step);
   }
   return { ok: true, arrived: pred ? !!pred(st) : true };
 }

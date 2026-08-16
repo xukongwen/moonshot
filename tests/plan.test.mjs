@@ -19,7 +19,7 @@ function stock(name) {
   return d;
 }
 
-check('23 parts', Object.keys(PARTS).length === 23, String(Object.keys(PARTS).length));
+check('25 parts', Object.keys(PARTS).length === 25, String(Object.keys(PARTS).length));
 check('missions listed', 'mun-roundtrip' in MISSIONS && 'duna-roundtrip' in MISSIONS);
 
 // ---- Hopper vs mun-roundtrip: too small ----

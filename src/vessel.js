@@ -27,6 +27,7 @@ export function buildVesselParts(design) {
     const def = PARTS[r.part];
     parts.push({
       key: `r${keyCounter++}`, def, kind: 'radial', stackIndex: r.host, sym: r.sym,
+      attachAngle: Number.isFinite(r.attachAngle) ? r.attachAngle : 0,
       fuel: (def.fuel ?? 0) * r.sym, ablator: 0,
       temp: 290, alive: true, ignited: false,
       chuteState: def.chute ? 'stowed' : null,
@@ -212,11 +213,15 @@ export function designFromParts(parts, name = 'Dropped Stage') {
   const indexOf = (si) => stackParts.findIndex((p) => p.stackIndex === si);
   const radials = parts
     .filter((p) => p.kind === 'radial' && p.alive !== false)
-    .map((p) => ({
-      part: partIdOf(p.def),
-      sym: p.sym,
-      host: Math.max(0, indexOf(p.stackIndex)),
-    }))
+    .map((p) => {
+      const rec = {
+        part: partIdOf(p.def),
+        sym: p.sym,
+        host: Math.max(0, indexOf(p.stackIndex)),
+      };
+      if (Number.isFinite(p.attachAngle)) rec.attachAngle = p.attachAngle;
+      return rec;
+    })
     .filter((r) => r.part);
   return { name, stack, radials };
 }

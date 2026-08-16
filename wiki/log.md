@@ -3,14 +3,16 @@
 
 > 更早条目已卷到 [`wiki/log/`](./log/)。生成：`node scripts/wiki-auto-curator.mjs`。
 
+- [2026-08-16] 发布 v0.1.1.1。
+- [2026-08-16] 电力 E1–E6、共面侧翼、LT-2 收起，打板 0.1.1.1。
+- [2026-08-16] OX-STAT 改长条 2.10×0.44×0.045，库存 Express/Reuser/Hauler host 0 左右一对 `sym: 2`（90°/270°）。对生面朝阳 gen=0.800080（不是 1.6）。图 logs/shots/panel-pair.png 两板都看见。版本仍 0.1.6，未提交。
+- [2026-08-16] LT-2 收起贴 1.25 m 罐（stowAngle 2.983，脚 ΔY +1.58 / Δradial 0.25），Express/Reuser 去掉指挥舱 LT-2。图 logs/shots/legs-stowed-pod.png。版本仍 0.1.6，未提交。
+- [2026-08-16] 电力 E6：有头镜头白天板 / 夜里耗 / SAS 失效。Mun Express 80 km，logs/e6-shots.json 真数：昼 eclipsed null / ecGen 0.800080 / 电 250；夜 eclipsed kerbin / ecGen 0 / 电 250；SAS 死 ec 0 / wheelsLive false / 电 0 红空。looks3d。版本仍 0.1.6，未提交。
+- [2026-08-16] 电力 E3：Z-100 + OX-STAT 进目录，挂 Express/Reuser/Hauler。垫上 250 EC，扔助推后上面 150，板仍在 host 0。E4–E6 未做。版本仍 0.1.6，未提交。
+- [2026-08-16] 电力计划 E1–E6 立案，未做。
 - [2026-08-16] 发布 v0.1.6。
 - [2026-08-16] Mun Reuser 全垫闭环：回收 2.77 km / 2.50 m/s（非上垫），lander-only 缪恩 1828 kg，Kerbin 开伞 1.17 m/s / 655 kg。图 recover / mun-land / home。未打板。
 - [2026-08-16] R6：MCP `ksp_set_active` / `ksp_recover`，切船并指挥助推回收。
-<!-- wiki-auto-curator:near-window -->
-# Wiki Log（近 14 天）
-
-> 更早条目已卷到 [`wiki/log/`](./log/)。生成：`node scripts/wiki-auto-curator.mjs`。
-
 - [2026-08-16] 发布 v0.1.5。
 - [2026-08-16] 打板 v0.1.5：助推回收 R1–R5 + LT-25。官方 R4 离垫 2.17 km / 9.31 m/s；R5 agent 回收 2.35 km / 8.55 m/s。
 - [2026-08-16] 新零件 LT-25（`legs-xl`，500 kg / 3.8 m / safeSpeed 12）。Mun Express host 16、Duna Hauler host 23 改用它；着陆器仍 LT-2。近景 logs/shots/booster-legs.png：支柱 3.8 m，贴皮 r=1.33，脚垫 r=0.72，落地脚 r≈4.3。没改物理，没打板。
@@ -62,6 +64,15 @@
 - [2026-08-15] MCP VAB 无头车间 + 34 个工具；crafts.json 与浏览器 localStorage 分库
 - [2026-08-15] MCP 拼出「这也能飞？」并截图
 - [2026-08-15] Wiki bootstrap：宪法、SCHEMA、模块、ADR、curator
+
+
+
+
+
+
+
+
+
 
 
 

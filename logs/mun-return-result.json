@@ -27,27 +27,44 @@
       "host": 5
     },
     {
-      "part": "legs",
+      "part": "legs-xl",
       "sym": 1,
-      "host": 0
+      "host": 16
     },
     {
       "part": "fins",
       "sym": 1,
       "host": 16
+    },
+    {
+      "part": "panel-oxstat",
+      "sym": 2,
+      "host": 0
+    },
+    {
+      "part": "batt-z100",
+      "sym": 1,
+      "host": 0
+    },
+    {
+      "part": "batt-z100",
+      "sym": 1,
+      "host": 16
     }
   ],
+  "budgetOk": true,
+  "redesigned": false,
   "mun": {
     "body": "mun",
-    "speed": 2.865122253395518,
-    "t": 50422.5070919929,
-    "fuel": 1250.6245761805578,
+    "speed": 3.034377268245372,
+    "t": 42349.939172096114,
+    "fuel": 1294.2174442853825,
     "water": false
   },
   "kerbin": {
     "body": "kerbin",
-    "speed": 10.735803776338994,
-    "t": 94861.38938320123,
+    "speed": 9.84703899406226,
+    "t": 84599.86024006574,
     "fuel": 0,
     "water": false
   },
@@ -62,5 +79,5 @@
     }
   ],
   "failures": 0,
-  "met": 94861.38938320123
+  "met": 84599.86024006574
 }

@@ -4,6 +4,7 @@
 import { mkdirSync, writeFileSync, readFileSync, readdirSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { Vector3, Quaternion } from 'three';
+import { fillEC } from '../src/power.js';
 
 export const SNAP_DIR = '/workspace/moonshot/logs/snapshots';
 
@@ -36,6 +37,7 @@ export function serializeSnapshot(st, { tag = 'snap', craft = null } = {}) {
     throttle: st.throttle ?? 0,
     landed: !!st.landed,
     dead: !!st.dead,
+    ec: st.ec ?? null,
     craft: craft ?? null,
     parts: (st.parts ?? []).map((p) => ({
       key: p.key,
@@ -102,6 +104,8 @@ export function applySnapshotToState(st, snap) {
   st.landed = !!snap.landed;
   st.dead = !!snap.dead;
   applyParts(st, snap.parts);
+  st.ec = snap.ec != null ? Number(snap.ec) : undefined;
+  fillEC(st);
   return st;
 }
 

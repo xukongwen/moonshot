@@ -116,7 +116,7 @@ export function runSessionAscent(session, lang) {
   const t0 = session.st.t;
   while (session.st && !session.st.dead && session.st.t - t0 <= ASCENT_MAX_S) {
     const tick = ascentTick(session.st, { plan: session.plan, stageIdx: session.stageIdx });
-    pointState(session.st, tick.dir);
+    pointState(session.st, tick.dir, ASCENT_DT);
     session.st.sas = false;
     session.setThrottle(tick.throttle);
     if (tick.stage) {

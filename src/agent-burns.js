@@ -44,10 +44,10 @@ function driveBurn(st, pred, {
   st.throttle = 1;
   const events = [];
   while (st.t < tEnd && !st.dead) {
-    if (aim === 'prograde') pointState(st, st.vel);
-    else if (aim === 'retrograde') pointState(st, st.vel.clone().negate());
-    else if (aim === 'up') pointState(st, st.pos);
-    else if (aim && aim.isVector3) pointState(st, aim);
+    if (aim === 'prograde') pointState(st, st.vel, dt);
+    else if (aim === 'retrograde') pointState(st, st.vel.clone().negate(), dt);
+    else if (aim === 'up') pointState(st, st.pos, dt);
+    else if (aim && aim.isVector3) pointState(st, aim, dt);
     const evs = physStep(st, dt);
     events.push(...evs);
     maybeStageTransfer(st, plan, stageIdx, stageFn);
@@ -224,7 +224,7 @@ export function runEscapeMuscle(st, ctrl = null, opts = {}) {
     let enc = null;
     const tEnd = st.t + 420;
     while (st.t < tEnd && !st.dead) {
-      pointState(st, st.vel);
+      pointState(st, st.vel, 0.15);
       physStep(st, 0.15);
       maybeStageTransfer(st, hooks.plan, hooks.stageIdx, hooks.stageFn);
       try {
@@ -725,26 +725,27 @@ function poweredDescent(st, bodyName, {
     const brake = Math.max(0.1, brakeFrac * Math.max(0.2, maxAcc - g));
     const vAllow = Math.sqrt(Math.max(0, 2 * brake * Math.max(0, aglNow - 15))) + 3;
     const chuteOut = st.parts.some((p) => p.alive && p.def.chute && p.chuteState === 'deployed');
+    const dt = aglNow < 2000 ? 0.04 : 0.08;
     if (useChutes && chuteOut && speed < 10 && aglNow < 400) {
-      pointState(st, u);
+      pointState(st, u, dt);
       st.throttle = 0;
     } else if (vH.length() > 4 && aglNow > horizKillAgl) {
       let aim = vH.clone().negate().addScaledVector(u, vH.length() * 0.25);
       if (steerPad && st.body === 'kerbin') aim.addScaledVector(padAim(st), Math.min(80, vH.length()));
-      pointState(st, aim);
+      pointState(st, aim, dt);
       st.throttle = 1;
     } else if (speed > vAllow || (aglNow < 400 && speed > 8)) {
       let aim = st.vel.clone().negate();
       if (steerPad && st.body === 'kerbin' && fuelLeft(st) > vertReserveKg && padDistanceM(st) > 800) {
         aim.addScaledVector(padAim(st), 0.28 * Math.max(1, aim.length()));
       }
-      pointState(st, aim);
+      pointState(st, aim, dt);
       st.throttle = 1;
     } else {
-      pointState(st, u);
+      pointState(st, u, dt);
       st.throttle = aglNow < 80 && speed > 3 ? 0.25 : 0;
     }
-    const evs = physStep(st, aglNow < 2000 ? 0.04 : 0.08);
+    const evs = physStep(st, dt);
     landedEv = evs.find((ev) => ev.type === 'landed') || landedEv;
     crashEv = evs.find((ev) => ev.type === 'crashed') || crashEv;
     if (st.landed) break;
@@ -890,7 +891,7 @@ export function runBoostback(st, {
     }
     const aim = padAim(st);
     if (aimDown) aim.addScaledVector(st.pos.clone().normalize(), -aimDown);
-    pointState(st, aim);
+    pointState(st, aim, dt);
     st.throttle = 1;
     physStep(st, dt);
     if (fuelLeft(st) < 8) { reason = 'dry'; break; }
@@ -967,10 +968,10 @@ export function coastToAgl(st, aglStart) {
     const agl = aglOf(st);
     const u = st.pos.clone().normalize();
     const vUp = st.vel.dot(u);
-    pointState(st, st.vel.clone().negate());
+    const dt = agl != null && agl < 20_000 ? 0.06 : 0.14;
+    pointState(st, st.vel.clone().negate(), dt);
     if (agl != null && agl < aglStart && vUp < 80) break;
     if (agl != null && agl < 1500) break;
-    const dt = agl != null && agl < 20_000 ? 0.06 : 0.14;
     physStep(st, dt);
   }
 }
@@ -1150,7 +1151,7 @@ function circularizeAtAp(st, bodyName, apTarget, peClear, hooks) {
       hdir.normalize();
       let bias = Math.max(-0.08, Math.min(0.35, (18 - (Number.isFinite(tAp) ? tAp : 0)) / 45));
       if (peAlt < atmo + 4000 && apAlt < apTarget * 1.15) bias = Math.max(bias, 0.22);
-      pointState(st, hdir.addScaledVector(u, bias));
+      pointState(st, hdir.addScaledVector(u, bias), 0.05);
     } catch { break; }
     st.throttle = 1;
     physStep(st, 0.05);
@@ -1210,7 +1211,7 @@ export function runRiseMuscle(st, ctrl = null, opts = {}) {
       if (e.a > 0 && apAlt > apTarget * 1.3) k = Math.max(k, 0.72);
       if (e.a < 0) k = Math.max(k, 0.85);
     }
-    pointState(st, u.clone().multiplyScalar(1 - k).addScaledVector(east, k));
+    pointState(st, u.clone().multiplyScalar(1 - k).addScaledVector(east, k), 0.05);
     st.throttle = 1;
     physStep(st, 0.05);
     maybeStageTransfer(st, hooks.plan, hooks.stageIdx, hooks.stageFn);
@@ -1395,8 +1396,9 @@ function kerbinChuteLand(st) {
       }
       const chuteOut = st.parts.some((p) => p.alive && p.def.chute && p.chuteState === 'deployed');
       const chuteAlive = st.parts.some((p) => p.alive && p.def.chute);
+      const dt = alt < 20_000 ? 0.12 : 0.35;
       if (chuteOut) {
-        pointState(st, u);
+        pointState(st, u, dt);
         st.throttle = 0;
       } else if (!chuteAlive && alt < 15_000 && fuelLeft(st) > 8) {
         lightLander(st);
@@ -1409,17 +1411,17 @@ function kerbinChuteLand(st) {
         const brake = Math.max(0.2, 0.35 * Math.max(0, maxAcc - g));
         const vAllow = Math.sqrt(Math.max(0, 2 * brake * Math.max(0, alt - 12))) + 5;
         if (speed > vAllow) {
-          pointState(st, speed > 60 ? st.vel.clone().negate() : u);
+          pointState(st, speed > 60 ? st.vel.clone().negate() : u, dt);
           st.throttle = 1;
         } else {
           st.throttle = 0;
-          if (alt < 800) pointState(st, u);
+          if (alt < 800) pointState(st, u, dt);
         }
       } else {
-        pointState(st, st.vel.clone().negate());
+        pointState(st, st.vel.clone().negate(), dt);
         st.throttle = 0;
       }
-      const evs = physStep(st, alt < 20_000 ? 0.12 : 0.35);
+      const evs = physStep(st, dt);
       landedEv = evs.find((ev) => ev.type === 'landed');
       if (st.landed || landedEv) break;
     }

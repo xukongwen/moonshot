@@ -33,7 +33,7 @@ export const TOOLS = [
   },
   {
     name: 'ksp_telemetry',
-    description: 'Read the flight HUD: altitude, speed, orbit, fuel, staging, warp, camera.',
+    description: 'Read the flight HUD: altitude, speed, orbit, fuel, staging, warp, camera, plus EC (ec, ecCap, ecGen, eclipsed, panelW) and wheelsLive.',
     inputSchema: { type: 'object', properties: {} },
   },
   {
@@ -540,7 +540,7 @@ export const TOOLS = [
   },
   {
     name: 'ksp_agent_check',
-    description: 'Press 检查 — run the A5 checker and append thoughts (transfer dry, lander early, budget, dead / suborbital). Same as the panel.',
+    description: 'Press 检查 — run the A5 checker and append thoughts (transfer dry, lander early, budget, dead / suborbital, night+low EC, SAS dead). Same as the panel.',
     inputSchema: { type: 'object', properties: {} },
   },
 ];

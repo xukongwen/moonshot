@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-16T05:55:58.211Z",
+  "generatedAt": "2026-08-16T10:04:13.656Z",
   "activeCap": 15,
   "logKeepDays": 14,
   "entries": [
@@ -13,7 +13,7 @@
       "summaryOneLiner": "记下第一次走游戏内 agent 路径（一刀一刀，不是一条龙脚本）的 Duna 着陆并回家。数字只来自 `logs/agent-fly-duna-result.json`。瑕疵照写。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:24:36.429Z",
+      "mtime": "2026-08-16T08:57:47.375Z",
       "compactionState": "full"
     },
     {
@@ -25,7 +25,7 @@
       "summaryOneLiner": "数字只来自 `logs/mun-reuser-result.json`（2026-08-16T05:35:47Z 全垫，`MUN_REUSER_REDESIGN=0`）。没改物理。未打板。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T05:37:33.621Z",
+      "mtime": "2026-08-16T08:57:47.887Z",
       "compactionState": "full"
     },
     {
@@ -37,7 +37,7 @@
       "summaryOneLiner": "锁定 TDI 点火相位，避免在几何 midnight 烧出一条错过 Duna 的双曲线。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:02:59.099Z",
+      "mtime": "2026-08-16T08:57:47.027Z",
       "compactionState": "full"
     },
     {
@@ -49,7 +49,7 @@
       "summaryOneLiner": "锁定天体状态坐标系，避免为了「太阳系惯性」拆掉 Mun Express。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:02:54.099Z",
+      "mtime": "2026-08-16T08:57:46.939Z",
       "compactionState": "full"
     },
     {
@@ -61,7 +61,7 @@
       "summaryOneLiner": "永远说中文。不要把整份 log 或 index 变更流水倒进聊天。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T13:13:45.371Z",
+      "mtime": "2026-08-16T08:57:46.791Z",
       "compactionState": "full"
     },
     {
@@ -73,7 +73,7 @@
       "summaryOneLiner": "agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 52 个。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T00:29:09.161Z",
+      "mtime": "2026-08-16T08:57:46.947Z",
       "compactionState": "full"
     },
     {
@@ -85,7 +85,7 @@
       "summaryOneLiner": "先读 [`active-memory.md`](./active-memory.md)、[`memory-registry.json`](./memory-registry.json)、[`lint-report.md`](./lint-report.md)。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T05:55:58.088Z",
+      "mtime": "2026-08-16T10:04:13.532Z",
       "compactionState": "full"
     },
     {
@@ -97,7 +97,7 @@
       "summaryOneLiner": "<!-- wiki-auto-curator:near-window -->",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T05:55:58.088Z",
+      "mtime": "2026-08-16T10:04:13.532Z",
       "compactionState": "full"
     },
     {
@@ -109,7 +109,7 @@
       "summaryOneLiner": "指向已飞通的行星转移，不把整份日志贴进 wiki。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T14:13:27.988Z",
+      "mtime": "2026-08-16T08:57:46.947Z",
       "compactionState": "full"
     },
     {
@@ -121,7 +121,7 @@
       "summaryOneLiner": "指向库存 Duna Hauler 与着陆测试。霍曼转移本身见 duna-hohmann.md。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:24:50.325Z",
+      "mtime": "2026-08-16T08:57:47.223Z",
       "compactionState": "full"
     },
     {
@@ -133,7 +133,7 @@
       "summaryOneLiner": "指向库存登月船与往返测试。表面只要着陆器，不要把转移级一起放下。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:55:34.843Z",
+      "mtime": "2026-08-16T09:49:50.628Z",
       "compactionState": "full"
     },
     {
@@ -145,7 +145,7 @@
       "summaryOneLiner": "可回收助推的地月往返。表面只要着陆器。助推回收不是上垫。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T05:37:33.645Z",
+      "mtime": "2026-08-16T08:57:47.923Z",
       "compactionState": "full"
     },
     {
@@ -157,7 +157,7 @@
       "summaryOneLiner": "概念图和以后的原画住在 art/，不和飞行截图 logs/shots 混。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T13:31:58.445Z",
+      "mtime": "2026-08-16T08:57:47.223Z",
       "compactionState": "full"
     },
     {
@@ -169,7 +169,7 @@
       "summaryOneLiner": "Score a craft against a mission dV budget before ignition. If it fails, redesign in the VAB.",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T04:08:55.999Z",
+      "mtime": "2026-08-16T08:57:47.275Z",
       "compactionState": "full"
     },
     {
@@ -181,7 +181,7 @@
       "summaryOneLiner": "记录 Kerbin 到 Duna 霍曼窗口、逃逸点火约定，以及已飞通的一次捕获。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:24:50.325Z",
+      "mtime": "2026-08-16T08:57:46.999Z",
       "compactionState": "full"
     },
     {
@@ -193,7 +193,7 @@
       "summaryOneLiner": "说明界面英中切换怎么存、怎么切，以及零件名不翻译。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:02:49.251Z",
+      "mtime": "2026-08-16T08:57:46.927Z",
       "compactionState": "full"
     },
     {
@@ -205,7 +205,7 @@
       "summaryOneLiner": "说明无头 MCP 如何覆盖原版人类操作：飞行、VAB、地图、语言。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T00:29:19.405Z",
+      "mtime": "2026-08-16T08:57:46.915Z",
       "compactionState": "full"
     },
     {
@@ -217,7 +217,7 @@
       "summaryOneLiner": "说明 Kerbol 嵌套 SOI 与天体状态约定，避免把父星相对坐标误当成惯性坐标。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:02:34.739Z",
+      "mtime": "2026-08-16T08:57:46.923Z",
       "compactionState": "full"
     },
     {
@@ -229,7 +229,7 @@
       "summaryOneLiner": "总图 + 分步 + 回退：起飞前一张总图，短脚本做肌肉，agent 在命名结点上检查并计划下一刀。错误可以是难度；中途能停、能看、能改，出错回到更早结点。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T03:26:51.701Z",
+      "mtime": "2026-08-16T08:57:47.267Z",
       "compactionState": "full"
     },
     {
@@ -241,7 +241,7 @@
       "summaryOneLiner": "说明整局游戏存档（session），不是飞船文件。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:59:19.246Z",
+      "mtime": "2026-08-16T08:57:46.943Z",
       "compactionState": "full"
     },
     {
@@ -250,10 +250,10 @@
       "memoryTier": "active",
       "memoryStatus": "living",
       "decayClass": "plan",
-      "summaryOneLiner": "说明 Moonshot 的长期预发布版本：`0.<era>.<build>`。agent 只加 build，不把中间位当成经典 Semver 的 minor。",
+      "summaryOneLiner": "说明 Moonshot 的长期预发布版本：`0.<era>.<minor>.<build>`。默认只加 build。大版本和换代必须用户亲口说。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T13:13:41.971Z",
+      "mtime": "2026-08-16T09:56:47.882Z",
       "compactionState": "full"
     },
     {
@@ -265,7 +265,19 @@
       "summaryOneLiner": "给 agent 一份不可漂移的仓库级判断：这是什么、代码与 wiki 谁说了算、哪些事默认不做。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T13:21:12.161Z",
+      "mtime": "2026-08-16T08:57:46.791Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/releases/v0.1.1.1.md",
+      "title": "v0.1.1.1",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "episodic",
+      "summaryOneLiner": "记录预发布 `v0.1.1.1`（`0.<era>.<minor>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T10:04:13.532Z",
       "compactionState": "full"
     },
     {
@@ -277,7 +289,7 @@
       "summaryOneLiner": "记录预发布 `v0.1.1`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:23:04.677Z",
+      "mtime": "2026-08-16T08:57:47.003Z",
       "compactionState": "full"
     },
     {
@@ -289,7 +301,7 @@
       "summaryOneLiner": "记录预发布 `v0.1.2`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:36:04.845Z",
+      "mtime": "2026-08-16T08:57:47.223Z",
       "compactionState": "full"
     },
     {
@@ -301,7 +313,7 @@
       "summaryOneLiner": "记录预发布 `v0.1.3`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T12:59:38.855Z",
+      "mtime": "2026-08-16T08:57:47.223Z",
       "compactionState": "full"
     },
     {
@@ -313,7 +325,7 @@
       "summaryOneLiner": "记录预发布 `v0.1.4`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:26:14.945Z",
+      "mtime": "2026-08-16T08:57:47.639Z",
       "compactionState": "full"
     },
     {
@@ -325,7 +337,7 @@
       "summaryOneLiner": "记录预发布 `v0.1.5`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T04:26:40.096Z",
+      "mtime": "2026-08-16T08:57:47.767Z",
       "compactionState": "full"
     },
     {
@@ -337,7 +349,7 @@
       "summaryOneLiner": "记录预发布 `v0.1.6`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T05:55:58.088Z",
+      "mtime": "2026-08-16T08:57:47.903Z",
       "compactionState": "full"
     },
     {
@@ -349,7 +361,7 @@
       "summaryOneLiner": "规定 Moonshot wiki 的目录、页形和收尾同步。Wiki 编译知识，不替代代码。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T13:31:58.445Z",
+      "mtime": "2026-08-16T08:57:46.795Z",
       "compactionState": "full"
     },
     {
@@ -361,7 +373,7 @@
       "summaryOneLiner": "把 wiki 从只增不治变成 agent 可启动的工作集：L1 必读指针，L2 按需全文。遗忘 = 离开 Active，不是删文件。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T11:02:02.852Z",
+      "mtime": "2026-08-16T08:57:46.795Z",
       "compactionState": "full"
     },
     {
@@ -373,7 +385,7 @@
       "summaryOneLiner": "北极星：世界里至少两艘船。人（和 agent）能选定目标、交汇、对接。每一刀的人类新操作都要有 MCP。R1–R6 已验收：交汇 2336 m / 8.34 m/s；硬对接可分离；截图 rdv-map / rdv-hud / rdv-close / dock-hard。版本将是 0.1.3。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T12:59:04.991Z",
+      "mtime": "2026-08-16T08:57:47.255Z",
       "compactionState": "full"
     },
     {
@@ -385,7 +397,7 @@
       "summaryOneLiner": "SpaceX 招牌动作：回收一级（boostback / 翻转 / 自杀燃烧 / 腿）。要真物理、多实验、好玩。合理零件可以（助推上装着陆腿，栅格舵先当现有鳍用）。不要超级零件。不要把助推传送回发射台。不要发明遥测。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T05:37:33.641Z",
+      "mtime": "2026-08-16T08:57:47.639Z",
       "compactionState": "full"
     },
     {
@@ -397,7 +409,7 @@
       "summaryOneLiner": "把「KSP + 动物之森 + 我的世界」收成一份会改的北极星，避免三款游戏平铺。这是长期方向，不是本周任务单。想法会随时更新，以本页和用户最新口说为准。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:40:33.914Z",
+      "mtime": "2026-08-16T09:57:01.478Z",
       "compactionState": "full"
     },
     {
@@ -409,7 +421,19 @@
       "summaryOneLiner": "游戏内能看见 agent 如何规划、如何思考。人提粗需求（「去火星再回来」），agent 写出总图、拆刀、一刀一刀飞。可看、可停、出错回到更早结点。无头 MCP 仍给外部 agent 用。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:24:50.325Z",
+      "mtime": "2026-08-16T08:57:47.287Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/电力计划.md",
+      "title": "电力计划",
+      "memoryTier": "active",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "影子断电、板朝太阳、夜里吃电池、没电丢姿态。先有电这个量，再有太阳和影子，再进目录和库存船。人能看见的，MCP 也能看见。不要超级零件。不要改火箭物理。不要发明没飞过的遥测。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T09:57:01.478Z",
       "compactionState": "full"
     }
   ]

@@ -12,7 +12,7 @@ agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 52 个。
 | 工具 | 含义 |
 |---|---|
 | ksp_new_flight | 用库存船在 Kerbin 发射台开新飞行并重置会话 |
-| ksp_telemetry | 读飞行 HUD：高度、速度、轨道、燃料、分级、时间加速、相机 |
+| ksp_telemetry | 读飞行 HUD：高度、速度、轨道、燃料、分级、时间加速、相机、电（ec / ecCap / ecGen / eclipsed / panelW）和 wheelsLive |
 | ksp_stage | 空格：下一级（点火、分离、丢助推或开伞） |
 | ksp_throttle | 油门 0..1 |
 | ksp_sas | 稳定辅助：off / hold / prograde / retrograde |
@@ -62,9 +62,9 @@ agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 52 个。
 | ksp_agent_plan | 粗目标 → mun/duna 总图，与面板「规划」相同。有船用当前船，否则库存 |
 | ksp_agent_step | 走一步然后停，不连刀。不是 ksp_step |
 | ksp_agent_revert | 回退到已完成结点快照。不是 ksp_revert（回 VAB） |
-| ksp_agent_check | 跑 A5 检查并追加思考 |
+| ksp_agent_check | 跑 A5 检查并追加思考（含夜里低电、SAS 死） |
 
-`ksp_telemetry` 在有目标且同一 SOI 时多：`target`、`range_m`、`closing_ms`（负=接近）、`rel_speed_ms`、`dockState`。
+`ksp_telemetry` 在有目标且同一 SOI 时多：`target`、`range_m`、`closing_ms`（负=接近）、`rel_speed_ms`、`dockState`。电字段来自 `ecTelemetry`：`ec`、`ecCap`、`ecGen`、`eclipsed`（天体 id 或 null）、`panelW`，另带 `wheelsLive`。无新控制工具。
 
 ## 边界
 

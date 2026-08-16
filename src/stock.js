@@ -76,6 +76,25 @@ export const STOCK = {
       { part: 'fins', sym: 1, host: 16 },
     ],
   },
+  'Mun Reuser': {
+    // Recoverable Mun land-and-return. Proven 5×L+M Falcon:
+    // LKO 72×91, recover 2.77 km / 2.50 m/s (not 上垫), TLI leftover 143 kg,
+    // capture died transfer-dry with lander 4500 kg unused.
+    // 6L / 7L / 4-stage / 5L+2M all failed ascent. Do not add tanks.
+    // Capture may finish on Kestrel if Falcon is dry. Do NOT land on Falcon.
+    stack: [
+      'pod-mk1', 'chute', 'heat-shield', 'decoupler-s', 'tank-l', 'tank-s', 'eng-kestrel',
+      'decoupler-s', 'tank-l', 'tank-l', 'tank-l', 'tank-l', 'tank-l', 'tank-m', 'eng-falcon',
+      'decoupler-l', 'adapter', 'tank-xl', 'tank-xl', 'tank-xl', 'eng-titan',
+    ],
+    radials: [
+      { part: 'legs', sym: 1, host: 5 },
+      { part: 'legs', sym: 1, host: 0 },
+      { part: 'legs-xl', sym: 1, host: 19 },
+      { part: 'fins', sym: 1, host: 19 },
+      { part: 'srb', sym: 2, host: 19 },
+    ],
+  },
   'Duna Hauler Light': DUNA_HAULER_LIGHT,
   'Duna Hauler': {
     stack: [...DUNA_HAULER_LIGHT.stack],

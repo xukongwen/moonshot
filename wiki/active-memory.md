@@ -4,7 +4,7 @@
 
 | 字段 | 值 |
 |---|---|
-| 生成时间 | 2026-08-16T04:26:26.910Z |
+| 生成时间 | 2026-08-16T05:55:58.211Z |
 | 条数 | 14 / 15 |
 | Registry | [memory-registry.json](./memory-registry.json) |
 | 计划 | [Wiki Auto-Curator 架构.md](./Wiki%20Auto-Curator%20架构.md) |

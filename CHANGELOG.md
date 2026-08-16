@@ -6,6 +6,13 @@
 - **era**（中间位）是代际，从 1 起。默认发布不加 era。只有用户明确要求换代时才用 `--era`（例如 0.1.12 → 0.2.0）。
 - **build**（末位）是日常递增值。每次较大交付 +1：0.1.1、0.1.2、0.1.88…
 
+## 0.1.6 — 2026-08-16
+
+- Mun Reuser 全垫闭环：助推离垫 2.77 km / 2.50 m/s（非上垫），lander-only 缪恩 1828 kg，Kerbin 开伞 1.17 m/s / 655 kg。真物理，不传送。
+- 回家肌肉改为缪恩向内逃逸（leaveMunForKerbin），不再追太阳霍曼 v∞。捕获允许 Falcon 干后点 Kestrel。
+- MCP R6 已在树上：ksp_set_active / ksp_recover。测试 tests/booster-r6.test.mjs。
+- 星空改为不透明先画，夜里不再透过地面。
+
 ## 0.1.5 — 2026-08-16
 
 - 助推回收 R1–R5：扔下的 Titan 成可飞的船，翻转 + 弹道瞄准 boostback + 自杀燃烧。官方 R4 离垫 2.17 km / 9.31 m/s；R5 agent「回收助推」2.35 km / 8.55 m/s。真物理，不传送。

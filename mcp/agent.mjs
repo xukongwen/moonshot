@@ -208,7 +208,11 @@ export function runSessionMuscle(session, nodeId, { missionId, lang } = {}) {
     }
     case 'capture': {
       const dest = destForNode('capture', missionId);
-      const out = runCaptureMuscle(session.st, session, { dest, missionId, nodeId: 'capture' });
+      // Capture may finish on the lander after transfer dries (Mun Reuser Falcon 143 kg).
+      // TLI/escape keep allowLander false. Not a physics change.
+      const out = runCaptureMuscle(session.st, session, {
+        dest, missionId, nodeId: 'capture', allowLander: true,
+      });
       const check = checkOf(session);
       return { ok: !!out.ok, thought: thoughtFromCheck(out.ok ? 'capture-ok' : 'capture-fail', check, out, loc) };
     }

@@ -18,10 +18,12 @@
 - 模块：modules/patched-conics.md · modules/hohmann.md · modules/mcp.md · modules/i18n.md · modules/versioning.md · modules/saves.md · modules/art.md · modules/flight-planning.md · modules/play-loop.md
 - 决策：adr/2026-08-15-parent-relative-body-state.md · adr/2026-08-15-ejection-asymptote.md
 - 工具：api/mcp-tools.md
-- 任务：missions/duna-hohmann.md · missions/mun-express.md · missions/duna-landing.md
-- 往返记录：2026-08-16-agent-duna-往返.md
+- 任务：missions/duna-hohmann.md · missions/mun-express.md · missions/mun-reuser.md · missions/duna-landing.md
+- 往返记录：2026-08-16-agent-duna-往返.md · 2026-08-16-mun-reuser-往返.md
 
 ## 当前入口
+
+- 发布 v0.1.6
 
 - 发布 v0.1.5
 

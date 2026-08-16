@@ -1132,6 +1132,7 @@ export class Flight {
     const sky = new THREE.Color(0x020308).lerp(new THREE.Color(0x77b4e8), skyF);
     this.renderer.setClearColor(sky);
     this.starsFade.value = 1 - skyF;
+    this.stars.visible = (1 - skyF) > 0.08;
     this.stars.position.copy(this.camera.position);
     this.sunSprite.position.copy(this.camera.position).addScaledVector(SUNDIR, 2e6);
     this.sunSprite.scale.setScalar(1.4e5);

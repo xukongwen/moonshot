@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-16T04:26:26.910Z",
+  "generatedAt": "2026-08-16T05:55:58.211Z",
   "activeCap": 15,
   "logKeepDays": 14,
   "entries": [
@@ -14,6 +14,18 @@
       "successor": null,
       "lastReferencedAt": null,
       "mtime": "2026-08-16T02:24:36.429Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/2026-08-16-mun-reuser-往返.md",
+      "title": "Mun Reuser 地月往返",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "数字只来自 `logs/mun-reuser-result.json`（2026-08-16T05:35:47Z 全垫，`MUN_REUSER_REDESIGN=0`）。没改物理。未打板。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T05:37:33.621Z",
       "compactionState": "full"
     },
     {
@@ -73,7 +85,7 @@
       "summaryOneLiner": "先读 [`active-memory.md`](./active-memory.md)、[`memory-registry.json`](./memory-registry.json)、[`lint-report.md`](./lint-report.md)。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T04:26:26.792Z",
+      "mtime": "2026-08-16T05:55:58.088Z",
       "compactionState": "full"
     },
     {
@@ -85,7 +97,7 @@
       "summaryOneLiner": "<!-- wiki-auto-curator:near-window -->",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T04:26:26.792Z",
+      "mtime": "2026-08-16T05:55:58.088Z",
       "compactionState": "full"
     },
     {
@@ -122,6 +134,18 @@
       "successor": null,
       "lastReferencedAt": null,
       "mtime": "2026-08-16T02:55:34.843Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/missions/mun-reuser.md",
+      "title": "任务：Mun Reuser",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "可回收助推的地月往返。表面只要着陆器。助推回收不是上垫。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T05:37:33.645Z",
       "compactionState": "full"
     },
     {
@@ -301,7 +325,19 @@
       "summaryOneLiner": "记录预发布 `v0.1.5`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T04:26:26.792Z",
+      "mtime": "2026-08-16T04:26:40.096Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/releases/v0.1.6.md",
+      "title": "v0.1.6",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "episodic",
+      "summaryOneLiner": "记录预发布 `v0.1.6`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T05:55:58.088Z",
       "compactionState": "full"
     },
     {
@@ -349,7 +385,7 @@
       "summaryOneLiner": "SpaceX 招牌动作：回收一级（boostback / 翻转 / 自杀燃烧 / 腿）。要真物理、多实验、好玩。合理零件可以（助推上装着陆腿，栅格舵先当现有鳍用）。不要超级零件。不要把助推传送回发射台。不要发明遥测。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T04:24:27.932Z",
+      "mtime": "2026-08-16T05:37:33.641Z",
       "compactionState": "full"
     },
     {

@@ -38,6 +38,7 @@ function maybeStageTransfer(st, plan, stageIdx, stageFn) {
 
 function driveBurn(st, pred, {
   aim = 'prograde', maxS = 400, dt = 0.15, plan = null, stageIdx = 0, stageFn = null,
+  allowLander = false,
 } = {}) {
   const tEnd = st.t + maxS;
   st.throttle = 1;
@@ -51,7 +52,18 @@ function driveBurn(st, pred, {
     events.push(...evs);
     maybeStageTransfer(st, plan, stageIdx, stageFn);
     if (pred(st, evs)) break;
-    if (transferFuelKg(st) <= 1 && roleEngines(st).transfer) break;
+    const roles = roleEngines(st);
+    if (roles.transfer && transferFuelKg(st) <= 1) {
+      // Mun Reuser: Falcon had 143 kg at capture, burned dry, then this
+      // break left Kestrel 4500 kg unlit on 1689×∞. Capture may finish
+      // on the lander; TLI/escape must not (allowLander stays false).
+      if (allowLander && roles.lander && fuelLeft(st) > 1) {
+        roles.lander.ignited = true;
+        roles.transfer.ignited = false;
+      } else {
+        break;
+      }
+    }
     if (fuelLeft(st) < 8) break;
   }
   st.throttle = 0;
@@ -483,20 +495,57 @@ function lightCaptureBurner(st, { allowLander = false } = {}) {
   return lightHomeBurner(st, { allowLander });
 }
 
-function escapeMunIfNeeded(st, hooks) {
-  if (st.body !== 'mun') return;
+// Kerbin-centric Mun return: v∞ to put Kerbin Pe near 70 km.
+// Do NOT use hohmannTransfer('mun','kerbin') — different parents, solar-scale junk.
+function munHomeVInf() {
+  const mu = BODIES.kerbin.mu;
+  const rMun = BODIES.mun.orbitRadius;
+  const rPe = BODIES.kerbin.radius + 70_000;
+  const aT = (rMun + rPe) / 2;
+  const vMun = Math.sqrt(mu / rMun);
+  const vAp = Math.sqrt(mu * (2 / rMun - 1 / aT));
+  return Math.abs(vMun - vAp);
+}
+
+function kerbinPeAlt(st) {
   try {
-    const e = els(st);
-    if (!(e.a < 0)) {
-      lightLander(st);
-      driveBurn(st, () => st.body !== 'mun' || els(st).a < 0, {
-        aim: 'prograde', maxS: 80, dt: 0.12, ...hooks,
-      });
-    }
-  } catch { /* leave Mun on rails */ }
-  if (st.body === 'mun') {
-    coastRailsOnState(st, { maxS: 40_000, pred: (s) => s.body === 'kerbin', dt: 8 });
+    const e = els(st, 'kerbin');
+    return e.rp - BODIES.kerbin.radius;
+  } catch {
+    return Infinity;
   }
+}
+
+// Inward ejection from Mun so leftover v subtracts from Mun's Kerbin vel.
+function leaveMunForKerbin(st, hooks = {}) {
+  if (st.body !== 'mun') return;
+  const vInfT = munHomeVInf();
+  let alreadyOut = false;
+  try {
+    alreadyOut = els(st).a < 0 && kerbinPeAlt(st) < 200_000;
+  } catch { alreadyOut = false; }
+  if (!alreadyOut) {
+    if (!lightLander(st) && fuelLeft(st) <= 1) return;
+    coastToEjectionAngle(st, 'mun', vInfT, { inward: true });
+    lightLander(st);
+    // Kerbin Pe while still in Mun SOI is a two-body lie (stopped a
+    // 24×417 Mun orbit last time). Only stop on leave / real v∞ / reserve.
+    driveBurn(st, () => {
+      if (st.body !== 'mun') return true;
+      if (fuelLeft(st) < 40) return true;
+      try {
+        if (els(st).a < 0 && vInfEst(st) >= vInfT - 15) return true;
+      } catch { /* keep burning */ }
+      return false;
+    }, { aim: 'prograde', maxS: 140, dt: 0.12, allowLander: true, ...hooks });
+  }
+  if (st.body === 'mun') {
+    coastRailsOnState(st, { maxS: 80_000, pred: (s) => s.body === 'kerbin', dt: 8 });
+  }
+}
+
+function escapeMunIfNeeded(st, hooks) {
+  leaveMunForKerbin(st, hooks);
 }
 
 export function runCaptureMuscle(st, ctrl = null, opts = {}) {
@@ -558,7 +607,7 @@ export function runCaptureMuscle(st, ctrl = null, opts = {}) {
       if (apAim && (e.ra - body.radius) > apAim && fuelLeft(st) > fuelReserve) return false;
       return true;
     } catch { return false; }
-  }, { aim: 'retrograde', maxS: 280, dt: 0.12, ...hooks });
+  }, { aim: 'retrograde', maxS: 280, dt: 0.12, allowLander, ...hooks });
 
   if (st.body === dest) {
     try {
@@ -569,7 +618,7 @@ export function runCaptureMuscle(st, ctrl = null, opts = {}) {
             const ee = elementsFromState(st.pos, st.vel, body.mu, st.t);
             return ee.a > 0 && Number.isFinite(ee.ra) && ee.ra < body.soi;
           } catch { return false; }
-        }, { aim: 'retrograde', maxS: 200, dt: 0.12, ...hooks });
+        }, { aim: 'retrograde', maxS: 200, dt: 0.12, allowLander, ...hooks });
       }
     } catch { /* leave */ }
   }
@@ -879,8 +928,16 @@ export function isTitanVessel(v) {
   return !!(v?.st?.parts ?? []).some((p) => p.alive !== false && /Titan/.test(p.def?.name || ''));
 }
 
+/** Dropped first stage: has Titan, no upper engine still stacked. Pad stack is not this. */
+export function isDroppedBooster(v) {
+  if (!isTitanVessel(v)) return false;
+  return !(v?.st?.parts ?? []).some((p) => (
+    p.alive !== false && p.def?.engine && !/Titan/.test(p.def?.name || '')
+  ));
+}
+
 export function findBoosterVessel(vessels, activeId) {
-  return (vessels ?? []).find((v) => v.id !== activeId && isTitanVessel(v)) ?? null;
+  return (vessels ?? []).find((v) => v.id !== activeId && isDroppedBooster(v)) ?? null;
 }
 
 export function markHeldTitans(vessels, exceptId) {
@@ -958,7 +1015,7 @@ export function runRecoverMuscle(ctrl) {
   const vessels = ctrl?.vessels ?? [];
   const activeId = ctrl?.activeId;
   let booster = findBoosterVessel(vessels, activeId);
-  if (!booster && isTitanVessel(vessels.find((v) => v.id === activeId))) {
+  if (!booster && isDroppedBooster(vessels.find((v) => v.id === activeId))) {
     booster = vessels.find((v) => v.id === activeId);
   }
   if (!booster) {
@@ -1377,58 +1434,66 @@ function kerbinChuteLand(st) {
   };
 }
 
+function dropPeNow(st, hooks, { peTarget = 56_000, fuelReserve = 12 } = {}) {
+  if (st.body !== 'kerbin' || st.landed) return { ok: true, already: true };
+  try {
+    const e = els(st);
+    if (e.a > 0 && (e.rp - BODIES.kerbin.radius) <= peTarget + 2_000) {
+      return { ok: true, already: true };
+    }
+  } catch { /* burn */ }
+  if (fuelLeft(st) <= fuelReserve) return { ok: false, reason: 'dry' };
+  lightLander(st);
+  driveBurn(st, () => {
+    if (st.body !== 'kerbin') return true;
+    if (fuelLeft(st) <= fuelReserve) return true;
+    try {
+      const e = els(st);
+      return e.a > 0 && (e.rp - BODIES.kerbin.radius) <= peTarget;
+    } catch { return false; }
+  }, { aim: 'retrograde', maxS: 240, dt: 0.12, allowLander: true, ...hooks });
+  try {
+    const e = els(st);
+    return { ok: e.a > 0 && (e.rp - BODIES.kerbin.radius) < 68_000, peKm: (e.rp - BODIES.kerbin.radius) / 1000 };
+  } catch {
+    return { ok: false };
+  }
+}
+
 function finishHomeAtKerbin(st, ctrl, opts = {}) {
   const hooks = hooksOf(ctrl);
   if (st.landed && st.body === 'kerbin') {
     return { ok: true, landed: true, dest: 'kerbin', check: readFlightCheck(st) };
   }
-  escapeMunIfNeeded(st, hooks);
-  if (st.body !== 'kerbin') {
-    return { ok: false, reason: 'left-soi', dest: 'kerbin', check: readFlightCheck(st) };
-  }
-  let captured = false;
-  try {
-    const e = els(st);
-    captured = e.a > 0 && e.e < 1 && Number.isFinite(e.ra) && e.ra < BODIES.kerbin.soi;
-  } catch { captured = false; }
-  let captureCheck = null;
-  if (!captured) {
-    const cap = runCaptureMuscle(st, ctrl, {
-      dest: 'kerbin',
-      allowLander: true,
-      peFloor: 45_000,
-      apAim: 2_000_000,
-      fuelReserve: 160,
-      nodeId: 'home',
-      missionId: opts.missionId,
-    });
-    captureCheck = cap.check ?? readFlightCheck(st);
-    if (!cap.ok) {
-      return {
-        ok: false,
-        reason: cap.reason || 'not-captured',
-        dest: 'kerbin',
-        encounter: true,
-        captured: false,
-        landed: false,
-        captureCheck,
-        check: captureCheck,
-      };
+  // Do not rails-coast to Ap on a Mun-crossing ellipse (1278×15302
+  // recrossed Mun). Coast any flyby out, then burn retro immediately
+  // to put Pe in atmo, then chute. Never report capture if still on Mun.
+  for (let i = 0; i < 3 && !st.dead && !st.landed; i++) {
+    if (st.body === 'mun') escapeMunIfNeeded(st, hooks);
+    if (st.body === 'mun') {
+      coastRailsOnState(st, { maxS: 80_000, pred: (s) => s.body === 'kerbin', dt: 8 });
     }
-    captured = true;
-  } else {
-    captureCheck = readFlightCheck(st);
-  }
-
-  escapeMunIfNeeded(st, hooks);
-  if (st.body === 'kerbin' && !st.landed) {
+    if (st.body !== 'kerbin') break;
+    let captured = false;
     try {
       const e = els(st);
-      const peAlt = e.rp - BODIES.kerbin.radius;
-      if (peAlt > 68_000 && fuelLeft(st) > 40) {
-        dropPeIntoAtmo(st, 'kerbin', 52_000, hooks, { fuelReserve: 40 });
-      }
-    } catch { /* try reentry anyway */ }
+      captured = e.a > 0 && e.e < 1 && Number.isFinite(e.ra) && e.ra < BODIES.kerbin.soi;
+    } catch { captured = false; }
+    if (!captured) {
+      const cap = runCaptureMuscle(st, ctrl, {
+        dest: 'kerbin',
+        allowLander: true,
+        peFloor: 45_000,
+        apAim: 2_000_000,
+        fuelReserve: 12,
+        nodeId: 'home',
+        missionId: opts.missionId,
+      });
+      if (!cap.ok && st.body === 'mun') continue;
+      if (!cap.ok) break;
+    }
+    if (st.body === 'kerbin') dropPeNow(st, hooks, { peTarget: 56_000, fuelReserve: 12 });
+    if (st.body === 'kerbin') break;
   }
 
   let land = { landed: false, speed: null, chute: false };
@@ -1436,17 +1501,25 @@ function finishHomeAtKerbin(st, ctrl, opts = {}) {
     land = kerbinChuteLand(st);
   }
   const check = readFlightCheck(st);
+  let captured = false;
+  if (st.body === 'kerbin') {
+    try {
+      const e = els(st);
+      captured = e.a > 0 && e.e < 1 && Number.isFinite(e.ra) && e.ra < BODIES.kerbin.soi;
+    } catch { captured = false; }
+  }
+  const landed = !!st.landed && st.body === 'kerbin' && !st.dead;
   return {
-    ok: captured || !!st.landed,
+    ok: landed,
     dest: 'kerbin',
     encounter: true,
-    captured,
-    landed: !!st.landed && st.body === 'kerbin' && !st.dead,
-    captureCheck,
+    captured: captured && st.body === 'kerbin',
+    landed,
+    captureCheck: check,
     touchdownSpeed: land.speed,
     chute: land.chute,
     check,
-    reason: (captured && !st.landed) ? 'not-landed' : null,
+    reason: landed ? null : (st.body !== 'kerbin' ? 'still-on-mun' : (st.dead ? 'dead' : 'not-landed')),
   };
 }
 
@@ -1460,21 +1533,26 @@ export function runHomeMuscle(st, ctrl = null, opts = {}) {
     return finishHomeAtKerbin(st, ctrl, opts);
   }
 
-  if (st.body === 'mun' || st.body === 'duna') {
+  if (st.body === 'mun') {
+    // Inward Mun ejection (Kerbin Pe ~70 km). Prograde-until-a<0 left a
+    // 9827×28377 Mun-crossing ellipse; solar Hohmann burned 965→7 kg.
+    if (!lightLander(st) && fuelLeft(st) <= 1) {
+      return { ok: false, reason: 'dry', check: readFlightCheck(st) };
+    }
+    leaveMunForKerbin(st, hooks);
+  } else if (st.body === 'duna') {
     const from = st.body;
     const to = 'kerbin';
     const xfer = hohmannTransfer(from, to);
-    if (from === 'duna') {
-      circularizePark(st, from, 65_000, 90_000, hooks);
-      waitHomeWindow(st, from, to);
-    }
-    const lit = from === 'duna' && roleEngines(st).transfer
+    circularizePark(st, from, 65_000, 90_000, hooks);
+    waitHomeWindow(st, from, to);
+    const lit = roleEngines(st).transfer
       ? lightTransferOnly(st)
       : { ok: lightLander(st) || !!roleEngines(st).lander, transferFuelKg: fuelLeft(st) };
     if (!lit.ok && fuelLeft(st) <= 1) {
       return { ok: false, reason: 'dry', check: readFlightCheck(st) };
     }
-    const align = coastToEjectionAngle(st, from, xfer.vInfDep, { inward: from === 'duna' });
+    const align = coastToEjectionAngle(st, from, xfer.vInfDep, { inward: true });
     if (align.ok) {
       if (roleEngines(st).transfer) lightTransferOnly(st);
       else lightLander(st);

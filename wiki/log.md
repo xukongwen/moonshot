@@ -3,6 +3,14 @@
 
 > 更早条目已卷到 [`wiki/log/`](./log/)。生成：`node scripts/wiki-auto-curator.mjs`。
 
+- [2026-08-16] 发布 v0.1.6。
+- [2026-08-16] Mun Reuser 全垫闭环：回收 2.77 km / 2.50 m/s（非上垫），lander-only 缪恩 1828 kg，Kerbin 开伞 1.17 m/s / 655 kg。图 recover / mun-land / home。未打板。
+- [2026-08-16] R6：MCP `ksp_set_active` / `ksp_recover`，切船并指挥助推回收。
+<!-- wiki-auto-curator:near-window -->
+# Wiki Log（近 14 天）
+
+> 更早条目已卷到 [`wiki/log/`](./log/)。生成：`node scripts/wiki-auto-curator.mjs`。
+
 - [2026-08-16] 发布 v0.1.5。
 - [2026-08-16] 打板 v0.1.5：助推回收 R1–R5 + LT-25。官方 R4 离垫 2.17 km / 9.31 m/s；R5 agent 回收 2.35 km / 8.55 m/s。
 - [2026-08-16] 新零件 LT-25（`legs-xl`，500 kg / 3.8 m / safeSpeed 12）。Mun Express host 16、Duna Hauler host 23 改用它；着陆器仍 LT-2。近景 logs/shots/booster-legs.png：支柱 3.8 m，贴皮 r=1.33，脚垫 r=0.72，落地脚 r≈4.3。没改物理，没打板。
@@ -54,6 +62,8 @@
 - [2026-08-15] MCP VAB 无头车间 + 34 个工具；crafts.json 与浏览器 localStorage 分库
 - [2026-08-15] MCP 拼出「这也能飞？」并截图
 - [2026-08-15] Wiki bootstrap：宪法、SCHEMA、模块、ADR、curator
+
+
 
 
 

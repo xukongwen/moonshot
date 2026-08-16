@@ -124,16 +124,18 @@ export function makeStars(count = 2500) {
   }
   const geo = new THREE.BufferGeometry();
   geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  // Opaque + early renderOrder so terrain paints over them. Transparent
+  // points sit in the late queue; WebGPU was ignoring depthTest and the
+  // night ground showed the skybox (ship looked afloat).
   const m = new THREE.PointsNodeMaterial({
-    transparent: true, depthWrite: false, depthTest: false, sizeAttenuation: false,
+    transparent: false, depthWrite: false, depthTest: true, sizeAttenuation: false,
   });
   const fadeU = uniform(1);
   m.colorNode = vec3(0.9, 0.92, 1.0);
-  m.opacityNode = fadeU;
   m.sizeNode = float(1.6);
   const pts = new THREE.Points(geo, m);
   pts.frustumCulled = false;
-  pts.renderOrder = 0;
+  pts.renderOrder = -1;
   return { points: pts, fadeU };
 }
 

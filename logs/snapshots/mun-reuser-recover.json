@@ -1,0 +1,99 @@
+{
+  "tag": "mun-reuser-recover",
+  "t": 328.68000000000615,
+  "body": "kerbin",
+  "pos": [
+    600009.5872142358,
+    -3.700187147478298e-11,
+    -2765.8587999886886
+  ],
+  "vel": [
+    0,
+    0,
+    0
+  ],
+  "quat": [
+    -0.003259509141339748,
+    0,
+    -0.7070992685614641,
+    0.7071067811865474
+  ],
+  "throttle": 0,
+  "landed": true,
+  "dead": false,
+  "craft": "Titan Booster",
+  "parts": [
+    {
+      "key": "s67",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 15
+    },
+    {
+      "key": "s68",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 16
+    },
+    {
+      "key": "s69",
+      "fuel": 538.2046569875945,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 17
+    },
+    {
+      "key": "s70",
+      "fuel": 538.2046569875945,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 18
+    },
+    {
+      "key": "s71",
+      "fuel": 538.2046569875945,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 19
+    },
+    {
+      "key": "s72",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 20
+    },
+    {
+      "key": "r75",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": true,
+      "alive": true,
+      "stackIndex": 19
+    },
+    {
+      "key": "r76",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 19
+    }
+  ]
+}

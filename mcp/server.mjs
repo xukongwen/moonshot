@@ -384,8 +384,29 @@ export const TOOLS = [
   },
   {
     name: 'ksp_vessels',
-    description: 'List vessels in the session: id, name, body, altitude, situation.',
+    description: 'List vessels in the session: id, name, body, altitude, situation, active, held, titan.',
     inputSchema: { type: 'object', properties: {} },
+  },
+  {
+    name: 'ksp_set_active',
+    description: 'Switch the commanded vessel (same as [ ] in flight). Does not teleport. After this, ksp_throttle / ksp_point / ksp_legs / ksp_step drive that ship.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Vessel id from ksp_vessels' },
+      },
+      required: ['id'],
+    },
+  },
+  {
+    name: 'ksp_recover',
+    description: 'Recover a dropped Titan: switch to it, boostback + suicide, then return focus to the upper if it is still flying. Same muscle as the agent 回收助推 node. Optional id; omit to pick the dropped Titan. Does not teleport. Reports real pad_m / speed; does not claim the pad.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Optional booster vessel id; omit to find the dropped Titan' },
+      },
+    },
   },
   {
     name: 'ksp_spawn_orbital',
@@ -660,6 +681,11 @@ export function callTool(name, args = {}) {
     case 'ksp_vessels':
       session.requireFlight();
       return { vessels: session.listVessels(), activeId: session.activeId, targetId: session.targetId };
+    case 'ksp_set_active':
+      if (args.id == null) throw new Error('ksp_set_active requires id');
+      return session.setActive(args.id);
+    case 'ksp_recover':
+      return session.recover(args.id);
     case 'ksp_spawn_orbital': {
       const src = args.design ?? args.craft ?? 'Mun Express';
       return session.spawnOrbital(src, {

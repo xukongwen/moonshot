@@ -1,0 +1,108 @@
+{
+  "tag": "mun-reuser-land",
+  "t": 121693.7866766376,
+  "body": "mun",
+  "pos": [
+    199451.68062964262,
+    -1.5193395823941948e-11,
+    15653.554439004713
+  ],
+  "vel": [
+    0,
+    0,
+    0
+  ],
+  "quat": [
+    0.05532622504106303,
+    0,
+    -0.7049390107113563,
+    0.7071067811865475
+  ],
+  "throttle": 0,
+  "landed": true,
+  "dead": false,
+  "craft": "Mun Reuser",
+  "parts": [
+    {
+      "key": "s52",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 0
+    },
+    {
+      "key": "s53",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": "stowed",
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 1
+    },
+    {
+      "key": "s54",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 2
+    },
+    {
+      "key": "s55",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 3
+    },
+    {
+      "key": "s56",
+      "fuel": 1625.284883216828,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 4
+    },
+    {
+      "key": "s57",
+      "fuel": 203.1606104021035,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "s58",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 6
+    },
+    {
+      "key": "r73",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": true,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "r74",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": true,
+      "alive": true,
+      "stackIndex": 0
+    }
+  ]
+}

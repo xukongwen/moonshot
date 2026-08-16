@@ -66,7 +66,7 @@ node mcp/systemtour.mjs     # 入轨、Minmus、逃出 Kerbin
 
 ## 版本
 
-当前打板：**v0.1.5**（非正式预发布，`0.<era>.<build>`）。记录见 [CHANGELOG.md](./CHANGELOG.md)。较大功能后：`npm run release`。
+当前打板：**v0.1.6**（非正式预发布，`0.<era>.<build>`）。记录见 [CHANGELOG.md](./CHANGELOG.md)。较大功能后：`npm run release`。
 
 ## Wiki
 

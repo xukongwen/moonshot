@@ -1,0 +1,1358 @@
+{
+  "startedAt": "2026-08-16T05:35:47.000Z",
+  "snapshot": "pad (Mun Reuser 3×XL + 5×L+M Falcon, Kestrel finishes capture after Falcon dry)",
+  "cut": "Proven 5×L+M (host 19). driveBurn switches to Kestrel when Falcon dries mid-capture. No extra tanks, no auto +1.",
+  "llm": false,
+  "invented": false,
+  "physicsUnchanged": true,
+  "paperWithholdsReserve": false,
+  "paperReserveNote": "Paper mun-roundtrip does NOT withhold the 8500 kg Titan reserve, so it overstates ascent Δv.",
+  "previous3xl5l2m": {
+    "archive": "logs/mun-reuser-result-3xl-5l2m.json",
+    "note": "5×L+2M first fly: Pe 28 km, Ap 6448 km, died MET 494 at 3212 m/s, Falcon leftover 610 kg."
+  },
+  "previous3xl6l": {
+    "archive": "logs/mun-reuser-result-3xl-6l.json",
+    "note": "6×L+M: best Pe −61×432 then Falcon dry before Pe>0."
+  },
+  "previous4stage": {
+    "archive": "logs/mun-reuser-result-4stage.json",
+    "note": "4-stage Falcon 3×L+M + Sparrow 2×L+M: Falcon dry before Pe>0, Sparrow stayed 10000 kg."
+  },
+  "previous3xl7l": {
+    "archive": "logs/mun-reuser-result-3xl-7l.json",
+    "note": "7×L+M and +1 8×L+M both died on ascent (Falcon dry before Pe>0)."
+  },
+  "previous3xl5l": {
+    "archive": "logs/mun-reuser-result-3xl-5l.json",
+    "note": "3×XL + 5×L+M Falcon archive (3× XL + Titan + LT-25 + fins + 2 SRB / 5× tank-l + 1× tank-m + Falcon). LKO 72 × 91 km, transfer leftover 3824 kg. recover ok 2.77 km / 2.50 m/s / water=false (not 上垫). TLI leftover 143 kg. capture FAIL 1689 × ∞ km, xfer 0 kg. 5×L+M recovered the booster but TLI left 143 kg and Mun capture died dry. This cut adds two transfer tank-l for capture leftover.",
+    "startedAt": "2026-08-16T04:50:25.873Z",
+    "finishedAt": "2026-08-16T04:50:28.689Z",
+    "verdict": "failed on capture: 捕获失败（not-captured）。转移级 0 kg。轨道 1689 × ∞ km，剩油 4500 kg。",
+    "stack": [
+      "pod-mk1",
+      "chute",
+      "heat-shield",
+      "decoupler-s",
+      "tank-l",
+      "tank-s",
+      "eng-kestrel",
+      "decoupler-s",
+      "tank-l",
+      "tank-l",
+      "tank-l",
+      "tank-l",
+      "tank-l",
+      "tank-m",
+      "eng-falcon",
+      "decoupler-l",
+      "adapter",
+      "tank-xl",
+      "tank-xl",
+      "tank-xl",
+      "eng-titan"
+    ],
+    "lifter": "3× XL + Titan + LT-25 + fins + 2 SRB",
+    "transfer": "5× tank-l + 1× tank-m + Falcon",
+    "padTwrSL": 1.6562726515398922,
+    "ascent": {
+      "ok": true,
+      "thought": "入轨完成。轨道 72 × 91 km，剩油 8324 kg，级 1。",
+      "orbitText": "72 × 91 km",
+      "transferFuelKg": 3824.380855451037,
+      "fuelKg": 8324.380855451036
+    },
+    "recover": {
+      "ok": true,
+      "thought": "助推离垫 2.77 km，触地 2.50 m/s。剩油 1615 kg。",
+      "pad_m": 2765.7950156412994,
+      "water": false,
+      "claimedPad": false,
+      "speed": 2.49797358823212
+    },
+    "tli": {
+      "ok": true,
+      "thought": "TLI完成。在 kerbin。轨道 88 × 10051 km，剩油 4643 kg。",
+      "orbitText": "88 × 10051 km",
+      "transferFuelKg": 143.28756177916964
+    },
+    "capture": {
+      "ok": false,
+      "thought": "捕获失败（not-captured）。转移级 0 kg。轨道 1689 × ∞ km，剩油 4500 kg。",
+      "orbitText": "1689 × ∞ km",
+      "transferFuelKg": 0
+    }
+  },
+  "previousFalcon4xl": {
+    "archive": "logs/mun-reuser-result-falcon-4xl.json",
+    "note": "Falcon 4×XL + 3×L+M archive (4× XL + Titan + LT-25 + fins + 2 SRB / 3× tank-l + 1× tank-m + Falcon). LKO 72 × 88 km, transfer leftover 3473 kg. recover FAIL 43.7 km / 14.94 m/s / water=true (not 上垫). TLI leftover 121 kg. capture FAIL 1443 × ∞ km, xfer 0 kg. 4 XL throws the booster too far; this cut is 3 XL Express recovery class + thicker transfer.",
+    "startedAt": "2026-08-16T04:44:15.725Z",
+    "finishedAt": "2026-08-16T04:44:18.131Z",
+    "verdict": "failed on capture: 捕获失败（not-captured）。转移级 0 kg。轨道 1443 × ∞ km，剩油 4500 kg。",
+    "stack": [
+      "pod-mk1",
+      "chute",
+      "heat-shield",
+      "decoupler-s",
+      "tank-l",
+      "tank-s",
+      "eng-kestrel",
+      "decoupler-s",
+      "tank-l",
+      "tank-l",
+      "tank-l",
+      "tank-m",
+      "eng-falcon",
+      "decoupler-l",
+      "adapter",
+      "tank-xl",
+      "tank-xl",
+      "tank-xl",
+      "tank-xl",
+      "eng-titan"
+    ],
+    "lifter": "4× XL + Titan + LT-25 + fins + 2 SRB",
+    "transfer": "3× tank-l + 1× tank-m + Falcon",
+    "padTwrSL": 1.5228338021633008,
+    "ascent": {
+      "ok": true,
+      "thought": "入轨完成。轨道 72 × 88 km，剩油 7973 kg，级 1。",
+      "orbitText": "72 × 88 km",
+      "transferFuelKg": 3472.9925693944597,
+      "fuelKg": 7972.992569394461
+    },
+    "recover": {
+      "ok": false,
+      "thought": "助推回收失败（crashed）。离垫 43.75 km。触地 14.94 m/s。",
+      "pad_m": 43749.22834723067,
+      "water": true,
+      "claimedPad": false
+    },
+    "tli": {
+      "ok": true,
+      "thought": "TLI完成。在 kerbin。轨道 84 × 10135 km，剩油 4621 kg。",
+      "orbitText": "84 × 10135 km",
+      "transferFuelKg": 120.75775440797389
+    },
+    "capture": {
+      "ok": false,
+      "thought": "捕获失败（not-captured）。转移级 0 kg。轨道 1443 × ∞ km，剩油 4500 kg。",
+      "orbitText": "1443 × ∞ km",
+      "transferFuelKg": 0
+    }
+  },
+  "previousSparrowAttempts": {
+    "archive": "logs/mun-reuser-result-sparrow.json",
+    "note": "Three Sparrow-transfer flights all died on ascent. Titan dropped at the 8.5 t reserve with Pe around −580 km; Sparrow (Isp SL 85) could not circularize. Paper budget does NOT withhold the 8500 kg reserve, so it overstates ascent.",
+    "startedAt": "2026-08-16T04:38:09.666Z",
+    "finishedAt": "2026-08-16T04:39:14.774Z",
+    "verdict": "Paper mun-roundtrip ok on stock and both redesigns. All three pad flights failed on ascent: Titan dropped at the 8500 kg reserve, Sparrow could not raise Pe out of atmosphere, ship dead. Recover / Mun land / Kerbin home were not flown. No further redesign. Physics unchanged.",
+    "attempts": [
+      {
+        "id": 1,
+        "name": "stock 3×XL + 2 SRB (as written)",
+        "planOk": true,
+        "padTwrSL": 1.8349235685434402,
+        "planText": "mun-roundtrip  OK\n  ok kerbin_ascent    lifter   need  4200  have  5713  margin   1513  paid lifter 2595+transfer 1605\n  ok mun_transfer     transfer need   900  have  1513  margin    613\n  ok mun_capture      transfer need   350  have   613  margin    263\n  ok mun_land         lander   need   650  have  3271  margin   2621\n  ok mun_ascent       lander   need   650  have  2621  margin   1971\n  ok mun_return       lander   need   350  have  1971  margin   1621",
+        "note": "Paper ok (have 5713/1513/613/3271/2621/1971, pad TWR 1.835). Titan dropped at 8.5 t reserve around MET 100 on −589×89. Sparrow lit, Pe never cleared atmo, crash MET 443, fuel 12136 kg. Booster leftover 8495 kg on −591×86, pad_m 6624, still flying/held.",
+        "verdict": "failed on ascent: 入轨失败：船毁了。剩油 12136 kg。",
+        "ascent": {
+          "ok": false,
+          "thought": "入轨失败：船毁了。剩油 12136 kg。",
+          "t": 443.2500000000665,
+          "orbitText": "-600 × 0 km",
+          "peKm": -600,
+          "apKm": 0.010585771048790776,
+          "fuelKg": 12136.084121264348,
+          "transferFuelKg": 7636.084121264347,
+          "transferName": "S-7 \"Sparrow\"",
+          "ignited": [
+            "S-7 \"Sparrow\""
+          ],
+          "dead": true,
+          "titanDropped": true
+        }
+      },
+      {
+        "id": 2,
+        "name": "redesign drop-srb (wrong pick for this failure)",
+        "planOk": true,
+        "padTwrSL": 1.555799232610363,
+        "planText": "mun-roundtrip  OK\n  ok kerbin_ascent    lifter   need  4200  have  5639  margin   1439  paid lifter 2522+transfer 1678\n  ok mun_transfer     transfer need   900  have  1439  margin    539\n  ok mun_capture      transfer need   350  have   539  margin    189\n  ok mun_land         lander   need   650  have  3271  margin   2621\n  ok mun_ascent       lander   need   650  have  2621  margin   1971\n  ok mun_return       lander   need   350  have  1971  margin   1621",
+        "note": "Script first treated the crash as a pancake and dropped the 2 SRBs. Same failure: Titan reserve drop, Sparrow cannot circularize. Crash MET 409, fuel 12743 kg.",
+        "verdict": "failed on ascent: 入轨失败：船毁了。剩油 12743 kg。",
+        "ascent": {
+          "ok": false,
+          "thought": "入轨失败：船毁了。剩油 12743 kg。",
+          "t": 409.05000000005873,
+          "orbitText": "-600 × 0 km",
+          "peKm": -600,
+          "apKm": 0.010389256148715503,
+          "fuelKg": 12742.593590548895,
+          "transferFuelKg": 8242.593590548893,
+          "transferName": "S-7 \"Sparrow\"",
+          "ignited": [
+            "S-7 \"Sparrow\""
+          ],
+          "dead": true,
+          "titanDropped": true
+        }
+      },
+      {
+        "id": 3,
+        "name": "redesign add 4th XL + keep 2 SRB (correct type; 8500 reserve)",
+        "planOk": true,
+        "padTwrSL": 1.536588962511628,
+        "planText": "mun-roundtrip  OK\n  ok kerbin_ascent    lifter   need  4200  have  6106  margin   1906  paid lifter 2988+transfer 1212\n  ok mun_transfer     transfer need   900  have  1906  margin   1006\n  ok mun_capture      transfer need   350  have  1006  margin    656\n  ok mun_land         lander   need   650  have  3271  margin   2621\n  ok mun_ascent       lander   need   650  have  2621  margin   1971\n  ok mun_return       lander   need   350  have  1971  margin   1621",
+        "note": "Paper still ok (have 6106/1906/1006/3271/2621/1971, pad TWR 1.537, wet 110710). Titan dropped ~MET 125 on −574×107, leftover 8487 kg (reserve held). Sparrow raised Pe only to about −322 then crash MET 584, fuel 10242 kg. Stopped. No second engine invented.",
+        "verdict": "failed on ascent: 入轨失败：船毁了。剩油 10242 kg。",
+        "ascent": {
+          "ok": false,
+          "thought": "入轨失败：船毁了。剩油 10242 kg。",
+          "t": 584.2500000000164,
+          "orbitText": "-600 × 2 km",
+          "peKm": -600,
+          "apKm": 1.7458506263871678,
+          "fuelKg": 10242.072094376694,
+          "transferFuelKg": 10242.072094376694,
+          "transferName": "S-7 \"Sparrow\"",
+          "ignited": [
+            "S-7 \"Sparrow\""
+          ],
+          "dead": true,
+          "titanDropped": true
+        }
+      }
+    ]
+  },
+  "nodes": [
+    {
+      "nodeId": "ascent",
+      "ok": true,
+      "stub": false,
+      "thought": "入轨完成。轨道 72 × 91 km，剩油 8324 kg，级 1。",
+      "reason": null,
+      "nextId": "recover",
+      "t": 341.40000000004335,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false,
+      "peKm": 71.62149260702333,
+      "apKm": 90.90480484076473,
+      "orbitText": "72 × 91 km",
+      "fuelKg": 8324.380855451036,
+      "transferFuelKg": 3824.380855451037,
+      "falconFuelKg": 3824.380855451037,
+      "sparrowFuelKg": null,
+      "landerName": "K-1 \"Kestrel\"",
+      "transferName": "F-30 \"Falcon\"",
+      "ignited": [
+        "F-30 \"Falcon\""
+      ],
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-400 Tank",
+        "F-30 \"Falcon\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "stageIdx": 1,
+      "alt_m": 89949.42335635086,
+      "agl_m": 89933.27893598044,
+      "speed_ms": 2247.9706803507024,
+      "wallMs": 2783,
+      "titanDropped": true,
+      "vessels": [
+        {
+          "id": "active",
+          "name": "Mun Reuser",
+          "held": false,
+          "titan": false,
+          "booster": false,
+          "body": "kerbin",
+          "landed": false,
+          "dead": false,
+          "fuel_kg": 8324.380855451036,
+          "pad_m": 230722.58641521758,
+          "water": true,
+          "speed_ms": 2247.9706803507024,
+          "orbitText": "72 × 91 km",
+          "peKm": 71.62149260702333,
+          "apKm": 90.90480484076473,
+          "bound": true,
+          "parts": [
+            "Mk1 Command Pod",
+            "Mk2 Parachute",
+            "AB-1 Heat Shield",
+            "TD-12 Decoupler",
+            "FT-800 Tank",
+            "FT-100 Tank",
+            "K-1 \"Kestrel\"",
+            "TD-12 Decoupler",
+            "FT-800 Tank",
+            "FT-800 Tank",
+            "FT-800 Tank",
+            "FT-800 Tank",
+            "FT-800 Tank",
+            "FT-400 Tank",
+            "F-30 \"Falcon\"",
+            "LT-2 Landing Legs ×4",
+            "LT-2 Landing Legs ×4"
+          ],
+          "ignited": [
+            "F-30 \"Falcon\""
+          ],
+          "agl_m": 89933.27893598044
+        },
+        {
+          "id": "stage-1",
+          "name": "Titan Booster",
+          "held": true,
+          "titan": true,
+          "booster": true,
+          "body": "kerbin",
+          "landed": false,
+          "dead": false,
+          "fuel_kg": 8495.19090967947,
+          "pad_m": 3544.672958687683,
+          "water": true,
+          "speed_ms": 741.782322595291,
+          "orbitText": "-598 × 56 km",
+          "peKm": -597.6528398333867,
+          "apKm": 56.439701761311156,
+          "bound": false,
+          "parts": [
+            "TD-25 Decoupler",
+            "C-125 Adapter",
+            "FT-3200 Tank",
+            "FT-3200 Tank",
+            "FT-3200 Tank",
+            "T-900 \"Titan\"",
+            "LT-25 Heavy Landing Legs ×4",
+            "Stabilizer Fins ×4"
+          ],
+          "ignited": [
+            "T-900 \"Titan\""
+          ],
+          "agl_m": null
+        }
+      ],
+      "ksp_vessels": {
+        "vessels": [
+          {
+            "id": "active",
+            "name": "Mun Reuser",
+            "body": "kerbin",
+            "alt_m": 89949.42335635086,
+            "situation": "flight",
+            "active": true,
+            "held": false,
+            "titan": false,
+            "booster": false
+          },
+          {
+            "id": "stage-1",
+            "name": "Titan Booster",
+            "body": "kerbin",
+            "alt_m": 26627.611881780787,
+            "situation": "flight",
+            "active": false,
+            "held": true,
+            "titan": true,
+            "booster": true
+          }
+        ],
+        "activeId": "active",
+        "targetId": null
+      },
+      "enginesLit": [
+        "F-30 \"Falcon\""
+      ],
+      "titanStillOnActive": false,
+      "hasSparrow": false,
+      "sparrowEaten": false
+    },
+    {
+      "nodeId": "recover",
+      "ok": true,
+      "stub": false,
+      "thought": "助推离垫 2.77 km，触地 2.50 m/s。剩油 1615 kg。",
+      "reason": "land",
+      "nextId": "window",
+      "t": 341.40000000004335,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false,
+      "peKm": 71.62149260702333,
+      "apKm": 90.90480484076473,
+      "orbitText": "72 × 91 km",
+      "fuelKg": 8324.380855451036,
+      "transferFuelKg": 3824.380855451037,
+      "falconFuelKg": 3824.380855451037,
+      "sparrowFuelKg": null,
+      "landerName": "K-1 \"Kestrel\"",
+      "transferName": "F-30 \"Falcon\"",
+      "ignited": [
+        "F-30 \"Falcon\""
+      ],
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-400 Tank",
+        "F-30 \"Falcon\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "stageIdx": 1,
+      "alt_m": 89949.42335635086,
+      "agl_m": 89933.27893598044,
+      "speed_ms": 2247.9706803507024,
+      "wallMs": 64,
+      "pad_m": 2765.7950156412994,
+      "speed": 2.49797358823212,
+      "water": false,
+      "crashed": false,
+      "fuel_kg": 1614.6139709627835,
+      "boosterId": "stage-1",
+      "upperId": "active",
+      "claimedPad": false,
+      "ksp_vessels": {
+        "vessels": [
+          {
+            "id": "active",
+            "name": "Mun Reuser",
+            "body": "kerbin",
+            "alt_m": 89949.42335635086,
+            "situation": "flight",
+            "active": true,
+            "held": false,
+            "titan": false,
+            "booster": false
+          },
+          {
+            "id": "stage-1",
+            "name": "Titan Booster",
+            "body": "kerbin",
+            "alt_m": 15.962057593162172,
+            "situation": "landed",
+            "active": false,
+            "held": false,
+            "titan": true,
+            "booster": true
+          }
+        ],
+        "activeId": "active",
+        "targetId": null
+      },
+      "vessels": [
+        {
+          "id": "active",
+          "name": "Mun Reuser",
+          "held": false,
+          "titan": false,
+          "booster": false,
+          "body": "kerbin",
+          "landed": false,
+          "dead": false,
+          "fuel_kg": 8324.380855451036,
+          "pad_m": 230722.58641521758,
+          "water": true,
+          "speed_ms": 2247.9706803507024,
+          "orbitText": "72 × 91 km",
+          "peKm": 71.62149260702333,
+          "apKm": 90.90480484076473,
+          "bound": true,
+          "parts": [
+            "Mk1 Command Pod",
+            "Mk2 Parachute",
+            "AB-1 Heat Shield",
+            "TD-12 Decoupler",
+            "FT-800 Tank",
+            "FT-100 Tank",
+            "K-1 \"Kestrel\"",
+            "TD-12 Decoupler",
+            "FT-800 Tank",
+            "FT-800 Tank",
+            "FT-800 Tank",
+            "FT-800 Tank",
+            "FT-800 Tank",
+            "FT-400 Tank",
+            "F-30 \"Falcon\"",
+            "LT-2 Landing Legs ×4",
+            "LT-2 Landing Legs ×4"
+          ],
+          "ignited": [
+            "F-30 \"Falcon\""
+          ],
+          "agl_m": 89933.27893598044
+        },
+        {
+          "id": "stage-1",
+          "name": "Titan Booster",
+          "held": false,
+          "titan": true,
+          "booster": true,
+          "body": "kerbin",
+          "landed": true,
+          "dead": false,
+          "fuel_kg": 1614.6139709627835,
+          "pad_m": 2765.7950156412994,
+          "water": false,
+          "speed_ms": 0,
+          "orbitText": "—",
+          "peKm": null,
+          "apKm": null,
+          "bound": false,
+          "parts": [
+            "TD-25 Decoupler",
+            "C-125 Adapter",
+            "FT-3200 Tank",
+            "FT-3200 Tank",
+            "FT-3200 Tank",
+            "T-900 \"Titan\"",
+            "LT-25 Heavy Landing Legs ×4",
+            "Stabilizer Fins ×4"
+          ],
+          "ignited": [
+            "T-900 \"Titan\""
+          ],
+          "agl_m": null
+        }
+      ],
+      "booster": {
+        "id": "stage-1",
+        "name": "Titan Booster",
+        "held": false,
+        "titan": true,
+        "booster": true,
+        "body": "kerbin",
+        "landed": true,
+        "dead": false,
+        "fuel_kg": 1614.6139709627835,
+        "pad_m": 2765.7950156412994,
+        "water": false,
+        "speed_ms": 0,
+        "orbitText": "—",
+        "peKm": null,
+        "apKm": null,
+        "bound": false,
+        "parts": [
+          "TD-25 Decoupler",
+          "C-125 Adapter",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "T-900 \"Titan\"",
+          "LT-25 Heavy Landing Legs ×4",
+          "Stabilizer Fins ×4"
+        ],
+        "ignited": [
+          "T-900 \"Titan\""
+        ],
+        "agl_m": null
+      },
+      "upper": {
+        "id": "active",
+        "name": "Mun Reuser",
+        "held": false,
+        "titan": false,
+        "booster": false,
+        "body": "kerbin",
+        "landed": false,
+        "dead": false,
+        "fuel_kg": 8324.380855451036,
+        "pad_m": 230722.58641521758,
+        "water": true,
+        "speed_ms": 2247.9706803507024,
+        "orbitText": "72 × 91 km",
+        "peKm": 71.62149260702333,
+        "apKm": 90.90480484076473,
+        "bound": true,
+        "parts": [
+          "Mk1 Command Pod",
+          "Mk2 Parachute",
+          "AB-1 Heat Shield",
+          "TD-12 Decoupler",
+          "FT-800 Tank",
+          "FT-100 Tank",
+          "K-1 \"Kestrel\"",
+          "TD-12 Decoupler",
+          "FT-800 Tank",
+          "FT-800 Tank",
+          "FT-800 Tank",
+          "FT-800 Tank",
+          "FT-800 Tank",
+          "FT-400 Tank",
+          "F-30 \"Falcon\"",
+          "LT-2 Landing Legs ×4",
+          "LT-2 Landing Legs ×4"
+        ],
+        "ignited": [
+          "F-30 \"Falcon\""
+        ],
+        "agl_m": 89933.27893598044
+      }
+    },
+    {
+      "nodeId": "window",
+      "ok": true,
+      "stub": false,
+      "thought": "窗口到了。相位 111.6°（目标 110.8°）。剩油 8324 kg。",
+      "reason": null,
+      "nextId": "tli",
+      "t": 2056.4000000000433,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false,
+      "peKm": 71.62149260702299,
+      "apKm": 90.90480484076414,
+      "orbitText": "72 × 91 km",
+      "fuelKg": 8324.380855451036,
+      "transferFuelKg": 3824.380855451037,
+      "falconFuelKg": 3824.380855451037,
+      "sparrowFuelKg": null,
+      "landerName": "K-1 \"Kestrel\"",
+      "transferName": "F-30 \"Falcon\"",
+      "ignited": [
+        "F-30 \"Falcon\""
+      ],
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-400 Tank",
+        "F-30 \"Falcon\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "stageIdx": 1,
+      "alt_m": 86514.92611458129,
+      "agl_m": 86498.78169421088,
+      "speed_ms": 2259.3333552657355,
+      "wallMs": 2
+    },
+    {
+      "nodeId": "tli",
+      "ok": true,
+      "stub": false,
+      "thought": "TLI完成。在 kerbin。轨道 88 × 10051 km，剩油 4643 kg。",
+      "reason": null,
+      "nextId": "coast",
+      "t": 2108.450000000075,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false,
+      "peKm": 87.62329086289915,
+      "apKm": 10051.15778936024,
+      "orbitText": "88 × 10051 km",
+      "fuelKg": 4643.287561779169,
+      "transferFuelKg": 143.28756177916964,
+      "falconFuelKg": 143.28756177916964,
+      "sparrowFuelKg": null,
+      "landerName": "K-1 \"Kestrel\"",
+      "transferName": "F-30 \"Falcon\"",
+      "ignited": [
+        "F-30 \"Falcon\""
+      ],
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-400 Tank",
+        "F-30 \"Falcon\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "stageIdx": 1,
+      "alt_m": 90830.85596686124,
+      "agl_m": 90813.06263689883,
+      "speed_ms": 3098.594240586403,
+      "wallMs": 11
+    },
+    {
+      "nodeId": "coast",
+      "ok": true,
+      "stub": false,
+      "thought": "滑行到 mun。轨道 1689 × ∞ km，剩油 4643 kg。",
+      "reason": null,
+      "nextId": "capture",
+      "t": 26793.450000000077,
+      "body": "mun",
+      "landed": false,
+      "dead": false,
+      "peKm": 1689.0487947534075,
+      "apKm": null,
+      "orbitText": "1689 × ∞ km",
+      "fuelKg": 4643.287561779169,
+      "transferFuelKg": 143.28756177916964,
+      "falconFuelKg": 143.28756177916964,
+      "sparrowFuelKg": null,
+      "landerName": "K-1 \"Kestrel\"",
+      "transferName": "F-30 \"Falcon\"",
+      "ignited": [
+        "F-30 \"Falcon\""
+      ],
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-400 Tank",
+        "F-30 \"Falcon\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "stageIdx": 1,
+      "alt_m": 2228692.661153594,
+      "agl_m": 2228674.8678236315,
+      "speed_ms": 366.257025921376,
+      "wallMs": 4
+    },
+    {
+      "nodeId": "capture",
+      "ok": true,
+      "stub": false,
+      "thought": "捕获到 mun。轨道 1689 × 2223 km，剩油 3970 kg。",
+      "reason": null,
+      "nextId": "jettison",
+      "t": 31385.910967550364,
+      "body": "mun",
+      "landed": false,
+      "dead": false,
+      "peKm": 1688.9648708164334,
+      "apKm": 2223.0742605270216,
+      "orbitText": "1689 × 2223 km",
+      "fuelKg": 3970.4613706004156,
+      "transferFuelKg": 0,
+      "falconFuelKg": 0,
+      "sparrowFuelKg": null,
+      "landerName": "K-1 \"Kestrel\"",
+      "transferName": "F-30 \"Falcon\"",
+      "ignited": [
+        "K-1 \"Kestrel\""
+      ],
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-400 Tank",
+        "F-30 \"Falcon\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "stageIdx": 1,
+      "alt_m": 1689079.769926071,
+      "agl_m": 1689062.1761844275,
+      "speed_ms": 196.85152223587266,
+      "wallMs": 15,
+      "landerFuelBeforeKg": 4500,
+      "falconFuelBeforeKg": 143.28756177916964,
+      "transferFuelBeforeKg": 143.28756177916964,
+      "ignitedBefore": [
+        "F-30 \"Falcon\""
+      ],
+      "landerFuelAfterKg": 3970.4613706004156,
+      "falconFuelAfterKg": 0,
+      "kestrelLit": true,
+      "kestrelBurned": true
+    },
+    {
+      "nodeId": "jettison",
+      "ok": true,
+      "stub": false,
+      "thought": "丢掉转移级（TD-12 Decoupler、FT-800 Tank、FT-800 Tank、FT-800 Tank、FT-800 Tank、FT-800 Tank、FT-400 Tank、F-30 \"Falcon\"）。还剩 Mk1 Command Pod、Mk2 Parachute、AB-1 Heat Shield、TD-12 Decoupler、FT-800 Tank、FT-100 Tank。剩油 3970 kg。",
+      "reason": null,
+      "nextId": "land",
+      "t": 31385.910967550364,
+      "body": "mun",
+      "landed": false,
+      "dead": false,
+      "peKm": 1688.9648708164334,
+      "apKm": 2223.0742605270216,
+      "orbitText": "1689 × 2223 km",
+      "fuelKg": 3970.4613706004156,
+      "transferFuelKg": 0,
+      "falconFuelKg": null,
+      "sparrowFuelKg": null,
+      "landerName": "K-1 \"Kestrel\"",
+      "transferName": null,
+      "ignited": [
+        "K-1 \"Kestrel\""
+      ],
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "stageIdx": 1,
+      "alt_m": 1689079.769926071,
+      "agl_m": 1689076.1573387596,
+      "speed_ms": 196.85152223587266,
+      "wallMs": 0
+    },
+    {
+      "nodeId": "land",
+      "ok": true,
+      "stub": false,
+      "thought": "落到 mun。剩油 1828 kg。",
+      "reason": null,
+      "nextId": "rise",
+      "t": 121693.7866766376,
+      "body": "mun",
+      "landed": true,
+      "dead": false,
+      "peKm": null,
+      "apKm": null,
+      "orbitText": "—",
+      "fuelKg": 1828.4454936189313,
+      "transferFuelKg": 0,
+      "falconFuelKg": null,
+      "sparrowFuelKg": null,
+      "landerName": "K-1 \"Kestrel\"",
+      "transferName": null,
+      "ignited": [
+        "K-1 \"Kestrel\""
+      ],
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "stageIdx": 1,
+      "alt_m": 65.0061169215187,
+      "agl_m": -0.00006989758317121897,
+      "speed_ms": 0,
+      "wallMs": 781,
+      "landerOnly": true,
+      "hasSparrow": false,
+      "ksp_vessels": {
+        "vessels": [
+          {
+            "id": "active",
+            "name": "Mun Reuser",
+            "body": "mun",
+            "alt_m": 65.0061169215187,
+            "situation": "landed",
+            "active": true,
+            "held": false,
+            "titan": false,
+            "booster": false
+          },
+          {
+            "id": "stage-1",
+            "name": "Titan Booster",
+            "body": "kerbin",
+            "alt_m": 15.962057593162172,
+            "situation": "landed",
+            "active": false,
+            "held": false,
+            "titan": true,
+            "booster": true
+          }
+        ],
+        "activeId": "active",
+        "targetId": null
+      }
+    },
+    {
+      "nodeId": "rise",
+      "ok": true,
+      "stub": false,
+      "thought": "上升入轨。轨道 22 × 28 km，剩油 965 kg。",
+      "reason": null,
+      "nextId": "home",
+      "t": 122247.43667663775,
+      "body": "mun",
+      "landed": false,
+      "dead": false,
+      "peKm": 22.261974854219122,
+      "apKm": 28.281250271540223,
+      "orbitText": "22 × 28 km",
+      "fuelKg": 965.3831838598212,
+      "transferFuelKg": 0,
+      "falconFuelKg": null,
+      "sparrowFuelKg": null,
+      "landerName": "K-1 \"Kestrel\"",
+      "transferName": null,
+      "ignited": [
+        "K-1 \"Kestrel\""
+      ],
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "stageIdx": 1,
+      "alt_m": 28268.575066874793,
+      "agl_m": 27807.695020981682,
+      "speed_ms": 530.6227666360879,
+      "wallMs": 55
+    },
+    {
+      "nodeId": "home",
+      "ok": true,
+      "stub": false,
+      "thought": "回家：落到 Kerbin。触地 1.17 m/s。剩油 655 kg。",
+      "reason": null,
+      "nextId": "home",
+      "t": 144510.98667663583,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false,
+      "peKm": null,
+      "apKm": null,
+      "orbitText": "—",
+      "fuelKg": 655.1855118719362,
+      "transferFuelKg": 0,
+      "falconFuelKg": null,
+      "sparrowFuelKg": null,
+      "landerName": null,
+      "transferName": null,
+      "ignited": [],
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "FT-800 Tank",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "stageIdx": 1,
+      "alt_m": 1632.7649996889522,
+      "agl_m": -1.366147195369649e-10,
+      "speed_ms": 0,
+      "wallMs": 12,
+      "touchdownSpeed": 1.1708213647035386,
+      "chute": true,
+      "captured": true,
+      "homeLanded": true
+    }
+  ],
+  "snapshots": {
+    "pad": {
+      "tag": "mun-reuser-pad",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-pad.json",
+      "t": 0,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false
+    },
+    "ascent": {
+      "tag": "mun-reuser-ascent",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-ascent.json",
+      "t": 341.40000000004335,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false
+    },
+    "recover": {
+      "tag": "mun-reuser-recover",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-recover.json",
+      "t": 328.68000000000615,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false,
+      "vesselId": "stage-1"
+    },
+    "recoverUpper": {
+      "tag": "mun-reuser-recover-upper",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-recover-upper.json",
+      "t": 341.40000000004335,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false,
+      "vesselId": "active"
+    },
+    "window": {
+      "tag": "mun-reuser-window",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-window.json",
+      "t": 2056.4000000000433,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false
+    },
+    "tli": {
+      "tag": "mun-reuser-tli",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-tli.json",
+      "t": 2108.450000000075,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false
+    },
+    "coast": {
+      "tag": "mun-reuser-coast",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-coast.json",
+      "t": 26793.450000000077,
+      "body": "mun",
+      "landed": false,
+      "dead": false
+    },
+    "capture": {
+      "tag": "mun-reuser-capture",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-capture.json",
+      "t": 31385.910967550364,
+      "body": "mun",
+      "landed": false,
+      "dead": false
+    },
+    "jettison": {
+      "tag": "mun-reuser-jettison",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-jettison.json",
+      "t": 31385.910967550364,
+      "body": "mun",
+      "landed": false,
+      "dead": false
+    },
+    "land": {
+      "tag": "mun-reuser-land",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-land.json",
+      "t": 121693.7866766376,
+      "body": "mun",
+      "landed": true,
+      "dead": false
+    },
+    "rise": {
+      "tag": "mun-reuser-rise",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-rise.json",
+      "t": 122247.43667663775,
+      "body": "mun",
+      "landed": false,
+      "dead": false
+    },
+    "home": {
+      "tag": "mun-reuser-home",
+      "path": "/workspace/moonshot/logs/snapshots/mun-reuser-home.json",
+      "t": 144510.98667663583,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false
+    }
+  },
+  "stopped": null,
+  "verdict": "recover landed pad_m=2765.7950156412994 speed=2.49797358823212 water=false | lander-only Mun touchdown fuel=1828.4454936189313 | home Kerbin chute land speed=1.1708213647035386",
+  "redesigns": [],
+  "claimedPad": false,
+  "boosterRecovered": true,
+  "munLanderOnly": true,
+  "kerbinHome": true,
+  "craft": "Mun Reuser",
+  "stack": [
+    "pod-mk1",
+    "chute",
+    "heat-shield",
+    "decoupler-s",
+    "tank-l",
+    "tank-s",
+    "eng-kestrel",
+    "decoupler-s",
+    "tank-l",
+    "tank-l",
+    "tank-l",
+    "tank-l",
+    "tank-l",
+    "tank-m",
+    "eng-falcon",
+    "decoupler-l",
+    "adapter",
+    "tank-xl",
+    "tank-xl",
+    "tank-xl",
+    "eng-titan"
+  ],
+  "radials": [
+    {
+      "part": "legs",
+      "sym": 1,
+      "host": 5
+    },
+    {
+      "part": "legs",
+      "sym": 1,
+      "host": 0
+    },
+    {
+      "part": "legs-xl",
+      "sym": 1,
+      "host": 19
+    },
+    {
+      "part": "fins",
+      "sym": 1,
+      "host": 19
+    },
+    {
+      "part": "srb",
+      "sym": 2,
+      "host": 19
+    }
+  ],
+  "lander": "pod + chute + shield + decoupler + tank-l + tank-s + Kestrel",
+  "transfer": "5× tank-l + 1× tank-m + Falcon",
+  "lifter": "3× XL + Titan + LT-25 + fins + 2 SRB",
+  "lifterReserveKg": 8500,
+  "padTwrSL": 1.6562726515398922,
+  "padWetKg": 102710,
+  "planOk": true,
+  "planText": "mun-roundtrip  OK\n  ok kerbin_ascent    lifter   need  4200  have  5502  margin   1302  paid lifter 2209+transfer 1991\n  ok mun_transfer     transfer need   900  have  1302  margin    402\n  ok mun_capture      transfer need   350  have   402  margin     52\n  ok mun_land         lander   need   650  have  3271  margin   2621\n  ok mun_ascent       lander   need   650  have  2621  margin   1971\n  ok mun_return       lander   need   350  have  1971  margin   1621",
+  "planPhases": [
+    {
+      "id": "kerbin_ascent",
+      "role": "lifter",
+      "need": 4200,
+      "have": 5501.856310494808,
+      "margin": 1301.856310494808,
+      "paid": {
+        "lifter": 2208.961553184677,
+        "transfer": 1991.038446815323
+      }
+    },
+    {
+      "id": "mun_transfer",
+      "role": "transfer",
+      "need": 900,
+      "have": 1301.8563104948075,
+      "margin": 401.85631049480753,
+      "paid": null
+    },
+    {
+      "id": "mun_capture",
+      "role": "transfer",
+      "need": 350,
+      "have": 401.85631049480753,
+      "margin": 51.85631049480753,
+      "paid": null
+    },
+    {
+      "id": "mun_land",
+      "role": "lander",
+      "need": 650,
+      "have": 3271.1881005990062,
+      "margin": 2621.1881005990062,
+      "paid": null
+    },
+    {
+      "id": "mun_ascent",
+      "role": "lander",
+      "need": 650,
+      "have": 2621.1881005990062,
+      "margin": 1971.1881005990062,
+      "paid": null
+    },
+    {
+      "id": "mun_return",
+      "role": "lander",
+      "need": 350,
+      "have": 1971.1881005990062,
+      "margin": 1621.1881005990062,
+      "paid": null
+    }
+  ],
+  "redesign": null,
+  "missionId": "mun-roundtrip",
+  "planThought": "总图已写。预算过了。第一刀：入轨。",
+  "planNodes": [
+    {
+      "id": "ascent",
+      "label": "入轨",
+      "status": "current"
+    },
+    {
+      "id": "recover",
+      "label": "回收助推",
+      "status": "pending"
+    },
+    {
+      "id": "window",
+      "label": "等窗口",
+      "status": "pending"
+    },
+    {
+      "id": "tli",
+      "label": "TLI",
+      "status": "pending"
+    },
+    {
+      "id": "coast",
+      "label": "滑行",
+      "status": "pending"
+    },
+    {
+      "id": "capture",
+      "label": "捕获",
+      "status": "pending"
+    },
+    {
+      "id": "jettison",
+      "label": "丢掉转移级",
+      "status": "pending"
+    },
+    {
+      "id": "land",
+      "label": "着陆",
+      "status": "pending"
+    },
+    {
+      "id": "rise",
+      "label": "上升",
+      "status": "pending"
+    },
+    {
+      "id": "home",
+      "label": "回家",
+      "status": "pending"
+    }
+  ],
+  "finishedAt": "2026-08-16T05:35:50.771Z",
+  "shots": {
+    "recover": {
+      "path": "logs/shots/mun-reuser-recover.png",
+      "bytes": 235429,
+      "real3d": true,
+      "composited": true,
+      "sceneBytes": 211037,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false,
+      "t": 328.68000000000615,
+      "names": [
+        "TD-25 Decoupler",
+        "C-125 Adapter",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "T-900 \"Titan\"",
+        "LT-25 Heavy Landing Legs ×4",
+        "Stabilizer Fins ×4"
+      ],
+      "situation": "已着陆 — 科比因",
+      "note": "headed DISPLAY=:3 canvas+HUD composite of mun-reuser-recover.json."
+    },
+    "munLand": {
+      "path": "logs/shots/mun-reuser-mun-land.png",
+      "bytes": 124548,
+      "real3d": true,
+      "composited": false,
+      "sceneBytes": 101003,
+      "body": "mun",
+      "landed": true,
+      "dead": false,
+      "t": 121693.7866766376,
+      "names": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "situation": "已着陆 — 缪恩",
+      "note": "headed DISPLAY=:3 canvas+HUD composite of mun-reuser-land.json."
+    },
+    "home": {
+      "path": "logs/shots/mun-reuser-home.png",
+      "bytes": 163792,
+      "real3d": true,
+      "composited": true,
+      "sceneBytes": 145877,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false,
+      "t": 144510.98667663583,
+      "names": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "FT-800 Tank",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ],
+      "situation": "已着陆 — 科比因",
+      "note": "headed DISPLAY=:3 canvas+HUD composite of mun-reuser-home.json."
+    },
+    "skipped": [],
+    "skipReason": null
+  }
+}

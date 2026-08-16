@@ -19,6 +19,7 @@ import {
   freshAgent, agentGet, agentToggle, agentPlan, agentStep, agentRevert, agentCheck,
   agentIdle,
 } from './agent.mjs';
+import { isTitanVessel, isDroppedBooster, runRecoverMuscle } from '../src/agent-burns.js';
 
 const Y = new Vector3(0, 1, 0);
 const STEP_CAP_S = 120;
@@ -326,6 +327,9 @@ export class SimSession {
         alt_m: alt,
         situation,
         active: v.id === this.activeId,
+        held: !!v.held,
+        titan: isTitanVessel(v),
+        booster: isDroppedBooster(v),
       };
     });
   }
@@ -348,6 +352,24 @@ export class SimSession {
     v.held = false;
     this.activeId = v.id;
     return { activeId: this.activeId, ...this.telemetry() };
+  }
+
+  /**
+   * Recover a dropped Titan: switch, boostback + suicide, return focus.
+   * Same muscle as the agent 回收助推 node. Optional id. Does not teleport.
+   */
+  recover(id) {
+    this.requireFlight();
+    if (id != null && id !== '') this.setActive(id);
+    const session = this;
+    return runRecoverMuscle({
+      vessels: session.vessels,
+      get activeId() { return session.activeId; },
+      get st() { return session.st; },
+      setActive(next) { session.setActive(next); },
+      setLegs(down) { session.setLegs(down); },
+      refreshMass() { session.refreshMass(); },
+    });
   }
 
   /**

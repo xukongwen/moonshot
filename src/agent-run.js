@@ -99,7 +99,7 @@ export function runEscape(flight, lang, { missionId, nodeId } = {}) {
 
 export function runCapture(flight, lang, { missionId } = {}) {
   const dest = destForNode('capture', missionId);
-  const out = runCaptureMuscle(flight.st, flight, { dest, missionId, nodeId: 'capture' });
+  const out = runCaptureMuscle(flight.st, flight, { dest, missionId, nodeId: 'capture', allowLander: true });
   afterRails(flight);
   return burnThought('capture-ok', 'capture-fail', out, flight, lang);
 }

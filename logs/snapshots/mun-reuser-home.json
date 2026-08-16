@@ -1,0 +1,108 @@
+{
+  "tag": "mun-reuser-home",
+  "t": 144510.98667663583,
+  "body": "kerbin",
+  "pos": [
+    -425700.0253482207,
+    -3.1895348695025085e-10,
+    -425137.0041994642
+  ],
+  "vel": [
+    0,
+    0,
+    0
+  ],
+  "quat": [
+    -0.4996690275053925,
+    0,
+    0.5003307535539022,
+    0.7071067811865472
+  ],
+  "throttle": 0,
+  "landed": true,
+  "dead": false,
+  "craft": "Mun Reuser",
+  "parts": [
+    {
+      "key": "s52",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 0
+    },
+    {
+      "key": "s53",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": "deployed",
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 1
+    },
+    {
+      "key": "s54",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 2
+    },
+    {
+      "key": "s55",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": false,
+      "stackIndex": 3
+    },
+    {
+      "key": "s56",
+      "fuel": 582.3871216639433,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 4
+    },
+    {
+      "key": "s57",
+      "fuel": 72.79839020799291,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": false,
+      "stackIndex": 5
+    },
+    {
+      "key": "s58",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": false,
+      "stackIndex": 6
+    },
+    {
+      "key": "r73",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": true,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "r74",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": true,
+      "alive": true,
+      "stackIndex": 0
+    }
+  ]
+}

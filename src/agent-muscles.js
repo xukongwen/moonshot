@@ -126,6 +126,15 @@ export function shouldStageDry(st, plan, stageIdx, { allowLander = true } = {}) 
       .sort((a, b) => a.stackIndex - b.stackIndex);
     const landerEng = engines[0];
     if (landerEng && nxt.ignite.includes(landerEng.key)) return { stage: false };
+    // 4-stage: Kestrel + Sparrow/Raven + Falcon. Circularize on Falcon;
+    // do not steal the vacuum TLI/escape stage if Falcon goes dry first.
+    // 3-stage Express (Kestrel + Sparrow) still lights Sparrow after Titan.
+    if (engines.length >= 3) {
+      const nextPart = st.parts.find((p) => p.alive && nxt.ignite.includes(p.key));
+      if (/Sparrow|Raven/.test(nextPart?.def?.name || '')) {
+        return { stage: false, reason: 'keep vacuum stage' };
+      }
+    }
   }
   return { stage: true, reason: titanLit ? 'lifter reserve' : 'stage dry' };
 }

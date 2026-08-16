@@ -9,7 +9,7 @@ import {
 } from './agent-muscles.js';
 import {
   runCaptureMuscle, runEscapeMuscle, runHomeMuscle, runLandMuscle, runRiseMuscle,
-  runTransferCoast,
+  runRecoverMuscle, runTransferCoast, markHeldTitans,
 } from './agent-burns.js';
 import { snapshotFromFlight, thoughtFromCheck, stubThought } from './agent-step.js';
 
@@ -183,13 +183,17 @@ export function runAscent(flight, lang) {
       pointState(cur, tick.dir);
       cur.sas = false;
       flight.setThrottle?.(tick.throttle);
-      if (tick.stage) flight.stage?.();
+      if (tick.stage) {
+        flight.stage?.();
+        markHeldTitans(flight.vessels, flight.activeId);
+      }
       const alt = cur.pos.length() - BODIES[cur.body].radius;
       if (alt > 200 && flight.warpIdx < 3) flight.setWarp?.(3);
       if (tick.done) {
         flight.setThrottle?.(0);
         if (maybeDropLaunchStage(cur) && flight.stageIndex < (flight.plan?.length ?? 0)) {
           flight.stage?.();
+          markHeldTitans(flight.vessels, flight.activeId);
         }
         flight.inferStageIndex?.();
         const check = checkOf(flight);
@@ -203,6 +207,37 @@ export function runAscent(flight, lang) {
   });
 }
 
+export function runRecover(flight, lang) {
+  const loc = langOf(lang);
+  const out = runRecoverMuscle({
+    vessels: flight.vessels ?? [],
+    get activeId() { return flight.activeId; },
+    get st() { return flight.st; },
+    setActive(id) { flight.switchTo(id); },
+    setLegs(down) {
+      flight.legsDeployed = !!down;
+      for (const p of flight.st?.parts ?? []) {
+        if (p.def?.legs) p.legsDown = !!down;
+      }
+    },
+    refreshMass() { flight.refreshViz?.(); flight.refreshHUD?.(); },
+  });
+  const kind = out.ok ? 'recover-ok' : 'recover-fail';
+  return {
+    ok: !!out.ok,
+    thought: thoughtFromCheck(kind, checkOf(flight), out, loc),
+    pad_m: out.pad_m,
+    speed: out.speed,
+    water: out.water,
+    crashed: out.crashed,
+    landed: out.landed,
+    fuel_kg: out.fuel_kg,
+    boosterId: out.boosterId,
+    upperId: out.upperId,
+    reason: out.reason,
+  };
+}
+
 export function runBrowserMuscle(nodeId, flight, { missionId, lang, state } = {}) {
   if (!flight?.active || !flight.st) {
     return Promise.resolve({ ok: false, thought: lang === 'en' ? 'Not in flight. Cannot take this cut.' : '不在飞行中，没法走这一刀。' });
@@ -210,6 +245,8 @@ export function runBrowserMuscle(nodeId, flight, { missionId, lang, state } = {}
   switch (nodeId) {
     case 'ascent':
       return runAscent(flight, lang);
+    case 'recover':
+      return Promise.resolve(runRecover(flight, lang));
     case 'window':
       return Promise.resolve(runWindow(flight, missionId, lang));
     case 'escape':

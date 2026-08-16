@@ -1,0 +1,99 @@
+{
+  "tag": "booster-exp4",
+  "t": 405.7199999999984,
+  "body": "kerbin",
+  "pos": [
+    600026.128651075,
+    -4.1690514896270136e-11,
+    -2174.104830955598
+  ],
+  "vel": [
+    0,
+    0,
+    0
+  ],
+  "quat": [
+    -0.0025620787231803647,
+    0,
+    -0.7071021395474746,
+    0.7071067811865475
+  ],
+  "throttle": 0,
+  "landed": true,
+  "dead": false,
+  "craft": "Mun Express",
+  "parts": [
+    {
+      "key": "s78",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 12
+    },
+    {
+      "key": "s79",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 13
+    },
+    {
+      "key": "s80",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 14
+    },
+    {
+      "key": "s81",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 15
+    },
+    {
+      "key": "s82",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 16
+    },
+    {
+      "key": "s83",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 17
+    },
+    {
+      "key": "r86",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": true,
+      "alive": true,
+      "stackIndex": 16
+    },
+    {
+      "key": "r87",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 16
+    }
+  ]
+}

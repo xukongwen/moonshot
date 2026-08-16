@@ -13,7 +13,7 @@ import {
 } from '../src/agent-muscles.js';
 import {
   runCaptureMuscle, runEscapeMuscle, runHomeMuscle, runLandMuscle, runRiseMuscle,
-  runTransferCoast,
+  runRecoverMuscle, runTransferCoast, markHeldTitans,
 } from '../src/agent-burns.js';
 import { applySnapshotToState } from './snapshot.mjs';
 
@@ -119,11 +119,15 @@ export function runSessionAscent(session, lang) {
     pointState(session.st, tick.dir);
     session.st.sas = false;
     session.setThrottle(tick.throttle);
-    if (tick.stage) session.stage();
+    if (tick.stage) {
+      session.stage();
+      markHeldTitans(session.vessels, session.activeId);
+    }
     if (tick.done) {
       session.setThrottle(0);
       if (maybeDropLaunchStage(session.st) && session.stageIdx < (session.plan?.length ?? 0)) {
         session.stage();
+        markHeldTitans(session.vessels, session.activeId);
       }
       session.resyncPlan();
       const check = checkOf(session);
@@ -150,6 +154,30 @@ export function runSessionMuscle(session, nodeId, { missionId, lang } = {}) {
   switch (nodeId) {
     case 'ascent':
       return runSessionAscent(session, loc);
+    case 'recover': {
+      const out = runRecoverMuscle({
+        vessels: session.vessels,
+        get activeId() { return session.activeId; },
+        get st() { return session.st; },
+        setActive(id) { session.setActive(id); },
+        setLegs(down) { session.setLegs(down); },
+        refreshMass() { session.refreshMass(); },
+      });
+      const kind = out.ok ? 'recover-ok' : 'recover-fail';
+      return {
+        ok: !!out.ok,
+        thought: thoughtFromCheck(kind, checkOf(session), out, loc),
+        pad_m: out.pad_m,
+        speed: out.speed,
+        water: out.water,
+        crashed: out.crashed,
+        landed: out.landed,
+        fuel_kg: out.fuel_kg,
+        boosterId: out.boosterId,
+        upperId: out.upperId,
+        reason: out.reason,
+      };
+    }
     case 'window': {
       const out = runWindowMuscle(session.st, missionId);
       const check = checkOf(session);
@@ -301,6 +329,13 @@ export function agentStep(session) {
     touchdownSpeed: res.touchdownSpeed,
     chute: res.chute,
     captureCheck: res.captureCheck ?? null,
+    pad_m: res.pad_m,
+    speed: res.speed,
+    water: res.water,
+    crashed: res.crashed,
+    fuel_kg: res.fuel_kg,
+    boosterId: res.boosterId,
+    upperId: res.upperId,
   });
 }
 

@@ -1,8 +1,9 @@
 // Stock craft designs. Stack index 0 = top.
 
 const DUNA_HAULER_LIGHT = {
-  // Sparrow lander (tank-l + tank-m). Raven transfer and Titan stay in orbit.
+  // Sparrow lander (tank-l + tank-m). Raven transfer stays in orbit.
   // Do NOT land on Raven/Titan. Never light Sparrow for TDI / mid-course / capture.
+  // Booster recovery: LT-25 legs-xl on last XL (host 23) with the fins/SRBs.
   //
   // Default pad stack: 4× tank-l + tank-m Raven, 8× XL Titan, 6 SRB on last XL.
   // Catalog was Mun-scale: Falcon (Isp 310) after LKO had ~5231 kg transfer;
@@ -46,6 +47,7 @@ const DUNA_HAULER_LIGHT = {
   ],
   radials: [
     { part: 'legs', sym: 1, host: 5 },
+    { part: 'legs-xl', sym: 1, host: 23 },
     { part: 'fins', sym: 1, host: 23 },
     { part: 'srb', sym: 6, host: 23 },
   ],
@@ -60,6 +62,8 @@ export const STOCK = {
     // Short lander: tank-m + tank-s + Kestrel. Transfer is staged away in
     // low Mun orbit BEFORE descent. Legs on the lander tank and the pod
     // (pod legs survive the reentry jettison). Do NOT land on the Sparrow.
+    // Booster recovery: LT-25 (legs-xl) on the last XL (host 16) so the
+    // Titan section can land. Lander keeps LT-2. Same safeSpeed 12.
     stack: [
       'pod-mk1', 'chute', 'heat-shield', 'decoupler-s', 'tank-m', 'tank-s', 'eng-kestrel',
       'decoupler-s', 'tank-l', 'tank-l', 'tank-m', 'eng-sparrow',
@@ -68,6 +72,7 @@ export const STOCK = {
     radials: [
       { part: 'legs', sym: 1, host: 5 },
       { part: 'legs', sym: 1, host: 0 },
+      { part: 'legs-xl', sym: 1, host: 16 },
       { part: 'fins', sym: 1, host: 16 },
     ],
   },

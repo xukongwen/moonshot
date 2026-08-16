@@ -6,6 +6,12 @@
 - **era**（中间位）是代际，从 1 起。默认发布不加 era。只有用户明确要求换代时才用 `--era`（例如 0.1.12 → 0.2.0）。
 - **build**（末位）是日常递增值。每次较大交付 +1：0.1.1、0.1.2、0.1.88…
 
+## 0.1.5 — 2026-08-16
+
+- 助推回收 R1–R5：扔下的 Titan 成可飞的船，翻转 + 弹道瞄准 boostback + 自杀燃烧。官方 R4 离垫 2.17 km / 9.31 m/s；R5 agent「回收助推」2.35 km / 8.55 m/s。真物理，不传送。
+- LT-25 Heavy Landing Legs ×4（`legs-xl`：Utility，2.5 m，径向，500 kg，3.8 m，safeSpeed 12）。目录 22→23。Mun Express host 16 / Duna Hauler host 23；着陆器仍 LT-2。
+- Titan 储备：Mun Express 8500 kg，Duna Hauler 5000 kg。
+
 ## 0.1.4 — 2026-08-16
 
 - 游戏内 Agent A1–A6：面板、目标→总图、走一步、回退、真检查、MCP `ksp_agent_*`

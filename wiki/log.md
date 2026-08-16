@@ -3,6 +3,15 @@
 
 > 更早条目已卷到 [`wiki/log/`](./log/)。生成：`node scripts/wiki-auto-curator.mjs`。
 
+- [2026-08-16] 发布 v0.1.5。
+- [2026-08-16] 打板 v0.1.5：助推回收 R1–R5 + LT-25。官方 R4 离垫 2.17 km / 9.31 m/s；R5 agent 回收 2.35 km / 8.55 m/s。
+- [2026-08-16] 新零件 LT-25（`legs-xl`，500 kg / 3.8 m / safeSpeed 12）。Mun Express host 16、Duna Hauler host 23 改用它；着陆器仍 LT-2。近景 logs/shots/booster-legs.png：支柱 3.8 m，贴皮 r=1.33，脚垫 r=0.72，落地脚 r≈4.3。没改物理，没打板。
+- [2026-08-16] Titan 腿外观：径向腿/鳍按宿主半径贴在罐外（1.25 m 着陆器不动）。近景 logs/shots/booster-legs.png 四条支柱/脚垫可见。没改物理，没打板。
+- [2026-08-16] 助推回收 R5：mun-roundtrip 结点「回收助推」。agent 路径上面 72×138 / 5138 kg，助推离垫 2.35 km / 触地 8.55 m/s / 0 kg / land。两艘都活。不是垫。图 logs/shots/booster-exp5.png。没打板。
+- [2026-08-16] 助推回收 R4：弹道瞄准 + 3-XL 储备 8.5 t。官方离垫 2.17 km / 9.31 m/s / 0 kg / land。上面 72×138。不是垫，不是八角。图 logs/shots/booster-exp4.png。没打板。
+- [2026-08-16] 助推回收 R3：扔下后朝垫翻转 + Titan 真烧 boostback。试 1 留 3 t 摔在 18.32 km / 43.2 m/s；试 2 留 5.8 t 下水 53.37 km / 2.68 m/s / 28 kg / water。比 R2 的 138.35 km 近。不是垫。图 logs/shots/booster-exp3.png。没打板。
+- [2026-08-16] 助推回收 R2：库存 Titan 段加 LT-2（Mun XL host 16 / Hauler host 23）。储备 8 t / 5 t。Mun Express 上面 72×114，助推下水 1.44 m/s / AGL 0 / 505 kg / water。图 logs/shots/booster-exp2.png。没打板。
+- [2026-08-16] 助推回收 R1：扔下的堆叠变成可飞的船。hop 触地 1.56 m/s / AGL 0 / 4149 kg。库存 Titan 入轨后剩油 0。图 logs/shots/booster-exp1.png。没打板。
 - [2026-08-16] 发布 v0.1.4。
 - [2026-08-16] Agent 路径 Duna 着陆并回家：全文 [2026-08-16-agent-duna-往返.md](./2026-08-16-agent-duna-往返.md)。落地 5849 kg，回家触地 1.18 m/s / 317 kg。瑕疵照写。这次之前没打板。
 - [2026-08-16] Duna 回家：相遇快照捕获 572×1985 km / 494 kg，伞+舱落到 Kerbin，触地 1.18 m/s，AGL 0，剩 317 kg。Sparrow only，没点 Raven。
@@ -45,6 +54,16 @@
 - [2026-08-15] MCP VAB 无头车间 + 34 个工具；crafts.json 与浏览器 localStorage 分库
 - [2026-08-15] MCP 拼出「这也能飞？」并截图
 - [2026-08-15] Wiki bootstrap：宪法、SCHEMA、模块、ADR、curator
+
+
+
+
+
+
+
+
+
+
 
 
 

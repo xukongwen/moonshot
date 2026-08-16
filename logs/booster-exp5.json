@@ -1,0 +1,330 @@
+{
+  "craft": "Mun Express",
+  "missionId": "mun-roundtrip",
+  "node": "recover",
+  "nodeLabel": "回收助推",
+  "plan": {
+    "nodes": [
+      {
+        "id": "ascent",
+        "label": "入轨"
+      },
+      {
+        "id": "recover",
+        "label": "回收助推"
+      },
+      {
+        "id": "window",
+        "label": "等窗口"
+      },
+      {
+        "id": "tli",
+        "label": "TLI"
+      },
+      {
+        "id": "coast",
+        "label": "滑行"
+      },
+      {
+        "id": "capture",
+        "label": "捕获"
+      },
+      {
+        "id": "jettison",
+        "label": "丢掉转移级"
+      },
+      {
+        "id": "land",
+        "label": "着陆"
+      },
+      {
+        "id": "rise",
+        "label": "上升"
+      },
+      {
+        "id": "home",
+        "label": "回家"
+      }
+    ],
+    "thought": "总图已写。预算过了。第一刀：入轨。"
+  },
+  "ascent": {
+    "ok": true,
+    "thought": "入轨完成。轨道 72 × 138 km，剩油 5138 kg，级 1。",
+    "nextId": "recover",
+    "vessels": [
+      {
+        "id": "active",
+        "name": "Mun Express",
+        "held": false,
+        "titan": false,
+        "body": "kerbin",
+        "landed": false,
+        "dead": false,
+        "fuel_kg": 5137.648942301888,
+        "pad_m": 451812.4826256274,
+        "orbitText": "72 × 138 km",
+        "peKm": 71.54881173201522,
+        "apKm": 138.23316612329393,
+        "bound": true,
+        "parts": [
+          "Mk1 Command Pod",
+          "Mk2 Parachute",
+          "AB-1 Heat Shield",
+          "TD-12 Decoupler",
+          "FT-400 Tank",
+          "FT-100 Tank",
+          "K-1 \"Kestrel\"",
+          "TD-12 Decoupler",
+          "FT-800 Tank",
+          "FT-800 Tank",
+          "FT-400 Tank",
+          "S-7 \"Sparrow\"",
+          "LT-2 Landing Legs ×4",
+          "LT-2 Landing Legs ×4"
+        ]
+      },
+      {
+        "id": "stage-1",
+        "name": "Titan Booster",
+        "held": true,
+        "titan": true,
+        "body": "kerbin",
+        "landed": false,
+        "dead": false,
+        "fuel_kg": 8495.19090967947,
+        "pad_m": 7073.112132805743,
+        "orbitText": "-586 × 93 km",
+        "peKm": -585.7453096873231,
+        "apKm": 93.2840843690054,
+        "bound": false,
+        "parts": [
+          "TD-25 Decoupler",
+          "C-125 Adapter",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "T-900 \"Titan\"",
+          "LT-2 Landing Legs ×4",
+          "Stabilizer Fins ×4"
+        ]
+      }
+    ],
+    "heldTitans": [
+      "stage-1"
+    ]
+  },
+  "recover": {
+    "ok": true,
+    "thought": "助推离垫 2.35 km，触地 8.55 m/s。剩油 0 kg。",
+    "nextId": "window",
+    "pad_m": 2354.8674520635345,
+    "speed": 8.550496768646148,
+    "water": false,
+    "crashed": false,
+    "landed": true,
+    "fuel_kg": 0,
+    "reason": "land",
+    "boosterId": "stage-1",
+    "upperId": "active"
+  },
+  "vessels": [
+    {
+      "id": "active",
+      "name": "Mun Express",
+      "held": false,
+      "titan": false,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false,
+      "fuel_kg": 5137.648942301888,
+      "pad_m": 451812.4826256274,
+      "orbitText": "72 × 138 km",
+      "peKm": 71.54881173201522,
+      "apKm": 138.23316612329393,
+      "bound": true,
+      "parts": [
+        "Mk1 Command Pod",
+        "Mk2 Parachute",
+        "AB-1 Heat Shield",
+        "TD-12 Decoupler",
+        "FT-400 Tank",
+        "FT-100 Tank",
+        "K-1 \"Kestrel\"",
+        "TD-12 Decoupler",
+        "FT-800 Tank",
+        "FT-800 Tank",
+        "FT-400 Tank",
+        "S-7 \"Sparrow\"",
+        "LT-2 Landing Legs ×4",
+        "LT-2 Landing Legs ×4"
+      ]
+    },
+    {
+      "id": "stage-1",
+      "name": "Titan Booster",
+      "held": false,
+      "titan": true,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false,
+      "fuel_kg": 0,
+      "pad_m": 2354.8674520635345,
+      "orbitText": "—",
+      "peKm": null,
+      "apKm": null,
+      "bound": false,
+      "parts": [
+        "TD-25 Decoupler",
+        "C-125 Adapter",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "T-900 \"Titan\"",
+        "LT-2 Landing Legs ×4",
+        "Stabilizer Fins ×4"
+      ]
+    }
+  ],
+  "bothLive": true,
+  "claimedPad": false,
+  "agent": {
+    "thought": "助推离垫 2.35 km，触地 8.55 m/s。剩油 0 kg。",
+    "thoughts": [
+      "总图已写。预算过了。第一刀：入轨。",
+      "下一刀：入轨。剩油 60500 kg。",
+      "入轨完成。轨道 72 × 138 km，剩油 5138 kg，级 1。",
+      "下一刀：回收助推。剩油 5138 kg。",
+      "助推离垫 2.35 km，触地 8.55 m/s。剩油 0 kg。"
+    ],
+    "current": {
+      "id": "window",
+      "label": "等窗口",
+      "status": "current"
+    },
+    "nodes": [
+      {
+        "id": "ascent",
+        "label": "入轨",
+        "status": "done"
+      },
+      {
+        "id": "recover",
+        "label": "回收助推",
+        "status": "done"
+      },
+      {
+        "id": "window",
+        "label": "等窗口",
+        "status": "current"
+      },
+      {
+        "id": "tli",
+        "label": "TLI",
+        "status": "pending"
+      },
+      {
+        "id": "coast",
+        "label": "滑行",
+        "status": "pending"
+      },
+      {
+        "id": "capture",
+        "label": "捕获",
+        "status": "pending"
+      },
+      {
+        "id": "jettison",
+        "label": "丢掉转移级",
+        "status": "pending"
+      },
+      {
+        "id": "land",
+        "label": "着陆",
+        "status": "pending"
+      },
+      {
+        "id": "rise",
+        "label": "上升",
+        "status": "pending"
+      },
+      {
+        "id": "home",
+        "label": "回家",
+        "status": "pending"
+      }
+    ]
+  },
+  "snapshots": {
+    "booster": "/workspace/moonshot/logs/snapshots/booster-exp5-booster.json",
+    "upper": "/workspace/moonshot/logs/snapshots/booster-exp5-upper.json"
+  },
+  "design": {
+    "name": "Mun Express",
+    "stack": [
+      "pod-mk1",
+      "chute",
+      "heat-shield",
+      "decoupler-s",
+      "tank-m",
+      "tank-s",
+      "eng-kestrel",
+      "decoupler-s",
+      "tank-l",
+      "tank-l",
+      "tank-m",
+      "eng-sparrow",
+      "decoupler-l",
+      "adapter",
+      "tank-xl",
+      "tank-xl",
+      "tank-xl",
+      "eng-titan"
+    ],
+    "radials": [
+      {
+        "part": "legs",
+        "sym": 1,
+        "host": 5
+      },
+      {
+        "part": "legs",
+        "sym": 1,
+        "host": 0
+      },
+      {
+        "part": "legs",
+        "sym": 1,
+        "host": 16
+      },
+      {
+        "part": "fins",
+        "sym": 1,
+        "host": 16
+      }
+    ]
+  },
+  "boosterDesign": {
+    "name": "Titan Booster",
+    "stack": [
+      "decoupler-l",
+      "adapter",
+      "tank-xl",
+      "tank-xl",
+      "tank-xl",
+      "eng-titan"
+    ],
+    "radials": [
+      {
+        "part": "legs",
+        "sym": 1,
+        "host": 4
+      },
+      {
+        "part": "fins",
+        "sym": 1,
+        "host": 4
+      }
+    ]
+  }
+}

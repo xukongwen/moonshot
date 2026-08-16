@@ -1,0 +1,99 @@
+{
+  "tag": "booster-exp3",
+  "t": 412.499999999998,
+  "body": "kerbin",
+  "pos": [
+    597633.1328846482,
+    -3.821580609613469e-11,
+    -53302.592318186944
+  ],
+  "vel": [
+    0,
+    0,
+    0
+  ],
+  "quat": [
+    -0.06281713794361568,
+    0,
+    -0.7043110159443573,
+    0.7071067811865474
+  ],
+  "throttle": 0,
+  "landed": true,
+  "dead": false,
+  "craft": "Mun Express",
+  "parts": [
+    {
+      "key": "s34",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 12
+    },
+    {
+      "key": "s35",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 13
+    },
+    {
+      "key": "s36",
+      "fuel": 9.289558977422004,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 14
+    },
+    {
+      "key": "s37",
+      "fuel": 9.289558977422004,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 15
+    },
+    {
+      "key": "s38",
+      "fuel": 9.289558977422004,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 16
+    },
+    {
+      "key": "s39",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 17
+    },
+    {
+      "key": "r42",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": true,
+      "alive": true,
+      "stackIndex": 16
+    },
+    {
+      "key": "r43",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 16
+    }
+  ]
+}

@@ -197,6 +197,56 @@ export function buildStagePlan(parts) {
   return plan;
 }
 
+/** Reverse-lookup catalog id from a live part def. */
+export function partIdOf(def) {
+  for (const [id, d] of Object.entries(PARTS)) if (d === def) return id;
+  return null;
+}
+
+/** Rebuild a VAB design from live parts (for save / screenshot of a dropped stage). */
+export function designFromParts(parts, name = 'Dropped Stage') {
+  const stackParts = parts
+    .filter((p) => p.kind === 'stack' && p.alive !== false)
+    .sort((a, b) => a.stackIndex - b.stackIndex);
+  const stack = stackParts.map((p) => partIdOf(p.def)).filter(Boolean);
+  const indexOf = (si) => stackParts.findIndex((p) => p.stackIndex === si);
+  const radials = parts
+    .filter((p) => p.kind === 'radial' && p.alive !== false)
+    .map((p) => ({
+      part: partIdOf(p.def),
+      sym: p.sym,
+      host: Math.max(0, indexOf(p.stackIndex)),
+    }))
+    .filter((r) => r.part);
+  return { name, stack, radials };
+}
+
+export function droppedStageName(removed) {
+  const eng = removed.find((p) => p.def?.engine && !p.def.engine?.srb);
+  if (eng && /Titan/.test(eng.def.name || '')) return 'Titan Booster';
+  if (eng) return `${eng.def.name} stage`;
+  return 'Dropped Stage';
+}
+
+/**
+ * Separation pose for a jettisoned stack. Call BEFORE stripping parts from the
+ * parent so parent massProps.comY is still the combined stack.
+ */
+export function droppedStageOffset(parentSt, removed) {
+  const geom = stackGeometry(removed);
+  const mp = massProps(removed, geom);
+  const centerLocalY = geom.totalLength / 2;
+  const parentComY = parentSt.massProps?.comY ?? 0;
+  return {
+    alongNose: centerLocalY - parentComY,
+    kick: -2.5,
+    mass: mp.m,
+    comY: mp.comY,
+    geom,
+    mp,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Delta-v / TWR (vacuum Isp, sea-level TWR for the first stage) — used by VAB & HUD
 // ---------------------------------------------------------------------------

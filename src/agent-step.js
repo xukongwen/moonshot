@@ -4,7 +4,7 @@
 import { pushThought, completeNode, createState } from './agent-plan.js';
 import { captureFlightSnapshot } from './agent-muscles.js';
 
-export const REAL_NODES = new Set(['ascent', 'window', 'coast', 'jettison', 'escape', 'tli', 'capture', 'land', 'rise', 'home']);
+export const REAL_NODES = new Set(['ascent', 'recover', 'window', 'coast', 'jettison', 'escape', 'tli', 'capture', 'land', 'rise', 'home']);
 export const STUB_NODES = new Set();
 
 export function muscleKind(nodeId) {
@@ -220,8 +220,63 @@ export function thoughtFromCheck(kind, check, extra, lang) {
       ? `Home failed (${why}). Body ${body}. Orbit ${orbit}, fuel ${fuel}.`
       : `回家失败（${why}）。在 ${body}。轨道 ${orbit}，剩油 ${fuel}。`;
   }
+  if (kind === 'recover-ok') {
+    const pad = extra?.pad_m;
+    const spd = extra?.speed;
+    const fuel = extra?.fuel_kg;
+    const padBit = Number.isFinite(pad)
+      ? (en ? `${(pad / 1000).toFixed(2)} km from pad` : `离垫 ${(pad / 1000).toFixed(2)} km`)
+      : null;
+    const spdBit = Number.isFinite(spd)
+      ? (en ? `touchdown ${spd.toFixed(2)} m/s` : `触地 ${spd.toFixed(2)} m/s`)
+      : null;
+    const fuelBit = Number.isFinite(fuel)
+      ? (en ? `fuel ${Math.round(fuel)} kg` : `剩油 ${Math.round(fuel)} kg`)
+      : null;
+    const waterBit = extra?.water ? (en ? 'water' : '下水') : null;
+    const more = [waterBit, fuelBit].filter(Boolean);
+    if (padBit && spdBit) {
+      const extraBit = more.length
+        ? (en ? ` ${more.join(', ')}.` : `${more.join('，')}。`)
+        : '';
+      if (extra?.already) {
+        return en
+          ? `Booster already down. ${padBit}, ${spdBit}.${extraBit}`
+          : `助推已经落地。${padBit}，${spdBit}。${extraBit}`;
+      }
+      return en
+        ? `Booster ${padBit}, ${spdBit}.${extraBit}`
+        : `助推${padBit}，${spdBit}。${extraBit}`;
+    }
+    const bits = [padBit, spdBit, waterBit, fuelBit].filter(Boolean);
+    const tail = bits.length
+      ? (en ? ` ${bits.join(', ')}.` : `${bits.join('，')}。`)
+      : (en ? '.' : '。');
+    if (extra?.already) {
+      return en ? `Booster already down.${tail}` : `助推已经落地。${tail}`;
+    }
+    return en ? `Booster recovered.${tail}` : `助推回收。${tail}`;
+  }
+  if (kind === 'recover-fail') {
+    const why = extra?.reason || 'fail';
+    if (why === 'no-booster') {
+      return en ? 'No dropped booster to recover.' : '没有扔下的助推，没法回收。';
+    }
+    const pad = extra?.pad_m;
+    const spd = extra?.speed;
+    const padBit = Number.isFinite(pad)
+      ? (en ? ` ${(pad / 1000).toFixed(2)} km from pad.` : `离垫 ${(pad / 1000).toFixed(2)} km。`)
+      : '';
+    const spdBit = Number.isFinite(spd)
+      ? (en ? ` Touchdown ${spd.toFixed(2)} m/s.` : `触地 ${spd.toFixed(2)} m/s。`)
+      : '';
+    return en
+      ? `Booster recovery failed (${why}).${padBit}${spdBit}`
+      : `助推回收失败（${why}）。${padBit}${spdBit}`;
+  }
   return en ? 'Step finished.' : '这一刀结束。';
 }
+
 
 export function applyStepSuccess(state, { nodeId, thought, snapshot } = {}) {
   let next = completeNode(state, nodeId);
@@ -289,6 +344,13 @@ function finishMuscle(state, node, out) {
       chute: out.chute,
       captureCheck: out.captureCheck,
       reason: out.reason,
+      pad_m: out.pad_m,
+      speed: out.speed,
+      water: out.water,
+      crashed: out.crashed,
+      fuel_kg: out.fuel_kg,
+      boosterId: out.boosterId,
+      upperId: out.upperId,
     };
   }
   const thought = out?.thought || stubThought(node.label);

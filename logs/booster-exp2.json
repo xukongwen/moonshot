@@ -1,0 +1,272 @@
+{
+  "reserve": {
+    "mun_kg": 8000,
+    "note": "3-XL Express 8000; 8-XL Hauler 5000 (LKO)"
+  },
+  "lko": {
+    "Mun Express": {
+      "drop": {
+        "reason": "titan-drop",
+        "stageReason": "lifter reserve",
+        "reserve_kg": 8000,
+        "t": 85.49999999999729,
+        "alt_m": 35120.3164511224,
+        "agl_m": 35113.501580095406,
+        "speed_ms": 1100.0971055705143,
+        "vUp_ms": 963.5981015594202,
+        "vH_ms": 530.7469645280169,
+        "fuel_kg": 7980.317805421773,
+        "mass_kg": 20590.31780542177,
+        "body": "kerbin",
+        "landed": false,
+        "dead": false,
+        "parts": [
+          "TD-25 Decoupler",
+          "C-125 Adapter",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "T-900 \"Titan\"",
+          "LT-2 Landing Legs ×4",
+          "Stabilizer Fins ×4"
+        ],
+        "hasLegs": true
+      },
+      "upper": {
+        "reason": "orbit",
+        "t": 489.0000000000769,
+        "alt_m": 105941.41448532592,
+        "agl_m": 105932.48460196028,
+        "speed_ms": 2215.4309191778902,
+        "vUp_ms": -52.25663335209788,
+        "vH_ms": 2214.8145299144344,
+        "fuel_kg": 5346.025733649569,
+        "mass_kg": 9346.025733649569,
+        "body": "kerbin",
+        "landed": false,
+        "dead": false,
+        "peKm": 71.9079713243359,
+        "apKm": 113.78618362556782,
+        "bound": true,
+        "orbitText": "72 × 114 km",
+        "titanOn": false,
+        "parts": [
+          "Mk1 Command Pod",
+          "Mk2 Parachute",
+          "AB-1 Heat Shield",
+          "TD-12 Decoupler",
+          "FT-400 Tank",
+          "FT-100 Tank",
+          "K-1 \"Kestrel\"",
+          "TD-12 Decoupler",
+          "FT-800 Tank",
+          "FT-800 Tank",
+          "FT-400 Tank",
+          "S-7 \"Sparrow\"",
+          "LT-2 Landing Legs ×4",
+          "LT-2 Landing Legs ×4"
+        ]
+      }
+    },
+    "Duna Hauler": {
+      "drop": {
+        "reason": "titan-drop",
+        "stageReason": "lifter reserve",
+        "reserve_kg": 5000,
+        "t": 262.8000000000255,
+        "alt_m": 53572.95566565392,
+        "agl_m": 53556.91704404282,
+        "speed_ms": 936.7398310173813,
+        "vUp_ms": 798.617623055053,
+        "vH_ms": 489.5828869153512,
+        "fuel_kg": 4992.134728260665,
+        "mass_kg": 27602.134728260662,
+        "body": "kerbin",
+        "landed": false,
+        "dead": false,
+        "parts": [
+          "TD-25 Decoupler",
+          "C-125 Adapter",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "FT-3200 Tank",
+          "T-900 \"Titan\"",
+          "LT-2 Landing Legs ×4",
+          "Stabilizer Fins ×4"
+        ],
+        "hasLegs": true
+      },
+      "upper": {
+        "reason": "orbit",
+        "t": 639.6999999999659,
+        "alt_m": 94131.70066792995,
+        "agl_m": 94116.79218812053,
+        "speed_ms": 2253.5014604463017,
+        "vUp_ms": -68.13360522522157,
+        "vH_ms": 2252.471230465026,
+        "fuel_kg": 11192.364364998684,
+        "mass_kg": 17242.364364998684,
+        "body": "kerbin",
+        "landed": false,
+        "dead": false,
+        "peKm": 71.84679475993593,
+        "apKm": 113.82206012590416,
+        "bound": true,
+        "orbitText": "72 × 114 km",
+        "titanOn": false,
+        "parts": [
+          "Mk1 Command Pod",
+          "Mk2 Parachute",
+          "AB-1 Heat Shield",
+          "TD-12 Decoupler",
+          "FT-800 Tank",
+          "FT-400 Tank",
+          "S-7 \"Sparrow\"",
+          "TD-12 Decoupler",
+          "FT-800 Tank",
+          "FT-800 Tank",
+          "FT-800 Tank",
+          "FT-800 Tank",
+          "FT-400 Tank",
+          "R-40 \"Raven\"",
+          "LT-2 Landing Legs ×4"
+        ]
+      }
+    }
+  },
+  "design": {
+    "name": "Mun Express",
+    "stack": [
+      "pod-mk1",
+      "chute",
+      "heat-shield",
+      "decoupler-s",
+      "tank-m",
+      "tank-s",
+      "eng-kestrel",
+      "decoupler-s",
+      "tank-l",
+      "tank-l",
+      "tank-m",
+      "eng-sparrow",
+      "decoupler-l",
+      "adapter",
+      "tank-xl",
+      "tank-xl",
+      "tank-xl",
+      "eng-titan"
+    ],
+    "radials": [
+      {
+        "part": "legs",
+        "sym": 1,
+        "host": 5
+      },
+      {
+        "part": "legs",
+        "sym": 1,
+        "host": 0
+      },
+      {
+        "part": "legs",
+        "sym": 1,
+        "host": 16
+      },
+      {
+        "part": "fins",
+        "sym": 1,
+        "host": 16
+      }
+    ]
+  },
+  "landing": {
+    "craft": "Mun Express",
+    "atSep": {
+      "id": "stage-1",
+      "name": "Titan Booster",
+      "reason": "titan-drop",
+      "stageReason": "lifter reserve",
+      "reserve_kg": 8000,
+      "t": 85.49999999999729,
+      "alt_m": 35120.3164511224,
+      "agl_m": 35113.501580095406,
+      "speed_ms": 1100.0971055705143,
+      "vUp_ms": 963.5981015594202,
+      "vH_ms": 530.7469645280169,
+      "fuel_kg": 7980.317805421773,
+      "mass_kg": 20590.31780542177,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false,
+      "parts": [
+        "TD-25 Decoupler",
+        "C-125 Adapter",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "T-900 \"Titan\"",
+        "LT-2 Landing Legs ×4",
+        "Stabilizer Fins ×4"
+      ],
+      "ignited": [
+        "T-900 \"Titan\""
+      ],
+      "hasLegs": true
+    },
+    "beforeCoast": {
+      "t": 85.49999999999729,
+      "alt_m": 35120.3164511224,
+      "agl_m": 35113.501580095406,
+      "speed_ms": 1100.0971055705143,
+      "vUp_ms": 963.5981015594202,
+      "vH_ms": 530.7469645280169,
+      "fuel_kg": 7980.317805421773,
+      "mass_kg": 20590.31780542177,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false
+    },
+    "atBurn": {
+      "t": 376.20000000005126,
+      "alt_m": 4977.831182170776,
+      "agl_m": 4971.0163111437805,
+      "speed_ms": 882.8452123459459,
+      "vUp_ms": -806.987168289845,
+      "vH_ms": 358.0326509938663,
+      "fuel_kg": 7980.317805421773,
+      "mass_kg": 20590.31780542177,
+      "body": "kerbin",
+      "landed": false,
+      "dead": false
+    },
+    "after": {
+      "t": 431.36000000007635,
+      "alt_m": 5.569463746272959,
+      "agl_m": 7.431388837630948e-12,
+      "speed_ms": 0,
+      "vUp_ms": 0,
+      "vH_ms": 0,
+      "fuel_kg": 505.2964645166682,
+      "mass_kg": 13115.296464516668,
+      "body": "kerbin",
+      "landed": true,
+      "dead": false
+    },
+    "burn": {
+      "landed": true,
+      "speed": 1.436633645595208,
+      "water": true,
+      "crashed": false
+    },
+    "impact": [],
+    "snapshot": "/workspace/moonshot/logs/snapshots/booster-exp2.json",
+    "claimedLanding": true,
+    "claimedPad": false,
+    "water": true
+  }
+}

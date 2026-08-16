@@ -1,0 +1,10 @@
+import { readFileSync } from 'fs';
+import { Vector3 } from 'three';
+import { BODIES, PAD_DIR } from '../src/constants.js';
+const snap = JSON.parse(readFileSync('logs/snapshots/booster-exp4.json', 'utf8'));
+const pos = new Vector3(...snap.pos);
+const u = pos.clone().normalize();
+const ang = Math.acos(Math.min(1, Math.max(-1, u.dot(PAD_DIR))));
+const pad_m = BODIES.kerbin.radius * ang;
+const alt = pos.length() - BODIES.kerbin.radius;
+console.log(JSON.stringify({ tag: snap.tag, landed: snap.landed, dead: snap.dead, alt, pad_m, pad_km: pad_m/1000, t: snap.t, nParts: snap.parts.length, fuel: snap.parts.reduce((s,p)=>s+(p.fuel||0),0) }));

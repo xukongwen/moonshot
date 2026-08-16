@@ -1,0 +1,81 @@
+{
+  "tag": "booster-exp1",
+  "t": 171.35999999999214,
+  "body": "kerbin",
+  "pos": [
+    600053.0910127698,
+    1.1696090125603307e-11,
+    0
+  ],
+  "vel": [
+    0,
+    0,
+    0
+  ],
+  "quat": [
+    0,
+    0,
+    -0.7071067811865475,
+    0.7071067811865475
+  ],
+  "throttle": 0,
+  "landed": true,
+  "dead": false,
+  "craft": "Booster Hop",
+  "parts": [
+    {
+      "key": "s52",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 3
+    },
+    {
+      "key": "s53",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 4
+    },
+    {
+      "key": "s54",
+      "fuel": 4148.557272904362,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "s55",
+      "fuel": 0,
+      "ignited": true,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 6
+    },
+    {
+      "key": "r56",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": true,
+      "alive": true,
+      "stackIndex": 5
+    },
+    {
+      "key": "r57",
+      "fuel": 0,
+      "ignited": false,
+      "chuteState": null,
+      "legsDown": null,
+      "alive": true,
+      "stackIndex": 5
+    }
+  ]
+}

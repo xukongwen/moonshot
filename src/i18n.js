@@ -115,6 +115,7 @@ export const STRINGS = {
     'flight.help.rcs': 'RCS translate (I/K fwd, J/L left, H/N up)',
     'flight.help.helpkey': 'this help',
     'flight.help.agent': 'toggle agent panel',
+    'flight.help.switchVessel': 'switch vessel',
     'agent.title': 'AGENT',
     'agent.toggle': 'Agent [O]',
     'agent.goal': 'GOAL',
@@ -176,6 +177,7 @@ export const STRINGS = {
     'body.duna': 'Duna',
 
     'msg.pad': '{name} on the pad. SPACE to ignite. H for controls.',
+    'msg.switchVessel': 'Controlling {name}',
     'msg.legsDeployed': 'Landing legs deployed',
     'msg.legsStowed': 'Landing legs stowed',
     'msg.chutesArmed': 'Parachutes armed',
@@ -323,6 +325,7 @@ export const STRINGS = {
     'flight.help.rcs': 'RCS 平移（I/K 前后，J/L 左右，H/N 上下）',
     'flight.help.helpkey': '本帮助',
     'flight.help.agent': '开关智能体面板',
+    'flight.help.switchVessel': '切换飞船',
     'agent.title': '智能体',
     'agent.toggle': '智能体 [O]',
     'agent.goal': '目标',
@@ -384,6 +387,7 @@ export const STRINGS = {
     'body.duna': '火星',
 
     'msg.pad': '{name} 已在发射台。空格点火。H 查看操作。',
+    'msg.switchVessel': '控制 {name}',
     'msg.legsDeployed': '着陆架已展开',
     'msg.legsStowed': '着陆架已收起',
     'msg.chutesArmed': '降落伞已预开',

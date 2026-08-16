@@ -3,7 +3,7 @@
 // Ejection phase is the hyperbolic asymptote, not geometric midnight.
 
 import { Vector3 } from 'three';
-import { BODIES, getBodyState, getRelativeState } from './constants.js';
+import { BODIES, getBodyState, getRelativeState, PAD_DIR } from './constants.js';
 import { computeSections } from './vessel.js';
 import {
   elementsFromState, propagate, timeToPeriapsis, timeToApoapsis,
@@ -12,6 +12,7 @@ import {
 } from './orbits.js';
 import { physicsStep, checkSOI } from './physics.js';
 import { heightAt } from './terrain.js';
+import { density } from './aero.js';
 import {
   angleDiff, coastRailsOnState, destForNode, dropToLander, fuelLeft,
   lightTransferOnly, orbitCheck, pointState, readFlightCheck, roleEngines,
@@ -643,7 +644,10 @@ function deorbitToSurface(st, bodyName, peTarget, hooks) {
   }
 }
 
-function poweredDescent(st, bodyName, { useChutes = false, brakeFrac = 0.45 } = {}) {
+function poweredDescent(st, bodyName, {
+  useChutes = false, brakeFrac = 0.45,
+  horizKillAgl = 2000, steerPad = false, vertReserveKg = 0,
+} = {}) {
   const body = BODIES[bodyName];
   for (const p of st.parts) {
     if (p.def?.legs) p.legsDown = true;
@@ -655,7 +659,8 @@ function poweredDescent(st, bodyName, { useChutes = false, brakeFrac = 0.45 } = 
   }
   lightLander(st);
   let landedEv = null;
-  for (let i = 0; i < 120_000 && !landedEv; i++) {
+  let crashEv = null;
+  for (let i = 0; i < 120_000 && !landedEv && !crashEv; i++) {
     const u = st.pos.clone().normalize();
     const r = st.pos.length();
     const aglNow = r - body.radius - heightAt(bodyName, u) - (st.massProps?.comY ?? 0);
@@ -674,24 +679,342 @@ function poweredDescent(st, bodyName, { useChutes = false, brakeFrac = 0.45 } = 
     if (useChutes && chuteOut && speed < 10 && aglNow < 400) {
       pointState(st, u);
       st.throttle = 0;
-    } else if (vH.length() > 4 && aglNow > 2000) {
-      pointState(st, vH.clone().negate().addScaledVector(u, vH.length() * 0.25));
+    } else if (vH.length() > 4 && aglNow > horizKillAgl) {
+      let aim = vH.clone().negate().addScaledVector(u, vH.length() * 0.25);
+      if (steerPad && st.body === 'kerbin') aim.addScaledVector(padAim(st), Math.min(80, vH.length()));
+      pointState(st, aim);
       st.throttle = 1;
     } else if (speed > vAllow || (aglNow < 400 && speed > 8)) {
-      pointState(st, st.vel.clone().negate());
+      let aim = st.vel.clone().negate();
+      if (steerPad && st.body === 'kerbin' && fuelLeft(st) > vertReserveKg && padDistanceM(st) > 800) {
+        aim.addScaledVector(padAim(st), 0.28 * Math.max(1, aim.length()));
+      }
+      pointState(st, aim);
       st.throttle = 1;
     } else {
       pointState(st, u);
       st.throttle = aglNow < 80 && speed > 3 ? 0.25 : 0;
     }
     const evs = physStep(st, aglNow < 2000 ? 0.04 : 0.08);
-    landedEv = evs.find((ev) => ev.type === 'landed');
+    landedEv = evs.find((ev) => ev.type === 'landed') || landedEv;
+    crashEv = evs.find((ev) => ev.type === 'crashed') || crashEv;
     if (st.landed) break;
     if (st.dead) break;
   }
   st.throttle = 0;
-  return { landed: !!st.landed && st.body === bodyName && !st.dead };
+  return {
+    landed: !!st.landed && st.body === bodyName && !st.dead,
+    speed: landedEv?.speed ?? crashEv?.speed ?? null,
+    water: landedEv?.water ?? false,
+    crashed: !!crashEv || !!st.dead,
+  };
 }
+
+
+/** Great-circle metres from the Kerbin pad (PAD_DIR). */
+export function padDistanceM(st) {
+  if (!st?.pos || st.body !== 'kerbin') return null;
+  return padDistanceAt(st.pos);
+}
+
+function padDistanceAt(pos) {
+  if (!pos) return null;
+  const u = pos.clone().normalize();
+  const ang = Math.acos(Math.min(1, Math.max(-1, u.dot(PAD_DIR))));
+  return BODIES.kerbin.radius * ang;
+}
+
+/** Horizontal velocity toward the pad. Positive = coming home. */
+export function vTowardPad(st) {
+  if (!st?.pos || !st?.vel) return 0;
+  const u = st.pos.clone().normalize();
+  const vUp = st.vel.dot(u);
+  const vH = st.vel.clone().addScaledVector(u, -vUp);
+  const toPad = PAD_DIR.clone().addScaledVector(u, -PAD_DIR.dot(u));
+  if (toPad.lengthSq() < 1e-12) return 0;
+  return vH.dot(toPad.normalize());
+}
+
+function padAim(st) {
+  const u = st.pos.clone().normalize();
+  const toPad = PAD_DIR.clone().addScaledVector(u, -PAD_DIR.dot(u));
+  if (toPad.lengthSq() < 1e-12) return st.vel.clone().negate();
+  return toPad.normalize();
+}
+
+/**
+ * Cheap ballistic (gravity + drag, no thrust). Used to aim boostback at the
+ * pad instead of guessing a leftover vH. Not a second physics engine — just
+ * an impact estimate.
+ */
+export function predictBallisticImpact(st, { dt = 0.35, maxS = 600 } = {}) {
+  if (!st?.pos || !st?.vel) return { ok: false, pad_m: null };
+  const body = BODIES[st.body] || BODIES.kerbin;
+  const pos = st.pos.clone();
+  const vel = st.vel.clone();
+  const m = Math.max(1, st.massProps?.m ?? 1);
+  const cda = (st.massProps?.dragArea ?? 2.5) * 0.8;
+  const comY = st.massProps?.comY ?? 0;
+  let t = 0;
+  const g = new Vector3();
+  const drag = new Vector3();
+  const u = new Vector3();
+  for (let i = 0; i < 40_000; i++) {
+    const r = pos.length();
+    if (r < 10) break;
+    u.copy(pos).multiplyScalar(1 / r);
+    const alt = r - body.radius;
+    const th = alt < 95_000 ? heightAt(st.body, u) : 0;
+    const agl = alt - th - comY;
+    const vUp = vel.dot(u);
+    if (agl <= 0 && vUp <= 0) {
+      return {
+        ok: true,
+        t,
+        pad_m: padDistanceAt(pos),
+        speed_ms: vel.length(),
+        water: st.body === 'kerbin' && th <= 1,
+        alt_m: alt,
+      };
+    }
+    if (t >= maxS) break;
+    const rho = density(st.body, alt);
+    g.copy(pos).multiplyScalar(-body.mu / (r * r * r));
+    drag.set(0, 0, 0);
+    const speed = vel.length();
+    if (rho > 0 && speed > 0.01) {
+      const q = 0.5 * rho * speed * speed;
+      drag.copy(vel).multiplyScalar(-q * cda / speed / m);
+    }
+    vel.addScaledVector(g, dt).add(drag.multiplyScalar(dt));
+    pos.addScaledVector(vel, dt);
+    t += dt;
+  }
+  return { ok: false, t, pad_m: null };
+}
+
+/**
+ * Flip toward the pad and burn Titan to kill / reverse downrange velocity.
+ * Attitude is cheated; fuel and physics stay real. Stops when the remaining
+ * horizontal velocity away from the pad is small, fuel hits a landing reserve,
+ * or (opt-in) a cheap ballistic impact is near the pad.
+ */
+export function runBoostback(st, {
+  landReserveKg = 3000,
+  vAwayStop = 40,
+  maxS = 80,
+  dt = 0.08,
+  impactPadM = null,
+  aimDown = 0,
+} = {}) {
+  const fuel0 = fuelLeft(st);
+  const v0 = st.vel.clone();
+  const t0 = st.t;
+  const toward0 = vTowardPad(st);
+  const pred0 = impactPadM != null ? predictBallisticImpact(st) : null;
+  let reason = 'timeout';
+  let bestPred = pred0?.ok ? pred0.pad_m : null;
+  let lastPred = bestPred;
+  const titan = (st.parts ?? []).find((p) => p.alive !== false && /Titan/.test(p.def?.name || ''));
+  if (titan && !titan.ignited) titan.ignited = true;
+  else if (!titan) lightLander(st);
+  st.throttle = 1;
+  for (let i = 0; i < 40_000 && !st.dead && !st.landed; i++) {
+    if (st.t - t0 > maxS) { reason = 'timeout'; break; }
+    const fuel = fuelLeft(st);
+    if (fuel <= landReserveKg) { reason = 'reserve'; break; }
+    if (impactPadM == null) {
+      const toward = vTowardPad(st);
+      const vAway = -toward;
+      if (vAway <= vAwayStop) { reason = 'v-toward'; break; }
+    } else if (i % 3 === 0 || (lastPred != null && lastPred < 25_000)) {
+      const pred = predictBallisticImpact(st);
+      if (pred.ok) {
+        lastPred = pred.pad_m;
+        if (pred.pad_m <= impactPadM) { reason = 'impact'; break; }
+        if (bestPred != null && pred.pad_m > bestPred + 600 && i > 6) {
+          reason = 'impact-min';
+          break;
+        }
+        if (bestPred == null || pred.pad_m < bestPred) bestPred = pred.pad_m;
+      }
+    }
+    const aim = padAim(st);
+    if (aimDown) aim.addScaledVector(st.pos.clone().normalize(), -aimDown);
+    pointState(st, aim);
+    st.throttle = 1;
+    physStep(st, dt);
+    if (fuelLeft(st) < 8) { reason = 'dry'; break; }
+  }
+  st.throttle = 0;
+  const pred1 = predictBallisticImpact(st);
+  return {
+    reason,
+    dt_s: st.t - t0,
+    dV_ms: st.vel.clone().sub(v0).length(),
+    fuelUsed_kg: fuel0 - fuelLeft(st),
+    fuelLeft_kg: fuelLeft(st),
+    vToward0_ms: toward0,
+    vToward_ms: vTowardPad(st),
+    pad_m: padDistanceM(st),
+    pred0_m: pred0?.ok ? pred0.pad_m : null,
+    pred_m: pred1.ok ? pred1.pad_m : lastPred,
+  };
+}
+
+/** Suicide burn on whatever is currently attached. No lander-only gate. */
+export function runPoweredDescent(st, bodyName, opts = {}) {
+  return poweredDescent(st, bodyName, opts);
+}
+
+/** Official Mun Express R4 profile. Not a Hauler pad claim. */
+export const BOOSTER_RECOVER_PROFILE = {
+  landReserveKg: 5150,
+  impactPadM: 3000,
+  aglStart: 5000,
+  brakeFrac: 0.72,
+};
+
+export function isTitanVessel(v) {
+  return !!(v?.st?.parts ?? []).some((p) => p.alive !== false && /Titan/.test(p.def?.name || ''));
+}
+
+export function findBoosterVessel(vessels, activeId) {
+  return (vessels ?? []).find((v) => v.id !== activeId && isTitanVessel(v)) ?? null;
+}
+
+export function markHeldTitans(vessels, exceptId) {
+  let n = 0;
+  for (const v of vessels ?? []) {
+    if (exceptId && v.id === exceptId) continue;
+    if (isTitanVessel(v)) {
+      v.held = true;
+      n += 1;
+    }
+  }
+  return n;
+}
+
+function aglOf(st) {
+  const body = BODIES[st.body];
+  if (!body || !st.pos) return null;
+  const u = st.pos.clone().normalize();
+  const alt = st.pos.length() - body.radius;
+  const th = alt < 95_000 ? heightAt(st.body, u) : 0;
+  return alt - th - (st.massProps?.comY ?? 0);
+}
+
+export function coastToAgl(st, aglStart) {
+  st.throttle = 0;
+  for (let i = 0; i < 50_000 && !st.dead && !st.landed; i++) {
+    const agl = aglOf(st);
+    const u = st.pos.clone().normalize();
+    const vUp = st.vel.dot(u);
+    pointState(st, st.vel.clone().negate());
+    if (agl != null && agl < aglStart && vUp < 80) break;
+    if (agl != null && agl < 1500) break;
+    const dt = agl != null && agl < 20_000 ? 0.06 : 0.14;
+    physStep(st, dt);
+  }
+}
+
+/** Boostback + suicide on the current state. Same muscles as R4 official. */
+export function recoverBoosterState(st, opts = {}) {
+  const profile = { ...BOOSTER_RECOVER_PROFILE, ...opts };
+  for (const p of st.parts ?? []) {
+    if (p.def?.legs) p.legsDown = true;
+  }
+  const titan = (st.parts ?? []).find((p) => p.alive !== false && /Titan/.test(p.def?.name || ''));
+  if (titan && !titan.ignited) titan.ignited = true;
+  const boostback = runBoostback(st, {
+    landReserveKg: profile.landReserveKg,
+    impactPadM: profile.impactPadM,
+    vAwayStop: -400,
+  });
+  coastToAgl(st, profile.aglStart);
+  const burn = runPoweredDescent(st, st.body || 'kerbin', {
+    useChutes: false,
+    brakeFrac: profile.brakeFrac,
+    horizKillAgl: 1e9,
+  });
+  return {
+    boostback,
+    burn,
+    pad_m: padDistanceM(st),
+    speed: burn.speed,
+    water: !!burn.water,
+    crashed: !!burn.crashed,
+    landed: !!burn.landed,
+    fuel_kg: fuelLeft(st),
+    dead: !!st.dead,
+  };
+}
+
+/**
+ * Switch to the dropped Titan, run boostback+suicide, return focus to the
+ * upper if it is still flying. ctrl: { vessels, activeId, st, setActive, setLegs?, refreshMass? }
+ */
+export function runRecoverMuscle(ctrl) {
+  const vessels = ctrl?.vessels ?? [];
+  const activeId = ctrl?.activeId;
+  let booster = findBoosterVessel(vessels, activeId);
+  if (!booster && isTitanVessel(vessels.find((v) => v.id === activeId))) {
+    booster = vessels.find((v) => v.id === activeId);
+  }
+  if (!booster) {
+    return { ok: false, reason: 'no-booster' };
+  }
+  const upperId = booster.id === activeId
+    ? (vessels.find((v) => v.id !== booster.id && !isTitanVessel(v))?.id ?? null)
+    : activeId;
+  booster.held = false;
+  if (typeof ctrl.setActive === 'function' && ctrl.activeId !== booster.id) {
+    ctrl.setActive(booster.id);
+  }
+  if (typeof ctrl.setLegs === 'function') ctrl.setLegs(true);
+  else {
+    for (const p of (ctrl.st?.parts ?? booster.st.parts ?? [])) {
+      if (p.def?.legs) p.legsDown = true;
+    }
+  }
+  const st = ctrl.st ?? booster.st;
+  if (st.landed || st.dead) {
+    const already = {
+      ok: !st.dead,
+      already: true,
+      reason: st.dead ? 'dead' : 'already',
+      pad_m: padDistanceM(st),
+      speed: null,
+      water: false,
+      crashed: !!st.dead,
+      landed: !!st.landed,
+      fuel_kg: fuelLeft(st),
+      dead: !!st.dead,
+      boosterId: booster.id,
+      upperId,
+    };
+    if (upperId && typeof ctrl.setActive === 'function') {
+      const upper = vessels.find((v) => v.id === upperId);
+      if (upper && !upper.st.dead && !upper.st.landed) ctrl.setActive(upperId);
+    }
+    return already;
+  }
+  const out = recoverBoosterState(st);
+  if (typeof ctrl.refreshMass === 'function') ctrl.refreshMass();
+  if (upperId && typeof ctrl.setActive === 'function') {
+    const upper = vessels.find((v) => v.id === upperId);
+    if (upper && !upper.st.dead && !upper.st.landed) ctrl.setActive(upperId);
+  }
+  const ok = !out.crashed && !out.dead && out.landed;
+  return {
+    ok,
+    reason: ok ? (out.water ? 'water' : 'land') : (out.crashed || out.dead ? 'crashed' : 'not-landed'),
+    ...out,
+    boosterId: booster.id,
+    upperId,
+  };
+}
+
 
 export function runLandMuscle(st, ctrl = null, opts = {}) {
   if (!st || st.dead) return { ok: false, reason: 'dead', check: readFlightCheck(st) };

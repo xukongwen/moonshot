@@ -4,7 +4,7 @@
 import { Vector3, Quaternion } from 'three';
 import { STOCK } from '../src/stock.js';
 import { BODIES, getBodyState, getRelativeState, PAD_DIR, PAD_ALTITUDE } from '../src/constants.js';
-import { buildVesselParts, buildStagePlan, stackGeometry, computeSections, massProps } from '../src/vessel.js';
+import { buildVesselParts, buildStagePlan, stackGeometry, computeSections, massProps, designFromParts, droppedStageOffset, droppedStageName } from '../src/vessel.js';
 import { physicsStep, checkSOI } from '../src/physics.js';
 import { elementsFromState, propagate, findMunEncounter, munTransferPhase, stateFromKepler } from '../src/orbits.js';
 import { heightAt } from '../src/terrain.js';
@@ -38,6 +38,7 @@ function serializeEvent(ev) {
   if (ev.body) out.body = ev.body;
   if (ev.water != null) out.water = ev.water;
   if (ev.part?.def?.name) out.part = ev.part.def.name;
+  if (ev.vesselId) out.vesselId = ev.vesselId;
   return out;
 }
 
@@ -340,6 +341,52 @@ export class SimSession {
     return { target: this.targetId, ...this.telemetry() };
   }
 
+  /** Command a vessel already in the session. Does not teleport. */
+  setActive(id) {
+    const v = this.vesselById(String(id));
+    if (!v) throw new Error(`Unknown vessel "${id}"`);
+    v.held = false;
+    this.activeId = v.id;
+    return { activeId: this.activeId, ...this.telemetry() };
+  }
+
+  /**
+   * Turn a jettisoned stack into a flyable vessel. Same part objects
+   * (fuel / ignited / legs stay). Radial SRBs stay discarded.
+   */
+  spawnDropped(removed, parentSt) {
+    if (!removed?.length) return null;
+    const offset = droppedStageOffset(parentSt, removed);
+    const Y = new Vector3(0, 1, 0);
+    const nose = Y.clone().applyQuaternion(parentSt.quat);
+    const name = droppedStageName(removed);
+    const design = designFromParts(removed, name);
+    const st = makeState({
+      parts: removed,
+      body: parentSt.body,
+      pos: parentSt.pos.clone().addScaledVector(nose, offset.alongNose),
+      vel: parentSt.vel.clone().addScaledVector(nose, offset.kick),
+      quat: parentSt.quat.clone(),
+      t: parentSt.t,
+      landed: false,
+    });
+    st.sas = true;
+    st.sasMode = 'hold';
+    st.sasTarget.copy(st.quat);
+    const id = `stage-${this._idSeq++}`;
+    const vessel = {
+      id,
+      name,
+      design,
+      st,
+      plan: buildStagePlan(removed),
+      stageIdx: 0,
+      liftedOff: true,
+    };
+    this.vessels.push(vessel);
+    return vessel;
+  }
+
   setTranslate({ x, y, z } = {}) {
     this.requireFlight();
     const tr = this.st.translate ?? (this.st.translate = { x: 0, y: 0, z: 0 });
@@ -639,7 +686,12 @@ export class SimSession {
       this.stageIdx = this.plan.length;
       return { staged: null, message: 'No remaining stages', ...this.telemetry() };
     }
-    if (ev.decouple !== null) st.parts = st.parts.filter((p) => p.stackIndex < ev.decouple);
+    let dropped = null;
+    if (ev.decouple !== null) {
+      const removed = st.parts.filter((p) => p.stackIndex >= ev.decouple);
+      st.parts = st.parts.filter((p) => p.stackIndex < ev.decouple);
+      dropped = this.spawnDropped(removed, st);
+    }
     for (const k of ev.dropRadials) st.parts = st.parts.filter((p) => p.key !== k);
     for (const k of ev.ignite) {
       const p = st.parts.find((q) => q.key === k);
@@ -658,6 +710,8 @@ export class SimSession {
       ignite: names || null,
       decouple: ev.decouple,
       dropRadials: ev.dropRadials.length,
+      droppedId: dropped?.id ?? null,
+      droppedName: dropped?.name ?? null,
       ...this.telemetry(),
     };
   }
@@ -764,7 +818,7 @@ export class SimSession {
 
   consumeEvents(v, evs, collected) {
     for (const ev of evs) {
-      collected.push(serializeEvent(ev));
+      collected.push(serializeEvent({ ...ev, vesselId: v.id }));
       if (ev.type === 'liftoff') v.liftedOff = true;
       if (ev.type === 'crashed') v.st.dead = true;
       if (ev.type === 'overheat' && ev.part?.def?.pod) v.st.dead = true;
@@ -806,6 +860,7 @@ export class SimSession {
     for (const v of this.vessels) {
       if (this.weld && v.id === this.weld.b) continue;
       const isActive = v.id === this.activeId;
+      if (!isActive && v.held) continue;
       if (!isActive) {
         v.st.throttle = 0;
         v.st.translate = { x: 0, y: 0, z: 0 };

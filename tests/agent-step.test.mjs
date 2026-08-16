@@ -105,6 +105,7 @@ console.log('4. applyGoal + completeNode + muscleKind');
   const r = applyGoal('登月回来', STOCK['Mun Express']);
   check('mun first ascent', r.nodes[0].id === 'ascent');
   check('tli is real', muscleKind('tli') === 'real');
+  check('recover is real', muscleKind('recover') === 'real');
   check('ascent real', muscleKind('ascent') === 'real');
   check('jettison real', muscleKind('jettison') === 'real');
   check('window real', muscleKind('window') === 'real');
@@ -116,8 +117,12 @@ console.log('4. applyGoal + completeNode + muscleKind');
   check('home real', muscleKind('home') === 'real');
   let s = createState({ nodes: r.nodes, nodeId: 'ascent', missionId: r.missionId, goal: r.goal });
   s = completeNode(s, 'ascent');
-  check('after ascent → window', s.nodeId === 'window');
-  check('currentNode', currentNode(s).id === 'window');
+  check('after ascent → recover', s.nodeId === 'recover', s.nodeId);
+  check('currentNode recover', currentNode(s).id === 'recover');
+  check('recover label', currentNode(s).label === '回收助推', currentNode(s).label);
+  s = completeNode(s, 'recover');
+  check('after recover → window', s.nodeId === 'window');
+  check('currentNode window', currentNode(s).id === 'window');
 }
 
 console.log('5. dropToLander does not mutate design');
@@ -219,6 +224,22 @@ console.log('9. muscleKind real + lightTransferOnly refuse + asymptote helper');
     body: 'kerbin', orbitText: '80 × 90 km', fuelKg: 6000,
   }, { reason: 'vinf-low', vInf: 796, vInfTarget: 918, transferFuelKg: 0 }, 'zh');
   check('escape-fail thought has v∞', /v∞\s*796/.test(escFail), escFail);
+}
+
+console.log('10. recover thought uses real pad/speed, invents none');
+{
+  const ok = thoughtFromCheck('recover-ok', { fuelKg: 12 }, { pad_m: 2170, speed: 9.31, fuel_kg: 0, water: false }, 'zh');
+  check('recover thought has 2.17', ok.includes('2.17'), ok);
+  check('recover thought has 9.31', ok.includes('9.31'), ok);
+  check('recover thought 离垫', ok.includes('离垫'), ok);
+  check('recover thought 触地', ok.includes('触地'), ok);
+  check('recover thought no 上垫', !ok.includes('上垫') && !ok.includes('八角'), ok);
+  const noPad = thoughtFromCheck('recover-ok', {}, { speed: 8.2, fuel_kg: 10 }, 'zh');
+  check('no pad does not invent km', !/\d+(\.\d+)?\s*km/.test(noPad), noPad);
+  check('no pad still has speed', noPad.includes('8.20') || noPad.includes('8.2'), noPad);
+  const fail = thoughtFromCheck('recover-fail', {}, { reason: 'no-booster' }, 'zh');
+  check('no-booster honest', fail.includes('没有扔下的助推'), fail);
+  check('no-booster no fake km', !/\d+(\.\d+)?\s*km/.test(fail), fail);
 }
 
 if (failures) {

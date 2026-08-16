@@ -127,6 +127,11 @@ export const PARTS = {
     legs: { safeSpeed: 12 }, radial: true, dragArea: 0.2, maxTemp: 1400, shape: 'legs',
     desc: 'Touch down at up to 12 m/s. Radial attach, toggle with G.',
   },
+  'legs-xl': {
+    name: 'LT-25 Heavy Landing Legs ×4', category: 'Utility', size: 2.5, mass: 500, length: 3.8,
+    legs: { safeSpeed: 12 }, radial: true, dragArea: 0.45, maxTemp: 1400, shape: 'legs-xl',
+    desc: 'Booster recovery legs for 2.5 m stacks. Radial attach, toggle with G. Same 12 m/s limit as LT-2.',
+  },
   'heat-shield': {
     name: 'AB-1 Heat Shield', category: 'Utility', size: 1.25, mass: 300, length: 0.3,
     shield: { ablator: 200 }, dragArea: 0.7, maxTemp: 3400, shape: 'shield',

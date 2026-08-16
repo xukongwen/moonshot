@@ -1,6 +1,6 @@
 ---
 title: flight-planning
-updated: 2026-08-15
+updated: 2026-08-16
 status: active
 tags: [flight, dv, planning]
 ---
@@ -13,7 +13,7 @@ Score a craft against a mission dV budget before ignition. If it fails, redesign
 
 ## 当前判断
 
-Implementation started. 22 parts (added R-40 Raven). No planet-size change. No Ike/Jool. No invented telemetry.
+Implementation started. 23 parts (added LT-25 `legs-xl`). No planet-size change. No Ike/Jool. No invented telemetry.
 
 Layer 1 lives in src/plan.js:
 

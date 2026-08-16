@@ -60,6 +60,12 @@ export class Autopilot {
     const evs = tlm?.events || [];
     for (const ev of evs) {
       this.events.push({ ...ev, t: this.st.t, body: this.st.body });
+      if (ev.vesselId && ev.vesselId !== this.session.activeId) {
+        if (ev.type === 'crashed') {
+          this.log(`  other ${ev.vesselId} crashed at ${Number(ev.speed).toFixed(1)} m/s`);
+        }
+        continue;
+      }
       if (ev.type === 'landed') {
         this.touchdowns.push({
           body: this.st.body,

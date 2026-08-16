@@ -34,6 +34,7 @@ export const DEMO_NODES_EN = [
 
 export const MUN_NODES_ZH = [
   { id: 'ascent', label: '入轨' },
+  { id: 'recover', label: '回收助推' },
   { id: 'window', label: '等窗口' },
   { id: 'tli', label: 'TLI' },
   { id: 'coast', label: '滑行' },
@@ -46,6 +47,7 @@ export const MUN_NODES_ZH = [
 
 export const MUN_NODES_EN = [
   { id: 'ascent', label: 'Insertion' },
+  { id: 'recover', label: 'Recover booster' },
   { id: 'window', label: 'Wait window' },
   { id: 'tli', label: 'TLI' },
   { id: 'coast', label: 'Coast' },

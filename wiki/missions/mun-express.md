@@ -13,7 +13,7 @@ tags: [mission, mun]
 
 ## 当前判断
 
-库存 Mun Express：短着陆器是 pod + chute + heat-shield + tank-m + tank-s + Kestrel，腿在着陆器罐和返回舱。
+库存 Mun Express：短着陆器是 pod + chute + heat-shield + tank-m + tank-s + Kestrel，腿在着陆器罐和返回舱；Titan 段最下一节 XL 也有 LT-2（助推回收 R2）。
 低 Mun 轨道先丢掉 Sparrow 转移级，再动力下降。不要在 Sparrow 上着陆再分离。
 
 tests/mun-return.test.mjs 一次通过（数字以 logs/mun-return-result.json 为准）：

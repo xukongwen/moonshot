@@ -23,8 +23,41 @@ function cyl(rTop, rBot, h, color, seg = 24) {
   return new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBot, h, seg), mat(color));
 }
 
-/** Build one part's mesh subtree, centred at origin. */
-export function buildPartMesh(p) {
+/** Flat trapezoid blade: thin in X (radial), wide in Z (tangent), long in -Y. */
+function taperedBlade(w0, w1, len, thick, color, opts = {}) {
+  const hw0 = w0 / 2, hw1 = w1 / 2, ht = thick / 2;
+  const verts = new Float32Array([
+    -ht, 0, -hw0,   ht, 0, -hw0,   ht, 0, hw0,   -ht, 0, hw0,
+    -ht, -len, -hw1, ht, -len, -hw1, ht, -len, hw1, -ht, -len, hw1,
+  ]);
+  const idx = [
+    1, 2, 6, 1, 6, 5,
+    3, 0, 4, 3, 4, 7,
+    0, 1, 5, 0, 5, 4,
+    2, 3, 7, 2, 7, 6,
+    0, 3, 2, 0, 2, 1,
+    4, 5, 6, 4, 6, 7,
+  ];
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.BufferAttribute(verts, 3));
+  geo.setIndex(idx);
+  geo.computeVertexNormals();
+  return new THREE.Mesh(geo, mat(color, opts));
+}
+
+/** Authored radial ring for 1.25 m stacks (hostR = 0.625). */
+const DESIGN_HOST_R = 0.625;
+
+function isWideHost(hostR) {
+  return hostR > DESIGN_HOST_R + 1e-9;
+}
+
+/** Place a radial ring just outside the host tank. 1.25 m keeps the authored radius. */
+export function radialAttachR(designedR, hostR, clearance = 0.08) {
+  return isWideHost(hostR) ? hostR + clearance : designedR;
+}
+
+export function buildPartMesh(p, hostR = DESIGN_HOST_R) {
   const d = p.def;
   const r = d.size / 2, L = d.length;
   const g = new THREE.Group();
@@ -74,10 +107,11 @@ export function buildPartMesh(p) {
       break;
     }
     case 'fins': {
+      const attachR = radialAttachR(0.3, hostR, 0.12);
       for (let i = 0; i < 4; i++) {
         const fin = new THREE.Mesh(new THREE.BoxGeometry(0.06, L, 0.55), mat(REDDISH));
         const a = (i / 4) * Math.PI * 2;
-        fin.position.set(Math.cos(a) * 0.3, 0, Math.sin(a) * 0.3);
+        fin.position.set(Math.cos(a) * attachR, 0, Math.sin(a) * attachR);
         fin.rotation.y = -a;
         g.add(fin);
       }
@@ -105,6 +139,8 @@ export function buildPartMesh(p) {
       break;
     }
     case 'legs': {
+      // LT-2: small lander legs. Authored for 1.25 m — do not fatten on XL hosts.
+      const attachR = radialAttachR(0.62, hostR, 0.08);
       for (let i = 0; i < 4; i++) {
         const leg = new THREE.Group();
         const strut = new THREE.Mesh(new THREE.BoxGeometry(0.09, L, 0.09), mat(GRAY));
@@ -113,10 +149,103 @@ export function buildPartMesh(p) {
         foot.position.y = -L;
         leg.add(strut, foot);
         const a = (i / 4) * Math.PI * 2 + Math.PI / 4;
-        leg.position.set(Math.cos(a) * 0.62, L * 0.4, Math.sin(a) * 0.62);
+        leg.position.set(Math.cos(a) * attachR, L * 0.4, Math.sin(a) * attachR);
         leg.userData.axis = new THREE.Vector3(-Math.sin(a), 0, Math.cos(a));
-        leg.userData.stowAngle = 1.25;     // folded against the hull
-        leg.userData.deployAngle = -0.32;  // splayed out
+        leg.userData.stowAngle = 1.25;
+        leg.userData.deployAngle = -0.32;
+        leg.userData.strutLen = L;
+        leg.userData.attachR = attachR;
+        leg.userData.footR = 0.17;
+        leg.name = `leg${i}`;
+        g.add(leg);
+      }
+      break;
+    }
+    case 'legs-xl': {
+      // LT-25: Falcon 9 recovery legs — wide cream carbon blade + helium ram + crush pad.
+      // Real F9: carbon/Al honeycomb, stowed along the tank, deploy out-and-down.
+      const attachR = hostR + 0.08;
+      const strutLen = L;
+      const footR = 0.72;
+      const attachY = -1.35;
+      const CARBON = 0xcfc6b6;
+      const EDGE = 0xb7ae9e;
+      const GROOVE = 0x8f877c;
+      const RAM = 0xd4dae0;
+      const SHOE = 0x1a1c20;
+      for (let i = 0; i < 4; i++) {
+        const a = (i / 4) * Math.PI * 2;
+        const ca = Math.cos(a), sa = Math.sin(a);
+
+        const mount = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.42, 0.55), mat(DARK));
+        mount.position.set(ca * attachR, attachY, sa * attachR);
+        mount.rotation.y = -a;
+        g.add(mount);
+        const hinge = cyl(0.11, 0.11, 0.52, 0x2a2e34, 10);
+        hinge.rotation.x = Math.PI / 2;
+        hinge.position.set(ca * attachR, attachY, sa * attachR);
+        hinge.rotation.y = -a;
+        g.add(hinge);
+
+        const leg = new THREE.Group();
+        const visual = new THREE.Group();
+        visual.rotation.y = -a; // +X radial out, +Z tangent — deploy rotates around tangent
+
+        const blade = taperedBlade(0.98, 0.40, strutLen * 0.96, 0.07, CARBON);
+        visual.add(blade);
+        const railL = taperedBlade(0.10, 0.07, strutLen * 0.96, 0.10, EDGE);
+        railL.position.z = 0.44;
+        const railR = taperedBlade(0.10, 0.07, strutLen * 0.96, 0.10, EDGE);
+        railR.position.z = -0.44;
+        visual.add(railL, railR);
+        const groove = taperedBlade(0.22, 0.12, strutLen * 0.72, 0.04, GROOVE);
+        groove.position.set(-0.03, -strutLen * 0.04, 0);
+        visual.add(groove);
+
+        const ram = cyl(0.045, 0.055, strutLen * 0.70, RAM, 10);
+        ram.material = mat(RAM, { metal: 0.72, rough: 0.28 });
+        ram.position.set(-0.08, -strutLen * 0.38, 0);
+        visual.add(ram);
+        const ramTip = cyl(0.035, 0.035, 0.18, 0x9aa3ab, 8);
+        ramTip.position.set(-0.08, -strutLen * 0.74, 0);
+        visual.add(ramTip);
+
+        // Last boom section = replaceable Al honeycomb crush core (real F9).
+        const boomTip = cyl(0.13, 0.17, 0.42, DARK, 10);
+        boomTip.position.y = -strutLen + 0.28;
+        const joint = new THREE.Mesh(new THREE.SphereGeometry(0.12, 10, 8), mat(0x2a2e34, { metal: 0.55, rough: 0.35 }));
+        joint.position.y = -strutLen + 0.06;
+        visual.add(boomTip, joint);
+
+        // Pad is articulated: cancel deployAngle so the shoe sits flat on the deck.
+        const shoe = new THREE.Group();
+        shoe.position.y = -strutLen;
+        shoe.rotation.z = -0.88;
+        const foot = new THREE.Mesh(
+          new THREE.CylinderGeometry(footR, footR * 1.04, 0.20, 16),
+          mat(SHOE, { rough: 0.82, metal: 0.12 }),
+        );
+        const lip = new THREE.Mesh(
+          new THREE.CylinderGeometry(footR * 1.10, footR * 1.10, 0.05, 16),
+          mat(0x0c0d10),
+        );
+        lip.position.y = -0.11;
+        const core = new THREE.Mesh(
+          new THREE.CylinderGeometry(footR * 0.62, footR * 0.62, 0.06, 8),
+          mat(0x3a3e44, { metal: 0.2, rough: 0.7 }),
+        );
+        core.position.y = 0.08;
+        shoe.add(foot, lip, core);
+        visual.add(shoe);
+
+        leg.add(visual);
+        leg.position.set(ca * attachR, attachY, sa * attachR);
+        leg.userData.axis = new THREE.Vector3(-sa, 0, ca);
+        leg.userData.stowAngle = 2.98;
+        leg.userData.deployAngle = 0.88;
+        leg.userData.strutLen = strutLen;
+        leg.userData.attachR = attachR;
+        leg.userData.footR = footR;
         leg.name = `leg${i}`;
         g.add(leg);
       }
@@ -156,10 +285,10 @@ export function buildVesselGroup(parts) {
 
   for (const p of parts) {
     if (!p.alive) continue;
-    const mesh = buildPartMesh(p);
     const y = partY(geom, p);
 
     if (p.kind === 'stack') {
+      const mesh = buildPartMesh(p);
       mesh.position.y = y;
       group.add(mesh);
       meshByKey.set(p.key, mesh);
@@ -172,18 +301,18 @@ export function buildVesselGroup(parts) {
     } else {
       // radial attachments
       const host = parts.find((q) => q.kind === 'stack' && q.stackIndex === p.stackIndex && q.alive);
-      const hostR = host ? host.def.size / 2 : 0.625;
+      const hostR = host ? host.def.size / 2 : DESIGN_HOST_R;
+      const mesh = buildPartMesh(p, hostR);
       const wrap = new THREE.Group();
       const positions = [];
       if (p.def.fins || p.def.legs) {
-        // these parts are full ×4 sets that radiate from the stack axis
+        // ×4 sets authored for 1.25 m; buildPartMesh places them on the host skin
         mesh.position.y = y;
-        mesh.scale.setScalar(1 + (hostR - 0.625) * 0.6);
         wrap.add(mesh);
       } else {
         for (let i = 0; i < p.sym; i++) {
           const a = (i / p.sym) * Math.PI * 2;
-          const inst = i === 0 ? mesh : buildPartMesh(p);
+          const inst = i === 0 ? mesh : buildPartMesh(p, hostR);
           const offset = hostR + p.def.size / 2;
           inst.position.set(Math.cos(a) * offset, y, Math.sin(a) * offset);
           wrap.add(inst);

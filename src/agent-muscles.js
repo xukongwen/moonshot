@@ -75,15 +75,49 @@ export function pointState(st, dir) {
   if (st.sasTarget?.copy) st.sasTarget.copy(st.quat);
 }
 
+/**
+ * Titan leftover when we drop the lifter. Not a full extra XL (16000 kg).
+ * Measured 2026-08-16: 3-XL Mun Express can spare 8.5 t and still circularize
+ * (72×138); 8 t left the booster 30 km short of a survivable pad-aim.
+ * 8-XL Duna Hauler misses LKO at 8 t (−293×21) and can only spare 5 t.
+ */
+export const LIFTER_RESERVE_KG = 8500;
+export const LIFTER_RESERVE_HEAVY_KG = 5000;
+
+export function sectionLiquidFuel(st, stackIndex) {
+  const secs = computeSections(st.parts);
+  const sec = secs.get(stackIndex);
+  return (st.parts ?? [])
+    .filter((p) => p.alive !== false && p.def?.fuel && !p.def.engine
+      && secs.get(p.stackIndex) === sec)
+    .reduce((s, p) => s + (p.fuel || 0), 0);
+}
+
+export function lifterFuelKg(st) {
+  const titan = (st.parts ?? []).find((p) => p.alive !== false && /Titan/.test(p.def?.name || ''));
+  if (!titan) return 0;
+  return sectionLiquidFuel(st, titan.stackIndex);
+}
+
+export function lifterReserveKg(st) {
+  const titan = (st.parts ?? []).find((p) => p.alive !== false && /Titan/.test(p.def?.name || ''));
+  if (!titan) return LIFTER_RESERVE_KG;
+  const secs = computeSections(st.parts);
+  const sec = secs.get(titan.stackIndex);
+  const nXl = (st.parts ?? []).filter((p) => p.alive !== false && p.def?.name === 'FT-3200 Tank'
+    && secs.get(p.stackIndex) === sec).length;
+  return nXl >= 6 ? LIFTER_RESERVE_HEAVY_KG : LIFTER_RESERVE_KG;
+}
+
 export function shouldStageDry(st, plan, stageIdx, { allowLander = true } = {}) {
   const srb = (st.parts ?? []).find((p) => p.def?.engine?.srb);
   if (srb && srb.fuel <= 1) return { stage: true, reason: 'SRBs dry' };
   const lit = (st.parts ?? []).find((p) => p.ignited && p.alive && p.def?.engine && !p.def.engine.srb);
   if (!lit) return { stage: false };
-  const secs = computeSections(st.parts);
-  const feed = st.parts.some((p) => p.def.fuel && !p.def.engine && p.fuel > 0.5
-    && secs.get(p.stackIndex) === secs.get(lit.stackIndex));
-  if (feed) return { stage: false };
+  const feedKg = sectionLiquidFuel(st, lit.stackIndex);
+  const titanLit = /Titan/.test(lit.def?.name || '');
+  const keep = titanLit ? lifterReserveKg(st) : 0.5;
+  if (feedKg > keep) return { stage: false };
   const nxt = plan?.[stageIdx];
   if (!nxt?.ignite?.length) return { stage: false };
   if (!allowLander) {
@@ -93,7 +127,7 @@ export function shouldStageDry(st, plan, stageIdx, { allowLander = true } = {}) 
     const landerEng = engines[0];
     if (landerEng && nxt.ignite.includes(landerEng.key)) return { stage: false };
   }
-  return { stage: true, reason: 'stage dry' };
+  return { stage: true, reason: titanLit ? 'lifter reserve' : 'stage dry' };
 }
 
 /**
@@ -202,11 +236,9 @@ export function ascentTick(st, opts = {}) {
 }
 
 export function maybeDropLaunchStage(st) {
-  const secs = computeSections(st.parts);
-  const spentTanks = !st.parts.some((p) => p.def.fuel && !p.def.engine && p.fuel > 0.5
-    && secs.get(p.stackIndex) === 0);
-  const booster = st.parts.find((p) => /Titan/.test(p.def?.name || ''));
-  return !!(booster && spentTanks);
+  const booster = (st.parts ?? []).find((p) => p.alive !== false && /Titan/.test(p.def?.name || ''));
+  if (!booster) return false;
+  return lifterFuelKg(st) <= lifterReserveKg(st);
 }
 
 export function vesselMunPhaseDeg(st) {

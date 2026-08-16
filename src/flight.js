@@ -14,7 +14,7 @@ import {
 } from './orbits.js';
 import { evaluateCapture, applyWeld, weldFromStates, placeFacingPorts } from './docking.js';
 import { physicsStep, checkSOI, stepDebris } from './physics.js';
-import { buildVesselParts, buildStagePlan, stackGeometry, computeSections, massProps, partY } from './vessel.js';
+import { buildVesselParts, buildStagePlan, stackGeometry, computeSections, massProps, partY, designFromParts, droppedStageOffset, droppedStageName } from './vessel.js';
 import { buildVesselGroup, buildPartMesh, setLegs, setCanopies } from './vesselviz.js';
 import { TerrainPatch, makePlanetTexture, heightAt } from './terrain.js';
 import {
@@ -566,6 +566,8 @@ export class Flight {
       this.keys[e.code] = true;
       switch (e.code) {
         case 'Space': e.preventDefault(); this.stage(); break;
+        case 'BracketLeft': e.preventDefault(); this.cycleVessel(-1); break;
+        case 'BracketRight': e.preventDefault(); this.cycleVessel(1); break;
         case 'KeyT': this.st.sas = !this.st.sas; this.st.sasTarget.copy(this.st.quat); break;
         case 'Digit1': this.st.sasMode = 'hold'; this.st.sasTarget.copy(this.st.quat); break;
         case 'Digit2': this.st.sasMode = 'prograde'; break;
@@ -702,6 +704,8 @@ export class Flight {
     this.sound.stage();
     st.geom = stackGeometry(st.parts);
     st.sections = computeSections(st.parts);
+    const cur = this.vesselById(this.activeId);
+    if (cur) cur.stageIdx = this.stageIndex;
     if (structuralChange) this.refreshViz(); // rebuild meshes without the jettisoned parts
     HUD.stages(this.plan, this.stageIndex, st.parts, st.sections);
   }
@@ -717,26 +721,66 @@ export class Flight {
     const st = this.st;
     const removed = st.parts.filter((p) => p.stackIndex >= idx);
     if (!removed.length) return;
+    const offset = droppedStageOffset(st, removed);
     st.parts = st.parts.filter((p) => p.stackIndex < idx);
 
-    const sub = buildVesselGroup(removed);
-    const len = sub.group.userData.geom.totalLength;
     const nose = this.nose();
-    // removed chunk was the bottom of the stack: its centre sits len/2 above the old bottom
-    const centerLocalY = len / 2;
-    const d = {
-      body: st.body,
-      pos: st.pos.clone().addScaledVector(nose, centerLocalY - st.massProps.comY),
-      vel: st.vel.clone().addScaledVector(nose, -2.5),
-      mass: removed.reduce((s, p) => s + p.def.mass * p.sym + p.fuel, 0),
-      cda: 2, spin: 0, dead: false,
-      group: sub.group, quat: st.quat.clone(),
-      axis: new THREE.Vector3().randomDirection(),
-      comOffset: centerLocalY,
+    const name = droppedStageName(removed);
+    const design = designFromParts(removed, name);
+    const geom = offset.geom;
+    const mp = offset.mp;
+    const bst = {
+      t: st.t, met: st.met, body: st.body,
+      pos: st.pos.clone().addScaledVector(nose, offset.alongNose),
+      vel: st.vel.clone().addScaledVector(nose, offset.kick),
+      quat: st.quat.clone(), angVel: new THREE.Vector3(),
+      throttle: 0, landed: false, dead: false,
+      parts: removed, geom, sections: computeSections(removed), massProps: mp,
+      controls: { pitch: 0, yaw: 0, roll: 0 },
+      translate: { x: 0, y: 0, z: 0 },
+      sas: true, sasMode: 'hold', sasTarget: st.quat.clone(),
+      elements: null,
     };
-    this.scene.add(d.group);
-    this.debris.push(d);
-    this.trimDebris();
+    if (!this.vessels) this.vessels = [];
+    const id = `stage-${this._idSeq++}`;
+    const vessel = {
+      id, name, design, st: bst,
+      plan: buildStagePlan(removed), stageIdx: 0, liftedOff: true,
+    };
+    this.vessels.push(vessel);
+    this.ensureOtherViz(vessel);
+  }
+
+  switchTo(id) {
+    const v = this.vesselById(id);
+    if (!v || v.id === this.activeId) return false;
+    v.held = false;
+    const cur = this.vesselById(this.activeId);
+    if (cur) {
+      cur.st = this.st;
+      cur.plan = this.plan;
+      cur.stageIdx = this.stageIndex;
+      cur.design = this.design;
+    }
+    this.activeId = v.id;
+    this.st = v.st;
+    this.plan = v.plan ?? buildStagePlan(v.st.parts);
+    this.stageIndex = v.stageIdx ?? 0;
+    this.design = v.design;
+    this.legsDeployed = v.st.parts.some((p) => p.legsDown);
+    this.refreshViz();
+    HUD.stages(this.plan, this.stageIndex, this.st.parts, this.st.sections);
+    HUD.msg(t('msg.switchVessel', { name: v.name || v.id }));
+    this.refreshHUD?.();
+    return true;
+  }
+
+  cycleVessel(dir) {
+    const list = this.vessels ?? [];
+    if (list.length < 2) return false;
+    const i = Math.max(0, list.findIndex((v) => v.id === this.activeId));
+    const n = (i + dir + list.length) % list.length;
+    return this.switchTo(list[n].id);
   }
 
   jettisonRadials(keys) {
@@ -840,6 +884,7 @@ export class Flight {
     const events = [];
     for (const v of this.vessels ?? []) {
       if (v.id === this.activeId) continue;
+      if (v.held) continue;
       if (this.weld && v.id === this.weld.b) continue;
       v.st.throttle = 0;
       v.st.translate = { x: 0, y: 0, z: 0 };

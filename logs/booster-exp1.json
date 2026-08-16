@@ -1,0 +1,123 @@
+{
+  "leftover": {
+    "Mun Express": {
+      "craft": "Mun Express",
+      "reason": "decouple",
+      "t": 102.59999999999631,
+      "alt_m": 52879.239998009056,
+      "vessels": 2,
+      "boosterId": "stage-1",
+      "boosterFuel_kg": 0,
+      "boosterParts": [
+        "TD-25 Decoupler",
+        "C-125 Adapter",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "T-900 \"Titan\"",
+        "Stabilizer Fins ×4"
+      ],
+      "titanIgnited": true
+    },
+    "Duna Hauler": {
+      "craft": "Duna Hauler",
+      "reason": "decouple",
+      "t": 273.5000000000279,
+      "alt_m": 62837.63043843559,
+      "vessels": 2,
+      "boosterId": "stage-1",
+      "boosterFuel_kg": 0,
+      "boosterParts": [
+        "TD-25 Decoupler",
+        "C-125 Adapter",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "FT-3200 Tank",
+        "T-900 \"Titan\"",
+        "Stabilizer Fins ×4"
+      ],
+      "titanIgnited": true
+    }
+  },
+  "hop": {
+    "name": "Booster Hop",
+    "stack": [
+      "pod-mk1",
+      "tank-s",
+      "eng-kestrel",
+      "decoupler-l",
+      "adapter",
+      "tank-xl",
+      "eng-titan"
+    ],
+    "radials": [
+      {
+        "part": "legs",
+        "sym": 1,
+        "host": 5
+      },
+      {
+        "part": "fins",
+        "sym": 1,
+        "host": 5
+      }
+    ]
+  },
+  "stagedAt": {
+    "t": 14.000000000000064,
+    "alt_m": 3957.7183237551944,
+    "speed_ms": 551.462501204921,
+    "fuel_kg": 9947.069582174518,
+    "titanFuel_kg": 9447.069582174518
+  },
+  "atSep": {
+    "id": "stage-1",
+    "name": "Titan Booster",
+    "fuel_kg": 9447.069582174518,
+    "parts": [
+      "TD-25 Decoupler",
+      "C-125 Adapter",
+      "FT-3200 Tank",
+      "T-900 \"Titan\"",
+      "LT-2 Landing Legs ×4",
+      "Stabilizer Fins ×4"
+    ],
+    "ignited": [
+      "T-900 \"Titan\""
+    ],
+    "alt_m": 3957.789399764966,
+    "speed_ms": 548.962501204921,
+    "agl_m": 3904.255602667513
+  },
+  "before": {
+    "t": 14.000000000000064,
+    "alt_m": 3957.789399764966,
+    "agl_m": 3904.255602667513,
+    "speed_ms": 548.962501204921,
+    "fuel_kg": 9447.069582174518
+  },
+  "after": {
+    "t": 171.35999999999214,
+    "alt_m": 53.09101276984438,
+    "agl_m": -1.7048584766143904e-12,
+    "speed_ms": 0,
+    "fuel_kg": 4148.557272904362,
+    "landed": true,
+    "dead": false,
+    "body": "kerbin"
+  },
+  "burn": {
+    "landed": true,
+    "speed": 1.5628371279390938,
+    "water": false,
+    "crashed": false
+  },
+  "impact": [],
+  "snapshot": "/workspace/moonshot/logs/snapshots/booster-exp1.json",
+  "claimedLanding": true
+}

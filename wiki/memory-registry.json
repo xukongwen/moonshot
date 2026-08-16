@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-16T02:25:40.510Z",
+  "generatedAt": "2026-08-16T04:26:26.910Z",
   "activeCap": 15,
   "logKeepDays": 14,
   "entries": [
@@ -73,7 +73,7 @@
       "summaryOneLiner": "先读 [`active-memory.md`](./active-memory.md)、[`memory-registry.json`](./memory-registry.json)、[`lint-report.md`](./lint-report.md)。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:25:40.393Z",
+      "mtime": "2026-08-16T04:26:26.792Z",
       "compactionState": "full"
     },
     {
@@ -85,7 +85,7 @@
       "summaryOneLiner": "<!-- wiki-auto-curator:near-window -->",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:25:40.393Z",
+      "mtime": "2026-08-16T04:26:26.792Z",
       "compactionState": "full"
     },
     {
@@ -121,7 +121,7 @@
       "summaryOneLiner": "指向库存登月船与往返测试。表面只要着陆器，不要把转移级一起放下。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-15T14:13:56.584Z",
+      "mtime": "2026-08-16T02:55:34.843Z",
       "compactionState": "full"
     },
     {
@@ -145,7 +145,7 @@
       "summaryOneLiner": "Score a craft against a mission dV budget before ignition. If it fails, redesign in the VAB.",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T01:58:34.002Z",
+      "mtime": "2026-08-16T04:08:55.999Z",
       "compactionState": "full"
     },
     {
@@ -205,7 +205,7 @@
       "summaryOneLiner": "总图 + 分步 + 回退：起飞前一张总图，短脚本做肌肉，agent 在命名结点上检查并计划下一刀。错误可以是难度；中途能停、能看、能改，出错回到更早结点。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:24:50.325Z",
+      "mtime": "2026-08-16T03:26:51.701Z",
       "compactionState": "full"
     },
     {
@@ -289,7 +289,19 @@
       "summaryOneLiner": "记录预发布 `v0.1.4`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:25:40.393Z",
+      "mtime": "2026-08-16T02:26:14.945Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/releases/v0.1.5.md",
+      "title": "v0.1.5",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "episodic",
+      "summaryOneLiner": "记录预发布 `v0.1.5`（`0.<era>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T04:26:26.792Z",
       "compactionState": "full"
     },
     {
@@ -329,6 +341,18 @@
       "compactionState": "full"
     },
     {
+      "path": "wiki/助推回收计划.md",
+      "title": "助推回收计划",
+      "memoryTier": "active",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "SpaceX 招牌动作：回收一级（boostback / 翻转 / 自杀燃烧 / 腿）。要真物理、多实验、好玩。合理零件可以（助推上装着陆腿，栅格舵先当现有鳍用）。不要超级零件。不要把助推传送回发射台。不要发明遥测。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T04:24:27.932Z",
+      "compactionState": "full"
+    },
+    {
       "path": "wiki/总体计划.md",
       "title": "总体计划",
       "memoryTier": "active",
@@ -337,7 +361,7 @@
       "summaryOneLiner": "把「KSP + 动物之森 + 我的世界」收成一份会改的北极星，避免三款游戏平铺。这是长期方向，不是本周任务单。想法会随时更新，以本页和用户最新口说为准。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T02:24:50.325Z",
+      "mtime": "2026-08-16T02:40:33.914Z",
       "compactionState": "full"
     },
     {

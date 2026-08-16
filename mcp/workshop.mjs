@@ -32,7 +32,7 @@ export class Workshop {
 
   addStackPart(id, at) {
     const def = requirePart(id);
-    if (def.radial && !def.decoupler && (id === 'srb' || id === 'fins' || id === 'legs')) {
+    if (def.radial && !def.decoupler && (id === 'srb' || id === 'fins' || id === 'legs' || id === 'legs-xl')) {
       throw new Error(t('vab.radialOnly', { name: def.name }));
     }
     const insert = at != null

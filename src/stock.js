@@ -112,4 +112,13 @@ export const STOCK = {
     stack: [...DUNA_HAULER_LIGHT.stack],
     radials: DUNA_HAULER_LIGHT.radials.map((r) => ({ ...r })),
   },
+  'Kerbin Eye': {
+    // First-cut orbit-spawn sat. Not hung on Express.
+    stack: ['sat-bus-s', 'cam-nadir'],
+    radials: [
+      { part: 'panel-oxstat', sym: 2, host: 0, attachAngle: Math.PI / 2 },
+      { part: 'batt-z100', sym: 1, host: 0, attachAngle: Math.PI },
+      { part: 'antenna-comm', sym: 1, host: 0, attachAngle: 0 },
+    ],
+  },
 };

@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2026-08-16T10:04:13.656Z",
+  "generatedAt": "2026-08-16T23:34:59.712Z",
   "activeCap": 15,
   "logKeepDays": 14,
   "entries": [
@@ -70,10 +70,10 @@
       "memoryTier": "active",
       "memoryStatus": "living",
       "decayClass": "protocol",
-      "summaryOneLiner": "agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 52 个。",
+      "summaryOneLiner": "agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 53 个。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T08:57:46.947Z",
+      "mtime": "2026-08-16T14:24:14.202Z",
       "compactionState": "full"
     },
     {
@@ -85,7 +85,7 @@
       "summaryOneLiner": "先读 [`active-memory.md`](./active-memory.md)、[`memory-registry.json`](./memory-registry.json)、[`lint-report.md`](./lint-report.md)。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T10:04:13.532Z",
+      "mtime": "2026-08-16T23:34:59.606Z",
       "compactionState": "full"
     },
     {
@@ -97,7 +97,7 @@
       "summaryOneLiner": "<!-- wiki-auto-curator:near-window -->",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T10:04:13.532Z",
+      "mtime": "2026-08-16T23:34:59.606Z",
       "compactionState": "full"
     },
     {
@@ -205,7 +205,7 @@
       "summaryOneLiner": "说明无头 MCP 如何覆盖原版人类操作：飞行、VAB、地图、语言。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T08:57:46.915Z",
+      "mtime": "2026-08-16T14:24:14.202Z",
       "compactionState": "full"
     },
     {
@@ -277,7 +277,19 @@
       "summaryOneLiner": "记录预发布 `v0.1.1.1`（`0.<era>.<minor>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T10:04:13.532Z",
+      "mtime": "2026-08-16T10:04:49.576Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/releases/v0.1.1.2.md",
+      "title": "v0.1.1.2",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "episodic",
+      "summaryOneLiner": "记录预发布 `v0.1.1.2`（`0.<era>.<minor>.<build>`）这一次交付，方便 agent 对照 CHANGELOG 和入口，而不是当正式版。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T23:34:59.606Z",
       "compactionState": "full"
     },
     {
@@ -397,7 +409,19 @@
       "summaryOneLiner": "SpaceX 招牌动作：回收一级（boostback / 翻转 / 自杀燃烧 / 腿）。要真物理、多实验、好玩。合理零件可以（助推上装着陆腿，栅格舵先当现有鳍用）。不要超级零件。不要把助推传送回发射台。不要发明遥测。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T08:57:47.639Z",
+      "mtime": "2026-08-16T12:48:36.850Z",
+      "compactionState": "full"
+    },
+    {
+      "path": "wiki/卫星计划.md",
+      "title": "卫星计划",
+      "memoryTier": "cold",
+      "memoryStatus": "living",
+      "decayClass": "plan",
+      "summaryOneLiner": "通信和卫星拍照。服务物流脊梁（以后订单/住客要能看见和说话）。0.1.x 先做基础设施。人能看见的，MCP 也能看见。不要超级零件。不要改火箭物理。不要发明没飞过的遥测。",
+      "successor": null,
+      "lastReferencedAt": null,
+      "mtime": "2026-08-16T23:34:20.638Z",
       "compactionState": "full"
     },
     {
@@ -409,7 +433,7 @@
       "summaryOneLiner": "把「KSP + 动物之森 + 我的世界」收成一份会改的北极星，避免三款游戏平铺。这是长期方向，不是本周任务单。想法会随时更新，以本页和用户最新口说为准。",
       "successor": null,
       "lastReferencedAt": null,
-      "mtime": "2026-08-16T09:57:01.478Z",
+      "mtime": "2026-08-16T23:34:20.638Z",
       "compactionState": "full"
     },
     {

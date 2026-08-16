@@ -3,6 +3,13 @@
 
 > 更早条目已卷到 [`wiki/log/`](./log/)。生成：`node scripts/wiki-auto-curator.mjs`。
 
+- [2026-08-17] 发布 v0.1.1.2。
+- [2026-08-17] 卫星 S1–S4（星体 / 无人脑子 / 通信 / 天底拍照）打板 0.1.1.2。S5–S6 未做。
+- [2026-08-16] 卫星 S4：真天底拍照 + 相册 + PHOTO_EC=5（飞过 150→145）。键 C / ksp_sat_photo。图 logs/shots/sat-s4-nadir.png（地面铺满）/ sat-s4-context.png。S5 检查句 / S6 未做。未打板。
+- [2026-08-16] 卫星 S3：天线 + 地心通视。探针没天线/缪恩背面静音。载人 crew 不绑天线。LKO 夜里仍通。图 logs/shots/sat-s3-comm-on.png / sat-s3-comm-off.png。S4–S6 未做。未打板。
+- [2026-08-16] 卫星 S2：无人脑子规则 hasBrain。探针船能 SAS/指向。没脑子残骸不能油门/SAS/分级。图 logs/shots/sat-s2-hold.png。S3–S6 未做。未打板。
+- [2026-08-16] 卫星 S1：sat-bus-s / antenna-comm / cam-nadir 进目录和 vesselviz，库存 Kerbin Eye。图 logs/shots/sat-s1.png。S2–S6 未做。未打板。
+- [2026-08-16] 卫星计划立案：通信+拍照，S1–S6 未做。不改物理、不改尺度。
 - [2026-08-16] 发布 v0.1.1.1。
 - [2026-08-16] 电力 E1–E6、共面侧翼、LT-2 收起，打板 0.1.1.1。
 - [2026-08-16] OX-STAT 改长条 2.10×0.44×0.045，库存 Express/Reuser/Hauler host 0 左右一对 `sym: 2`（90°/270°）。对生面朝阳 gen=0.800080（不是 1.6）。图 logs/shots/panel-pair.png 两板都看见。版本仍 0.1.6，未提交。
@@ -64,6 +71,20 @@
 - [2026-08-15] MCP VAB 无头车间 + 34 个工具；crafts.json 与浏览器 localStorage 分库
 - [2026-08-15] MCP 拼出「这也能飞？」并截图
 - [2026-08-15] Wiki bootstrap：宪法、SCHEMA、模块、ADR、curator
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

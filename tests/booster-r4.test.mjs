@@ -5,6 +5,7 @@ import { ascentTick, pointState, fuelLeft } from '../src/agent-muscles.js';
 import {
   runBoostback, padDistanceM, vTowardPad, predictBallisticImpact,
 } from '../src/agent-burns.js';
+import { hasBrain } from '../src/vessel.js';
 
 let failures = 0;
 const check = (name, cond, detail = '') => {
@@ -59,20 +60,13 @@ function flyToTitanDrop() {
   if (dropped) {
     session.setActive(dropped.id);
     const fuel0 = fuelLeft(session.st);
-    const pred0 = predictBallisticImpact(session.st);
-    const toward0 = vTowardPad(session.st);
+    check('dropped titan has no brain', hasBrain(session.st.parts) === false);
     const bb = runBoostback(session.st, {
       landReserveKg: 5200, impactPadM: 6000, vAwayStop: -400,
     });
     const fuel1 = fuelLeft(session.st);
-    const pred1 = predictBallisticImpact(session.st);
-    check('burned real fuel', bb.fuelUsed_kg > 500 && fuel1 < fuel0 - 500, String(bb.fuelUsed_kg));
-    check('fuel not invented', Math.abs((fuel0 - fuel1) - bb.fuelUsed_kg) < 2, `${fuel0 - fuel1} vs ${bb.fuelUsed_kg}`);
-    check('predicted impact closer', pred1.ok && pred1.pad_m < pred0.pad_m - 20_000,
-      `${pred0.pad_m} -> ${pred1.pad_m}`);
-    check('predicted impact under 15 km', pred1.ok && pred1.pad_m < 15_000, String(pred1.pad_m));
-    check('vToward improved', vTowardPad(session.st) > toward0 + 200, `${toward0} -> ${vTowardPad(session.st)}`);
-    check('reason impact or reserve', bb.reason === 'impact' || bb.reason === 'reserve', bb.reason);
+    check('S2 mute reason no-brain', bb.reason === 'no-brain', bb.reason);
+    check('S2 mute no fuel burned', bb.fuelUsed_kg === 0 && fuel1 === fuel0, String(bb.fuelUsed_kg));
     check('Titan still on booster', session.st.parts.some((p) => /Titan/.test(p.def?.name || '')));
     check('no teleport', padDistanceM(session.st) > 1000, String(padDistanceM(session.st)));
     check('PAD_DIR still +X', PAD_DIR.x === 1 && PAD_DIR.y === 0 && PAD_DIR.z === 0);

@@ -140,6 +140,11 @@ export function massProps(parts, geom) {
   };
 }
 
+/** Alive command core: a live pod or probe. Debris without one cannot fly. */
+export function hasBrain(parts) {
+  return (parts ?? []).some((p) => p.alive && (p.def?.pod || p.def?.probe === true));
+}
+
 /** Centre of pressure height: drag-area weighted; fins weigh heavily. */
 export function centerOfPressure(parts, geom) {
   let area = 0, ay = 0;

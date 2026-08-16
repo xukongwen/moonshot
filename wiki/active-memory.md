@@ -4,7 +4,7 @@
 
 | 字段 | 值 |
 |---|---|
-| 生成时间 | 2026-08-16T10:04:13.656Z |
+| 生成时间 | 2026-08-16T23:34:59.712Z |
 | 条数 | 15 / 15 |
 | Registry | [memory-registry.json](./memory-registry.json) |
 | 计划 | [Wiki Auto-Curator 架构.md](./Wiki%20Auto-Curator%20架构.md) |
@@ -25,7 +25,7 @@
 - [saves](./modules/saves.md) — 说明整局游戏存档（session），不是飞船文件。
 - [ADR：getBodyState 保持父星相对](./adr/2026-08-15-parent-relative-body-state.md) — 锁定天体状态坐标系，避免为了「太阳系惯性」拆掉 Mun Express。
 - [ADR：逃逸点火对准双曲线渐近线](./adr/2026-08-15-ejection-asymptote.md) — 锁定 TDI 点火相位，避免在几何 midnight 烧出一条错过 Duna 的双曲线。
-- [MCP tools](./api/mcp-tools.md) — agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 52 个。
+- [MCP tools](./api/mcp-tools.md) — agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 53 个。
 
 ## 读取协议
 

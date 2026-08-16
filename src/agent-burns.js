@@ -19,6 +19,7 @@ import {
   sectionFuel, shouldStageDry, targetEjectionAngleDeg, transferFuelKg,
   vesselMidnightAngle, vInfEst,
 } from './agent-muscles.js';
+import { canCommand } from './comms.js';
 
 const Y = new Vector3(0, 1, 0);
 
@@ -40,6 +41,7 @@ function driveBurn(st, pred, {
   aim = 'prograde', maxS = 400, dt = 0.15, plan = null, stageIdx = 0, stageFn = null,
   allowLander = false,
 } = {}) {
+  if (!canCommand(st).ok) return [];
   const tEnd = st.t + maxS;
   st.throttle = 1;
   const events = [];
@@ -857,6 +859,21 @@ export function runBoostback(st, {
   impactPadM = null,
   aimDown = 0,
 } = {}) {
+  const cmd = canCommand(st);
+  if (!cmd.ok) {
+    return {
+      reason: cmd.reason,
+      dt_s: 0,
+      dV_ms: 0,
+      fuelUsed_kg: 0,
+      fuelLeft_kg: fuelLeft(st),
+      vToward0_ms: vTowardPad(st),
+      vToward_ms: vTowardPad(st),
+      pad_m: padDistanceM(st),
+      pred0_m: null,
+      pred_m: null,
+    };
+  }
   const fuel0 = fuelLeft(st);
   const v0 = st.vel.clone();
   const t0 = st.t;
@@ -1036,6 +1053,10 @@ export function runRecoverMuscle(ctrl) {
     }
   }
   const st = ctrl.st ?? booster.st;
+  if (!st.landed) {
+    const recCmd = canCommand(st);
+    if (!recCmd.ok) return { ok: false, reason: recCmd.reason, boosterId: booster.id, upperId };
+  }
   if (st.landed || st.dead) {
     const already = {
       ok: !st.dead,

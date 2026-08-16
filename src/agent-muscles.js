@@ -11,6 +11,7 @@ import {
 import { checkSOI } from './physics.js';
 import { snapshotFromState } from './save.js';
 import { paySAS, stepECOnRails, ecTelemetry } from './power.js';
+import { canCommand } from './comms.js';
 
 const Y = new Vector3(0, 1, 0);
 
@@ -70,6 +71,7 @@ export function captureFlightSnapshot(st, { tag = 'agent', craft = null } = {}) 
 }
 
 export function pointState(st, dir, dt = 0) {
+  if (!canCommand(st).ok) return;
   const v = dir.clone();
   if (v.lengthSq() < 1e-12) v.copy(st.pos).normalize();
   st.quat.setFromUnitVectors(Y, v.normalize());

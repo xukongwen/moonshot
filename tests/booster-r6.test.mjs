@@ -85,10 +85,14 @@ console.log('4. stage drop, list, switch, command booster');
 
   const legs = callTool('ksp_legs', { down: true });
   check('legs on booster', session.st.parts.some((p) => p.def?.legs && p.legsDown), JSON.stringify(legs));
-  callTool('ksp_throttle', { value: 0.3 });
+  const th = callTool('ksp_throttle', { value: 0.3 });
+  check('throttle muted', th.ok === false, String(th.ok));
+  check('reason no-brain', th.reason === 'no-brain', String(th.reason));
+  check('throttle stays 0', session.st.throttle === 0, String(session.st.throttle));
+  const t0 = session.st.t;
   callTool('ksp_step', { seconds: 0.4 });
   check('booster still alive', !session.st.dead);
-  check('time advanced', session.st.t > 1, String(session.st.t));
+  check('time advanced', session.st.t > t0, String(session.st.t));
 }
 
 console.log('5. recover already-landed booster does not invent km');

@@ -17,7 +17,7 @@ function mat(color, opts = {}) {
 }
 
 const WHITE = 0xdfe3e8, GRAY = 0x8d959e, DARK = 0x3a3f46, ORANGE = 0xc96a2a,
-  YELLOW = 0xd6b13c, REDDISH = 0x9e4a3a, BLUE = 0x5f87b0;
+  YELLOW = 0xd6b13c, REDDISH = 0x9e4a3a, BLUE = 0x5f87b0, GOLD = 0xc9a227;
 
 function cyl(rTop, rBot, h, color, seg = 24) {
   return new THREE.Mesh(new THREE.CylinderGeometry(rTop, rBot, h, seg), mat(color));
@@ -337,6 +337,83 @@ export function buildPartMesh(p, hostR = DESIGN_HOST_R) {
       g.add(capT, capB);
       break;
     }
+    case 'satbus': {
+      // 1.25 m cube-ish box. White body + gold MLI + dark radiators. Flat faces.
+      // Stack axis +Y; top/bottom stay stackable (camera goes under).
+      const w = d.size;
+      g.add(new THREE.Mesh(new THREE.BoxGeometry(w, L, w), mat(WHITE, { rough: 0.48, metal: 0.16 })));
+      const mli = new THREE.Mesh(
+        new THREE.BoxGeometry(0.018, L * 0.64, w * 0.72),
+        mat(GOLD, { metal: 0.72, rough: 0.32 }),
+      );
+      mli.position.x = w / 2 + 0.009;
+      const mli2 = mli.clone();
+      mli2.position.x = -(w / 2 + 0.009);
+      g.add(mli, mli2);
+      const rad = new THREE.Mesh(
+        new THREE.BoxGeometry(w * 0.58, L * 0.15, 0.016),
+        mat(DARK, { rough: 0.72, metal: 0.28 }),
+      );
+      rad.position.set(0, L * 0.18, w / 2 + 0.008);
+      const radB = rad.clone();
+      radB.position.y = -L * 0.18;
+      const radZ = rad.clone();
+      radZ.position.z = -(w / 2 + 0.008);
+      const radZB = radB.clone();
+      radZB.position.z = -(w / 2 + 0.008);
+      g.add(rad, radB, radZ, radZB);
+      const top = new THREE.Mesh(new THREE.BoxGeometry(w * 0.78, 0.03, w * 0.78), mat(GOLD, { metal: 0.68, rough: 0.36 }));
+      top.position.y = L / 2 - 0.012;
+      const bot = new THREE.Mesh(new THREE.BoxGeometry(w * 0.42, 0.035, w * 0.42), mat(GRAY));
+      bot.position.y = -(L / 2 - 0.012);
+      g.add(top, bot);
+      const tracker = new THREE.Mesh(new THREE.BoxGeometry(0.11, 0.09, 0.11), mat(DARK));
+      tracker.position.set(w * 0.36, L * 0.28, w / 2 + 0.05);
+      g.add(tracker);
+      break;
+    }
+    case 'antenna': {
+      // Radial dish. Local +X = out after wrap rotation.y = -a. Gold dish + gray boom.
+      const mount = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.08, 0.08), mat(GRAY, { metal: 0.5, rough: 0.4 }));
+      mount.position.x = 0.03;
+      g.add(mount);
+      const boom = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.04, 0.04), mat(GRAY, { metal: 0.55, rough: 0.35 }));
+      boom.position.x = 0.14;
+      g.add(boom);
+      const dishR = 0.40;
+      const dish = new THREE.Mesh(
+        new THREE.SphereGeometry(dishR, 28, 16, 0, Math.PI * 2, 0, Math.PI * 0.42),
+        mat(GOLD, { metal: 0.78, rough: 0.26, extra: { side: THREE.DoubleSide } }),
+      );
+      dish.scale.set(1, 0.38, 1);
+      dish.rotation.z = Math.PI / 2; // concave faces +X
+      dish.position.x = 0.28;
+      g.add(dish);
+      const feed = cyl(0.022, 0.038, 0.10, GRAY, 10);
+      feed.rotation.z = Math.PI / 2;
+      feed.position.x = 0.46;
+      g.add(feed);
+      break;
+    }
+    case 'camera': {
+      // Dark barrel + glass on the −Y (nadir) end. Stack part under the bus.
+      const house = new THREE.Mesh(new THREE.BoxGeometry(r * 1.7, L * 0.30, r * 1.7), mat(DARK));
+      house.position.y = L * 0.30;
+      g.add(house);
+      const barrel = cyl(r * 0.70, r * 0.78, L * 0.52, 0x2a2e34, 16);
+      barrel.position.y = -L * 0.02;
+      g.add(barrel);
+      const ring = cyl(r * 0.82, r * 0.82, 0.035, GRAY, 16);
+      ring.position.y = -L * 0.28;
+      g.add(ring);
+      const glass = new THREE.Mesh(
+        new THREE.CylinderGeometry(r * 0.52, r * 0.52, 0.04, 16),
+        mat(BLUE, { metal: 0.82, rough: 0.14 }),
+      );
+      glass.position.y = -L * 0.36;
+      g.add(glass);
+      break;
+    }
     default:
       g.add(cyl(r, r, L, GRAY));
   }
@@ -382,16 +459,19 @@ export function buildVesselGroup(parts) {
       } else {
         const a0 = Number.isFinite(p.attachAngle) ? p.attachAngle : 0;
         const wafer = p.def.shape === 'panel' || p.def.shape === 'battery';
+        const facesOut = wafer || p.def.shape === 'antenna';
         for (let i = 0; i < p.sym; i++) {
           const a = a0 + (i / p.sym) * Math.PI * 2;
           const inst = i === 0 ? mesh : buildPartMesh(p, hostR);
           // panel halfOut ~0: attach at host skin; the mesh offset (span/2) does the rest
+          // antenna: small halfOut so the dish sits outside the 1.25 m box, not inside
           const halfOut = p.def.shape === 'panel' ? 0
             : p.def.shape === 'battery' ? 0.07
+            : p.def.shape === 'antenna' ? 0.18
             : p.def.size / 2;
           const offset = hostR + halfOut;
           inst.position.set(Math.cos(a) * offset, y, Math.sin(a) * offset);
-          if (wafer) {
+          if (facesOut) {
             inst.rotation.y = -a;
             // Opposite attach: rotation.y = -a sends local +Z to the
             // other tangent. Extra local rotateX(PI) — not Euler x+y,

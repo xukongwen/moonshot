@@ -88,7 +88,7 @@ export class VAB {
     if (PARTS[id].radial && !PARTS[id].decoupler) {
       // radial-only parts can't go in the stack (except none currently)
       if (id === 'srb' || id === 'fins' || id === 'legs' || id === 'legs-xl'
-          || id === 'panel-oxstat' || id === 'batt-z100') {
+          || id === 'panel-oxstat' || id === 'batt-z100' || id === 'antenna-comm') {
         $('part-info').innerHTML = `<b>${t('vab.radialOnly', { name: PARTS[id].name })}</b>`;
         return;
       }

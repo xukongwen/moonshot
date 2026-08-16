@@ -1,0 +1,48 @@
+{
+  "at": "2026-08-16T13:22:55.711Z",
+  "display": ":3",
+  "craft": "Kerbin Eye",
+  "method": "headed Chrome channel=chrome canvas.toDataURL + HUD colorkey overlay",
+  "attempts": 1,
+  "on": {
+    "path": "logs/shots/sat-s3-comm-on.png",
+    "bytes": 405086,
+    "real3d": true,
+    "composited": true,
+    "sceneBytes": 401129,
+    "cam": {
+      "out": 2.6,
+      "up": 1.8,
+      "side": 2.4
+    },
+    "hudComm": "通信 通",
+    "telemetry": {
+      "comm": true,
+      "commReason": "ok",
+      "body": "kerbin",
+      "alt": 80000.13761208137,
+      "brain": true
+    }
+  },
+  "off": {
+    "path": "logs/shots/sat-s3-comm-off.png",
+    "bytes": 143793,
+    "real3d": true,
+    "composited": true,
+    "sceneBytes": 87293,
+    "cam": {
+      "out": 3.6,
+      "up": 1.4,
+      "side": 2.2
+    },
+    "hudComm": "通信 断",
+    "telemetry": {
+      "comm": false,
+      "commReason": "occulted:mun",
+      "body": "mun",
+      "alt": 60000.00000000006,
+      "brain": true
+    }
+  },
+  "errors": []
+}

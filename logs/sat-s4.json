@@ -1,0 +1,27 @@
+{
+  "at": "2026-08-16T14:23:18.311Z",
+  "display": ":3",
+  "craft": "Kerbin Eye",
+  "method": "headed Chrome takePhoto() nadir + chase-cam context",
+  "attempts": 1,
+  "PHOTO_EC": 5,
+  "ecBefore": 150,
+  "ecAfter": 145,
+  "ecSpent": 5,
+  "albumN": 1,
+  "body": "kerbin",
+  "alt": 80000.00088072475,
+  "nadir": {
+    "path": "logs/shots/sat-s4-nadir.png",
+    "bytes": 457875,
+    "real3d": true
+  },
+  "context": {
+    "path": "logs/shots/sat-s4-context.png",
+    "bytes": 337971,
+    "real3d": true,
+    "composited": true,
+    "sceneBytes": 444183
+  },
+  "errors": []
+}

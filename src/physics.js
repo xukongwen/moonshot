@@ -10,6 +10,7 @@ import {
   stackGeometry, computeSections, massProps, centerOfPressure, burn, partY,
 } from './vessel.js';
 import { wheelsLive, paySAS, SAS_EC_DEADBAND_DEG, stepEC } from './power.js';
+import { canCommand } from './comms.js';
 
 const Y = new THREE.Vector3(0, 1, 0);
 const tmp1 = new THREE.Vector3(), tmp2 = new THREE.Vector3(), tmp3 = new THREE.Vector3();
@@ -29,6 +30,8 @@ export function physicsStep(st, dt, events) {
 
   st.geom = stackGeometry(st.parts);
   st.sections = computeSections(st.parts);
+  const commanded = canCommand(st).ok;
+  if (!commanded) st.throttle = 0;
   const mp = massProps(st.parts, st.geom);
   const copY = centerOfPressure(st.parts, st.geom);
   st.massProps = mp;
@@ -71,7 +74,7 @@ export function physicsStep(st, dt, events) {
 
   // ---- attitude ----
   if (!st.landed) {
-    stepAttitude(st, dt, { mp, copY, qDyn, press, thrust, perEngine, dragF, noseWorld, up });
+    stepAttitude(st, dt, { mp, copY, qDyn, press, thrust, perEngine, dragF, noseWorld, up, commanded });
   }
 
   // ---- EC generation (realtime). Rails/warp use stepECOnRails. ----
@@ -182,7 +185,8 @@ function stepAttitude(st, dt, env) {
     gimbalT += f * Math.sin((p.def.engine.gimbal * Math.PI) / 180) * Math.abs(partY(st.geom, p) - mp.comY);
   }
   const finT = mp.finArea * qDyn * 0.012 * Math.max(1, mp.comY * 0.6);
-  const wheels = wheelsLive(st) ? mp.podTorque : 0;
+  const commanded = env.commanded === true;
+  const wheels = (commanded && wheelsLive(st)) ? mp.podTorque : 0;
   const avail = wheels + gimbalT + finT;
 
   const torque = new THREE.Vector3();
@@ -192,18 +196,19 @@ function stepAttitude(st, dt, env) {
   const fwdRoll = noseWorld;
   const zAxis = new THREE.Vector3(0, 0, 1).applyQuaternion(st.quat);
   const c = st.controls;
-  const hasInput = c.pitch !== 0 || c.yaw !== 0 || c.roll !== 0;
-  if (hasInput) {
+  const hasInput = commanded && (c.pitch !== 0 || c.yaw !== 0 || c.roll !== 0);
+  if (commanded && hasInput) {
     torque.addScaledVector(right, c.pitch * avail);
     torque.addScaledVector(zAxis, c.yaw * avail);
     torque.addScaledVector(fwdRoll, c.roll * avail * 0.4);
     st.sasTarget.copy(st.quat); // retarget while steering
-  } else if (st.sas) {
+  } else if (commanded && st.sas) {
     sasTorque(st, avail, mp, torque, noseWorld);
   }
 
   // SAS / wheel input costs EC. Deadband (~0.5°) is free. Empty EC: wheels already 0.
-  if (wheels > 0 && (hasInput || (st.sas && sasErrorAngle(st, noseWorld) > SAS_EC_DEADBAND_DEG * Math.PI / 180))) {
+  // No brain / no comm: no pilot/SAS torque and no SAS pay (ec=0 still only kills wheels).
+  if (commanded && wheels > 0 && (hasInput || (st.sas && sasErrorAngle(st, noseWorld) > SAS_EC_DEADBAND_DEG * Math.PI / 180))) {
     paySAS(st, dt);
   }
 

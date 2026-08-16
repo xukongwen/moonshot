@@ -1,0 +1,33 @@
+{
+  "at": "2026-08-16T12:52:20.558Z",
+  "display": ":3",
+  "craft": "Kerbin Eye",
+  "orbit": "80 km circular kerbin",
+  "setup": "Kerbin Eye day-side 80 km, SAS hold, 3/4 cam",
+  "method": "headed Chrome channel=chrome canvas.toDataURL + HUD colorkey overlay",
+  "cam": {
+    "out": 2.6,
+    "up": 1.8,
+    "side": 2.4
+  },
+  "path": "logs/shots/sat-s2-hold.png",
+  "bytes": 403664,
+  "real3d": true,
+  "composited": true,
+  "sceneBytes": 400838,
+  "attempts": 1,
+  "telemetry": {
+    "ec": 150,
+    "ecCap": 150,
+    "wheelsLive": true,
+    "body": "kerbin",
+    "alt": 80000.13761208137,
+    "sas": true,
+    "brain": true,
+    "throttle": 0,
+    "attErrDeg": 0
+  },
+  "hudEc": "电 150 / 150",
+  "situation": "轨道飞行 — 科比因",
+  "errors": []
+}

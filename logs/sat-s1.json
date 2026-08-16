@@ -1,0 +1,32 @@
+{
+  "at": "2026-08-16T12:23:41.531Z",
+  "display": ":3",
+  "craft": "Kerbin Eye",
+  "orbit": "80 km circular kerbin",
+  "setup": "sat-bus-s + cam-nadir, wings 90/270, battery 180, dish 0, identity quat, 3/4 cam",
+  "method": "headed Chrome channel=chrome canvas.toDataURL + HUD colorkey overlay",
+  "cam": {
+    "out": 2.6,
+    "up": 1.8,
+    "side": 2.4
+  },
+  "path": "logs/shots/sat-s1.png",
+  "bytes": 413094,
+  "real3d": true,
+  "composited": true,
+  "sceneBytes": 407049,
+  "attempts": 1,
+  "telemetry": {
+    "ec": 150,
+    "ecCap": 150,
+    "ecGen": 0,
+    "eclipsed": null,
+    "panelW": 0,
+    "wheelsLive": true,
+    "body": "kerbin",
+    "alt": 80000
+  },
+  "hudEc": "电 150 / 150",
+  "situation": "轨道飞行 — 科比因",
+  "errors": []
+}

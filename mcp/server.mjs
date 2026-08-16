@@ -33,7 +33,7 @@ export const TOOLS = [
   },
   {
     name: 'ksp_telemetry',
-    description: 'Read the flight HUD: altitude, speed, orbit, fuel, staging, warp, camera, plus EC (ec, ecCap, ecGen, eclipsed, panelW) and wheelsLive.',
+    description: 'Read the flight HUD: altitude, speed, orbit, fuel, staging, warp, camera, plus EC (ec, ecCap, ecGen, eclipsed, panelW), wheelsLive, comm / commReason, albumN, photoEc.',
     inputSchema: { type: 'object', properties: {} },
   },
   {
@@ -498,6 +498,11 @@ export const TOOLS = [
     },
   },
   {
+    name: 'ksp_sat_photo',
+    description: 'Take an onboard nadir still of the current SOI body (human key C). Needs a live camera, a real world under you (not kerbol), and PHOTO_EC. Does not need comms. Headless: pays EC and records album metadata; png is null. Headed Flight: real PNG. Same gates as the human button.',
+    inputSchema: { type: 'object', properties: {} },
+  },
+  {
     name: 'ksp_agent_get',
     description: 'Read the in-game agent panel: visible, goal, missionId, nodes, current node, thoughts, running, which nodes have snapshots, plan.ok / fail summary. Same state as the panel. Does not invent fuel or Δv.',
     inputSchema: { type: 'object', properties: {} },
@@ -723,6 +728,8 @@ export function callTool(name, args = {}) {
         ...red,
       };
     }
+    case 'ksp_sat_photo':
+      return session.satPhoto();
     case 'ksp_agent_get':
       return session.agentGet();
     case 'ksp_agent_toggle':
@@ -797,13 +804,12 @@ function handle(msg) {
           replyError(id, -32602, 'tools/call requires params.name');
           return;
         }
-        try {
-          const result = callTool(name, args);
+        Promise.resolve(callTool(name, args)).then((result) => {
           reply(id, textResult(result));
-        } catch (err) {
+        }).catch((err) => {
           log('tool error', name, err);
           reply(id, textResult(err?.message || String(err), true));
-        }
+        });
         return;
       }
       case 'shutdown':

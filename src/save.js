@@ -110,6 +110,9 @@ export function snapshotFromState(st, { tag = 'save', craft = null } = {}) {
     landed: !!st.landed,
     dead: !!st.dead,
     ec: st.ec ?? null,
+    album: Array.isArray(st.album) ? st.album.map((e) => ({
+      t: e.t, body: e.body, alt: e.alt, ecSpent: e.ecSpent, ...(e.path ? { path: e.path } : {}),
+    })) : [],
     craft: craft ?? null,
     parts: (st.parts ?? []).map((p) => ({
       key: p.key,

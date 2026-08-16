@@ -7,12 +7,12 @@ tags: [api, mcp]
 
 # MCP tools
 
-agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 52 个。
+agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 53 个。
 
 | 工具 | 含义 |
 |---|---|
 | ksp_new_flight | 用库存船在 Kerbin 发射台开新飞行并重置会话 |
-| ksp_telemetry | 读飞行 HUD：高度、速度、轨道、燃料、分级、时间加速、相机、电（ec / ecCap / ecGen / eclipsed / panelW）和 wheelsLive |
+| ksp_telemetry | 读飞行 HUD：高度、速度、轨道、燃料、分级、时间加速、相机、电（ec / ecCap / ecGen / eclipsed / panelW）、wheelsLive、通信（comm / commReason） |
 | ksp_stage | 空格：下一级（点火、分离、丢助推或开伞） |
 | ksp_throttle | 油门 0..1 |
 | ksp_sas | 稳定辅助：off / hold / prograde / retrograde |
@@ -57,6 +57,7 @@ agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 52 个。
 | ksp_undock | 拆开焊接并给一点分离 |
 | ksp_plan | 用 mun-roundtrip / duna-roundtrip 的 Δv 预算给当前 VAB 或库存船打分，不飞 |
 | ksp_redesign | 按预算给缺油的级加罐或 SRB；VAB 当前设计写回车间，库存名只返回新设计不改 stock.js |
+| ksp_sat_photo | 天底拍照（人键 C）。要活相机、脚下有真实天体（不是 kerbol）、PHOTO_EC。不要通信。无头只记账，png 为 null |
 | ksp_agent_get | 读 agent 面板状态：visible、goal、missionId、结点、当前刀、思考、running、有快照的结点、plan.ok / fail。不编油和 Δv |
 | ksp_agent_toggle | 开/关 agent 面板（只改 flag；无头无 DOM） |
 | ksp_agent_plan | 粗目标 → mun/duna 总图，与面板「规划」相同。有船用当前船，否则库存 |
@@ -64,7 +65,7 @@ agent 可读工具目录。描述来自 mcp/server.mjs 的 TOOLS。共 52 个。
 | ksp_agent_revert | 回退到已完成结点快照。不是 ksp_revert（回 VAB） |
 | ksp_agent_check | 跑 A5 检查并追加思考（含夜里低电、SAS 死） |
 
-`ksp_telemetry` 在有目标且同一 SOI 时多：`target`、`range_m`、`closing_ms`（负=接近）、`rel_speed_ms`、`dockState`。电字段来自 `ecTelemetry`：`ec`、`ecCap`、`ecGen`、`eclipsed`（天体 id 或 null）、`panelW`，另带 `wheelsLive`。无新控制工具。
+`ksp_telemetry` 在有目标且同一 SOI 时多：`target`、`range_m`、`closing_ms`（负=接近）、`rel_speed_ms`、`dockState`。电字段来自 `ecTelemetry`：`ec`、`ecCap`、`ecGen`、`eclipsed`（天体 id 或 null）、`panelW`，另带 `wheelsLive`。通信字段来自 `commState`：`comm`（bool）、`commReason`（`crew` / `ok` / `no-antenna` / `occulted:<body>`）。另带 `albumN`、`photoEc`（PHOTO_EC）。拍照走 `ksp_sat_photo`，与人键 C 同一套门。
 
 ## 边界
 

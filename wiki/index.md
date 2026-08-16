@@ -1,6 +1,6 @@
 # Moonshot Wiki
 
-更新日期：2026-08-16
+更新日期：2026-08-17
 
 ## Active Memory（L1 · agent 默认）
 
@@ -14,7 +14,7 @@
 - 宪法：Moonshot 宪法.md
 - 规则：AGENTS.md · SCHEMA.md
 - 整理：Wiki Auto-Curator 架构.md
-- 计划：总体计划.md · 交汇对接架构计划.md · 游戏内Agent计划.md · 助推回收计划.md · 电力计划.md
+- 计划：总体计划.md · 交汇对接架构计划.md · 游戏内Agent计划.md · 助推回收计划.md · 电力计划.md · 卫星计划.md
 - 模块：modules/patched-conics.md · modules/hohmann.md · modules/mcp.md · modules/i18n.md · modules/versioning.md · modules/saves.md · modules/art.md · modules/flight-planning.md · modules/play-loop.md
 - 决策：adr/2026-08-15-parent-relative-body-state.md · adr/2026-08-15-ejection-asymptote.md
 - 工具：api/mcp-tools.md
@@ -23,11 +23,15 @@
 
 ## 当前入口
 
+- 发布 v0.1.1.2
+
 - 发布 v0.1.1.1
 
 - 发布 v0.1.6
 
 - 电力：E1–E6 + 共面侧翼 + LT-2 收起，打板 0.1.1.1。见 电力计划.md
+
+- 卫星：S1–S4 已做（零件/无人/通信/天底拍照），S5–S6 未做。见 卫星计划.md
 
 - 发布 v0.1.5
 

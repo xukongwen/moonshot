@@ -33,7 +33,7 @@ export class Workshop {
   addStackPart(id, at) {
     const def = requirePart(id);
     if (def.radial && !def.decoupler && (id === 'srb' || id === 'fins' || id === 'legs' || id === 'legs-xl'
-        || id === 'panel-oxstat' || id === 'batt-z100')) {
+        || id === 'panel-oxstat' || id === 'batt-z100' || id === 'antenna-comm')) {
       throw new Error(t('vab.radialOnly', { name: def.name }));
     }
     const insert = at != null

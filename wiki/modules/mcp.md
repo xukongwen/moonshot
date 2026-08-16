@@ -18,7 +18,7 @@ DOM-free 车间：mcp/workshop.mjs。无头飞船在 mcp/crafts.json。浏览器
 发射校验：必须有 command pod 和 engine。
 测试 tests/workshop.test.mjs 会从空车间重建 Mun Express。
 
-52 个工具：原飞行/VAB/存档、交汇对接、ksp_plan / ksp_redesign，加上 A6 `ksp_agent_*`（get / toggle / plan / step / revert / check）。与游戏内面板同一套函数，stdio 无 DOM。ksp_vab_save 仍只存飞船。
+53 个工具：原飞行/VAB/存档、交汇对接、ksp_plan / ksp_redesign、S4 `ksp_sat_photo`，加上 A6 `ksp_agent_*`（get / toggle / plan / step / revert / check）。与游戏内面板同一套函数，stdio 无 DOM。ksp_vab_save 仍只存飞船。
 
 ## 关键入口
 

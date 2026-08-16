@@ -4,7 +4,7 @@
 import { Vector3, Quaternion } from 'three';
 import { STOCK } from '../src/stock.js';
 import { BODIES, getBodyState, getRelativeState, PAD_DIR, PAD_ALTITUDE } from '../src/constants.js';
-import { buildVesselParts, buildStagePlan, stackGeometry, computeSections, massProps, designFromParts, droppedStageOffset, droppedStageName } from '../src/vessel.js';
+import { buildVesselParts, buildStagePlan, stackGeometry, computeSections, massProps, designFromParts, droppedStageOffset, droppedStageName, hasBrain } from '../src/vessel.js';
 import { physicsStep, checkSOI } from '../src/physics.js';
 import { elementsFromState, propagate, findMunEncounter, munTransferPhase, stateFromKepler } from '../src/orbits.js';
 import { heightAt } from '../src/terrain.js';
@@ -21,6 +21,10 @@ import {
 } from './agent.mjs';
 import { isTitanVessel, isDroppedBooster, runRecoverMuscle } from '../src/agent-burns.js';
 import { fillEC, splitEC, ecTelemetry, stepECOnRails } from '../src/power.js';
+import { canCommand, commState } from '../src/comms.js';
+import {
+  PHOTO_EC, canPhoto, payPhoto, ensureAlbum, pushAlbum, albumN, altOf,
+} from '../src/photo.js';
 
 const Y = new Vector3(0, 1, 0);
 const STEP_CAP_S = 120;
@@ -85,6 +89,7 @@ function makeState({ parts, body, pos, vel, quat, t, landed }) {
     sas: false,
     sasMode: 'hold',
     sasTarget: quat.clone(),
+    album: [],
   };
   fillEC(st);
   return st;
@@ -642,6 +647,7 @@ export class SimSession {
     const vspeed = st.vel.dot(up);
     const nav = this.relativeNav();
 
+    const cs = commState(st);
     const snap = {
       t: st.t,
       craft: this.craftName,
@@ -656,6 +662,9 @@ export class SimSession {
       fuel_kg: this.fuelLeft(),
       sas: st.sas,
       sasMode: st.sasMode,
+      brain: hasBrain(st.parts),
+      comm: cs.comm,
+      commReason: cs.commReason,
       stageIndex: this.stageIdx,
       stages: this.plan.slice(this.stageIdx).map((e) => e.label),
       ap_m: null,
@@ -683,6 +692,8 @@ export class SimSession {
       dockState: this.dockState,
       translate: { ...(st.translate ?? { x: 0, y: 0, z: 0 }) },
       ...ecTelemetry(st),
+      albumN: albumN(st),
+      photoEc: PHOTO_EC,
     };
 
     try {
@@ -706,8 +717,16 @@ export class SimSession {
     return snap;
   }
 
+  commandGate() {
+    const cmd = canCommand(this.st);
+    if (cmd.ok) return null;
+    return { ok: false, reason: cmd.reason, ...this.telemetry() };
+  }
+
   stage() {
     const st = this.requireFlight();
+    const blocked = this.commandGate();
+    if (blocked) return blocked;
     const ev = this.plan[this.stageIdx++];
     if (!ev) {
       this.stageIdx = this.plan.length;
@@ -745,12 +764,16 @@ export class SimSession {
 
   setThrottle(value) {
     this.requireFlight();
+    const blocked = this.commandGate();
+    if (blocked) return blocked;
     this.st.throttle = clamp(value, 0, 1);
     return { throttle: this.st.throttle, ...this.telemetry() };
   }
 
   setSas(mode) {
     this.requireFlight();
+    const blocked = this.commandGate();
+    if (blocked) return blocked;
     const allowed = ['off', 'hold', 'prograde', 'retrograde'];
     if (!allowed.includes(mode)) {
       throw new Error(`Invalid SAS mode "${mode}". Use: ${allowed.join(', ')}`);
@@ -767,6 +790,8 @@ export class SimSession {
 
   setControls({ pitch, yaw, roll } = {}) {
     this.requireFlight();
+    const blocked = this.commandGate();
+    if (blocked) return blocked;
     const c = this.st.controls;
     if (pitch != null) c.pitch = clamp(pitch, -1, 1);
     if (yaw != null) c.yaw = clamp(yaw, -1, 1);
@@ -776,6 +801,8 @@ export class SimSession {
 
   point(dir) {
     const st = this.requireFlight();
+    const blocked = this.commandGate();
+    if (blocked) return blocked;
     const up = this.up();
     const east = this.east();
     let v;
@@ -831,6 +858,51 @@ export class SimSession {
       }
     }
     return { chutes: 'armed', parts: n, ...this.telemetry() };
+  }
+
+  /**
+   * Onboard nadir photo. Same gates as the human C key.
+   * Headless: metadata only (png null). Headed Flight: prefer takePhoto().
+   */
+  async satPhoto() {
+    const st = this.requireFlight();
+    if (typeof this.flight?.takePhoto === 'function' && this.flight.renderer) {
+      const shot = await this.flight.takePhoto();
+      const cs = commState(st);
+      return { ...shot, comm: cs.comm, ...this.telemetry(), ok: shot.ok, reason: shot.reason };
+    }
+    const gate = canPhoto(st);
+    const cs = commState(st);
+    const alt = altOf(st);
+    if (!gate.ok) {
+      return {
+        ok: false,
+        reason: gate.reason,
+        ecSpent: 0,
+        albumN: albumN(st),
+        comm: cs.comm,
+        body: st.body,
+        alt,
+        png: null,
+        photoEc: PHOTO_EC,
+        ...this.telemetry(),
+      };
+    }
+    payPhoto(st);
+    ensureAlbum(st);
+    pushAlbum(st, { alt, ecSpent: PHOTO_EC });
+    return {
+      ok: true,
+      reason: 'ok',
+      ecSpent: PHOTO_EC,
+      albumN: albumN(st),
+      comm: cs.comm,
+      body: st.body,
+      alt,
+      png: null,
+      photoEc: PHOTO_EC,
+      ...this.telemetry(),
+    };
   }
 
   vesselCanRails(v) {

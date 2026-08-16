@@ -147,6 +147,21 @@ export const PARTS = {
     ecCap: 100, radial: true, dragArea: 0.04, maxTemp: 1400, shape: 'battery',
     desc: '100 EC radial brick. No generation, no deploy.',
   },
+  'sat-bus-s': {
+    name: 'S-125 Sat Bus', category: 'Pods', size: 1.25, mass: 250, length: 0.80,
+    probe: true, pod: { torque: 2500, ecCap: 50 }, dragArea: 0.5, maxTemp: 1400, shape: 'satbus',
+    desc: 'Unmanned 1.25 m bus. Built-in wheels + 50 EC.',
+  },
+  'antenna-comm': {
+    name: 'HG-5 Comm Dish', category: 'Utility', size: 0.7, mass: 30, length: 0.45,
+    antenna: true, radial: true, dragArea: 0.12, maxTemp: 1400, shape: 'antenna',
+    desc: 'Radial dish. Comms needs this (S3). No deploy.',
+  },
+  'cam-nadir': {
+    name: 'Nadir Camera', category: 'Utility', size: 0.35, mass: 40, length: 0.28,
+    camera: true, dragArea: 0.08, maxTemp: 1400, shape: 'camera',
+    desc: 'Nadir camera. Photo needs this (S4).',
+  },
 };
 
 export const CATEGORIES = ['Pods', 'Tanks', 'Engines', 'Coupling', 'Aero', 'Utility'];

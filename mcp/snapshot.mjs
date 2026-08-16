@@ -38,6 +38,9 @@ export function serializeSnapshot(st, { tag = 'snap', craft = null } = {}) {
     landed: !!st.landed,
     dead: !!st.dead,
     ec: st.ec ?? null,
+    album: Array.isArray(st.album) ? st.album.map((e) => ({
+      t: e.t, body: e.body, alt: e.alt, ecSpent: e.ecSpent, ...(e.path ? { path: e.path } : {}),
+    })) : [],
     craft: craft ?? null,
     parts: (st.parts ?? []).map((p) => ({
       key: p.key,
@@ -106,6 +109,9 @@ export function applySnapshotToState(st, snap) {
   applyParts(st, snap.parts);
   st.ec = snap.ec != null ? Number(snap.ec) : undefined;
   fillEC(st);
+  st.album = Array.isArray(snap.album) ? snap.album.map((e) => ({
+    t: e.t, body: e.body, alt: e.alt, ecSpent: e.ecSpent, ...(e.path ? { path: e.path } : {}),
+  })) : (st.album ?? []);
   return st;
 }
 

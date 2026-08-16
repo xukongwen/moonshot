@@ -4,6 +4,7 @@ import { fmtTime, fmtDist, BODIES } from './constants.js';
 import { feedTanks } from './vessel.js';
 import { t, bodyName, getLang, stageLabel } from './i18n.js';
 import { ecCap } from './power.js';
+import { commState } from './comms.js';
 
 const $ = (id) => document.getElementById(id);
 
@@ -23,6 +24,14 @@ export const HUD = {
   },
 
   setThrottle(th) { $('throttle-fill').style.height = `${(th * 100).toFixed(0)}%`; },
+
+  setAlbum(n, last) {
+    const el = $('ro-album');
+    if (!el) return;
+    const count = Number(n) || 0;
+    if (last?.body) el.textContent = `${t('hud.album')} ${count} · ${last.body}`;
+    else el.textContent = `${t('hud.album')} ${count}`;
+  },
 
   setSAS(on, mode) {
     $('sas-ind').classList.toggle('on', on);
@@ -49,6 +58,12 @@ export const HUD = {
       if (ec <= 0 || cap <= 0) ecEl.style.color = '#ff5040';
       else if (ec < 0.2 * cap) ecEl.style.color = '#ffae42';
       else ecEl.style.color = '';
+    }
+    const commEl = $('ro-comm');
+    if (commEl) {
+      const cs = commState(st);
+      commEl.textContent = `${t('hud.comm')} ${cs.comm ? t('hud.commOn') : t('hud.commOff')}`;
+      commEl.style.color = cs.comm ? '#6fc06a' : '#ff5040';
     }
     const tf = info.maxTempFrac;
     const el = $('ro-temp');

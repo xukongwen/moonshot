@@ -27,6 +27,10 @@ import { SoundFX } from './sound.js';
 import { t, bodyName, getLang } from './i18n.js';
 import { loadDemoIfEmpty } from './agent-ui.js';
 import { fillEC, splitEC, stepECOnRails } from './power.js';
+import { canCommand } from './comms.js';
+import {
+  PHOTO_EC, canPhoto, payPhoto, ensureAlbum, pushAlbum, albumN, photoFilePath, altOf,
+} from './photo.js';
 
 const WARP_LEVELS = [1, 2, 3, 4, 10, 100, 1000, 10000, 100000];
 const PHYS_DT = 0.02;
@@ -44,6 +48,7 @@ export class Flight {
   async init() {
     this.scene = new THREE.Scene();
     this.camera = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 0.3, 1e12);
+    this.photoCam = new THREE.PerspectiveCamera(60, innerWidth / innerHeight, 50, 1e12);
     this.camCtl = { az: 0.5, el: 0.25, dist: 28 };
 
     this.scene.add(new THREE.AmbientLight(0x445566, 0.5));
@@ -161,6 +166,7 @@ export class Flight {
       translate: { x: 0, y: 0, z: 0 },
       sas: true, sasMode: 'hold', sasTarget: quat.clone(),
       elements: null,
+      album: [],
     };
     fillEC(this.st);
     this.plan = buildStagePlan(parts);
@@ -185,6 +191,7 @@ export class Flight {
     this.encTimer = 0;
     this.hudTimer = 0;
     this.camCtl.dist = Math.max(20, this.st.geom.totalLength * 2.2);
+    this._noBrainMsg = false;
 
     this.refreshViz();
     this.active = true;
@@ -255,6 +262,9 @@ export class Flight {
     st.massProps = massProps(st.parts, st.geom);
     st.ec = snap.ec != null ? Number(snap.ec) : undefined;
     fillEC(st);
+    st.album = Array.isArray(snap.album) ? snap.album.map((e) => ({
+      t: e.t, body: e.body, alt: e.alt, ecSpent: e.ecSpent, ...(e.path ? { path: e.path } : {}),
+    })) : (st.album ?? []);
 
     this.legsDeployed = st.parts.some((p) => p.legsDown);
     this.warpIdx = 0;
@@ -449,6 +459,7 @@ export class Flight {
       translate: { x: 0, y: 0, z: 0 },
       sas: true, sasMode: 'hold', sasTarget: quat.clone(),
       elements: null,
+      album: [],
     };
     fillEC(st);
     if (!this.vessels) this.vessels = [];
@@ -562,6 +573,8 @@ export class Flight {
     $('btn-help-close').onclick = () => HUD.toggleHelp(false);
     $('btn-warp-up').onclick = () => this.setWarp(this.warpIdx + 1);
     $('btn-warp-down').onclick = () => this.setWarp(this.warpIdx - 1);
+    const btnPhoto = $('btn-photo');
+    if (btnPhoto) btnPhoto.onclick = () => { void this.takePhoto(); };
   }
 
   bindInput() {
@@ -573,10 +586,18 @@ export class Flight {
         case 'Space': e.preventDefault(); this.stage(); break;
         case 'BracketLeft': e.preventDefault(); this.cycleVessel(-1); break;
         case 'BracketRight': e.preventDefault(); this.cycleVessel(1); break;
-        case 'KeyT': this.st.sas = !this.st.sas; this.st.sasTarget.copy(this.st.quat); break;
-        case 'Digit1': this.st.sasMode = 'hold'; this.st.sasTarget.copy(this.st.quat); break;
-        case 'Digit2': this.st.sasMode = 'prograde'; break;
-        case 'Digit3': this.st.sasMode = 'retrograde'; break;
+        case 'KeyT':
+          if (!this.commandOk()) break;
+          this.st.sas = !this.st.sas; this.st.sasTarget.copy(this.st.quat); break;
+        case 'Digit1':
+          if (!this.commandOk()) break;
+          this.st.sasMode = 'hold'; this.st.sasTarget.copy(this.st.quat); break;
+        case 'Digit2':
+          if (!this.commandOk()) break;
+          this.st.sasMode = 'prograde'; break;
+        case 'Digit3':
+          if (!this.commandOk()) break;
+          this.st.sasMode = 'retrograde'; break;
         case 'KeyZ': this.setThrottle(1); break;
         case 'KeyX': this.setThrottle(0); break;
         case 'KeyG':
@@ -590,6 +611,10 @@ export class Flight {
             if (p.alive && p.def.chute && p.chuteState === 'stowed') p.chuteState = 'armed';
           }
           HUD.msg(t('msg.chutesArmed'));
+          break;
+        case 'KeyC':
+          e.preventDefault();
+          void this.takePhoto();
           break;
         case 'KeyM': this.toggleMap(); break;
         case 'F1': e.preventDefault(); HUD.toggleHelp(); break;
@@ -621,18 +646,52 @@ export class Flight {
     }, { passive: true });
   }
 
+  warnNoBrain() {
+    if (this._noBrainMsg) return;
+    this._noBrainMsg = true;
+    HUD.msg(t('msg.noBrain'), 'warn');
+  }
+
+  warnNoComm() {
+    if (this._noCommMsg) return;
+    this._noCommMsg = true;
+    HUD.msg(t('msg.noComm'), 'warn');
+  }
+
+  commandOk() {
+    const cmd = canCommand(this.st);
+    if (cmd.ok) return true;
+    if (cmd.reason === 'no-brain') this.warnNoBrain();
+    else this.warnNoComm();
+    return false;
+  }
+
   setThrottle(v) {
+    if (!this.commandOk()) return;
     this.st.throttle = THREE.MathUtils.clamp(v, 0, 1);
     if (this.rails && v > 0) { this.setWarp(0); HUD.msg(t('msg.warpThrottle'), 'warn'); }
   }
 
   handleHeldKeys(dt) {
     const st = this.st;
-    if (this.keys.ShiftLeft || this.keys.ShiftRight) this.setThrottle(st.throttle + dt * 0.6);
-    if (this.keys.ControlLeft || this.keys.ControlRight) this.setThrottle(st.throttle - dt * 0.6);
-    st.controls.pitch = (this.keys.KeyW ? -1 : 0) + (this.keys.KeyS ? 1 : 0);
-    st.controls.yaw = (this.keys.KeyA ? -1 : 0) + (this.keys.KeyD ? 1 : 0);
-    st.controls.roll = (this.keys.KeyQ ? -1 : 0) + (this.keys.KeyE ? 1 : 0);
+    const cmd = canCommand(st);
+    if (cmd.ok) {
+      if (this.keys.ShiftLeft || this.keys.ShiftRight) this.setThrottle(st.throttle + dt * 0.6);
+      if (this.keys.ControlLeft || this.keys.ControlRight) this.setThrottle(st.throttle - dt * 0.6);
+      st.controls.pitch = (this.keys.KeyW ? -1 : 0) + (this.keys.KeyS ? 1 : 0);
+      st.controls.yaw = (this.keys.KeyA ? -1 : 0) + (this.keys.KeyD ? 1 : 0);
+      st.controls.roll = (this.keys.KeyQ ? -1 : 0) + (this.keys.KeyE ? 1 : 0);
+    } else {
+      st.controls.pitch = 0;
+      st.controls.yaw = 0;
+      st.controls.roll = 0;
+      const trying = this.keys.ShiftLeft || this.keys.ShiftRight || this.keys.ControlLeft || this.keys.ControlRight
+        || this.keys.KeyW || this.keys.KeyS || this.keys.KeyA || this.keys.KeyD || this.keys.KeyQ || this.keys.KeyE;
+      if (trying) {
+        if (cmd.reason === 'no-brain') this.warnNoBrain();
+        else this.warnNoComm();
+      }
+    }
     st.translate = st.translate || { x: 0, y: 0, z: 0 };
     st.translate.y = (this.keys.KeyI ? 1 : 0) + (this.keys.KeyK ? -1 : 0);
     st.translate.x = (this.keys.KeyL ? 1 : 0) + (this.keys.KeyJ ? -1 : 0);
@@ -682,6 +741,7 @@ export class Flight {
 
   stage() {
     if (this.st.dead) return;
+    if (!this.commandOk()) return;
     this.sound.ensure();
     if (this.stageIndex >= this.plan.length) { HUD.msg(t('msg.noStages'), 'warn'); return; }
     if (this.rails) { this.setWarp(0); }
@@ -745,6 +805,7 @@ export class Flight {
       translate: { x: 0, y: 0, z: 0 },
       sas: true, sasMode: 'hold', sasTarget: st.quat.clone(),
       elements: null,
+      album: [],
     };
     splitEC(st, bst);
     if (!this.vessels) this.vessels = [];
@@ -774,6 +835,7 @@ export class Flight {
     this.stageIndex = v.stageIdx ?? 0;
     this.design = v.design;
     this.legsDeployed = v.st.parts.some((p) => p.legsDown);
+    this._noBrainMsg = false;
     this.refreshViz();
     HUD.stages(this.plan, this.stageIndex, this.st.parts, this.st.sections);
     HUD.msg(t('msg.switchVessel', { name: v.name || v.id }));
@@ -830,12 +892,156 @@ export class Flight {
     }
   }
 
+
+  // -------------------------------------------------------------------------
+  // nadir photo (onboard, no comms)
+  // -------------------------------------------------------------------------
+
+  aimPhotoCam() {
+    const st = this.st;
+    const cam = this.photoCam;
+    const canvas = this.renderer?.domElement;
+    const w = canvas?.width || (typeof innerWidth === 'number' ? innerWidth : 1500);
+    const h = canvas?.height || (typeof innerHeight === 'number' ? innerHeight : 900);
+    cam.aspect = w / Math.max(1, h);
+    cam.fov = 60;
+    cam.near = 50;
+    cam.far = 1e12;
+    cam.updateProjectionMatrix();
+    cam.position.set(0, 0, 0);
+    const mesh = this.bodyMeshes?.[st.body];
+    const target = mesh?.position ? mesh.position.clone() : st.pos.clone().negate();
+    let up = new THREE.Vector3(0, 1, 0);
+    if (st.vel && st.pos) {
+      const hvec = st.pos.clone().cross(st.vel);
+      if (hvec.lengthSq() > 1e-8) up.copy(hvec).normalize();
+    }
+    const look = target.clone().sub(cam.position);
+    if (look.lengthSq() < 1e-12) look.copy(st.pos).negate();
+    look.normalize();
+    if (Math.abs(look.dot(up)) > 0.98) {
+      up = Math.abs(look.y) > 0.9 ? new THREE.Vector3(0, 0, 1) : new THREE.Vector3(0, 1, 0);
+    }
+    cam.up.copy(up);
+    cam.lookAt(target);
+    cam.updateMatrixWorld(true);
+    return target;
+  }
+
+  hideForPhoto() {
+    const hidden = [];
+    const hide = (obj) => {
+      if (!obj) return;
+      hidden.push([obj, obj.visible]);
+      obj.visible = false;
+    };
+    hide(this.vGroup);
+    for (const g of this.otherViz?.values() ?? []) hide(g);
+    for (const d of this.debris ?? []) hide(d.group);
+    hide(this.pad);
+    hide(this.plasma?.mesh);
+    return hidden;
+  }
+
+  restoreHidden(hidden) {
+    for (const [obj, vis] of hidden) obj.visible = vis;
+  }
+
+  photoFail(reason) {
+    const key = {
+      'no-camera': 'msg.photoNoCamera',
+      'no-ground': 'msg.photoNoGround',
+      'no-ec': 'msg.photoNoEc',
+      dead: 'msg.photoDead',
+    }[reason];
+    HUD.msg(key ? t(key) : reason, 'warn');
+    return this.photoPayload({ ok: false, reason, png: null });
+  }
+
+  photoPayload({ ok, reason, png = null, path, ecSpent = 0 }) {
+    const st = this.st;
+    return {
+      ok: !!ok,
+      reason: reason ?? (ok ? 'ok' : 'no-camera'),
+      ecSpent: ok ? (ecSpent || PHOTO_EC) : 0,
+      albumN: albumN(st),
+      body: st?.body ?? null,
+      alt: st ? altOf(st) : 0,
+      png: png ?? null,
+      photoEc: PHOTO_EC,
+      ...(path ? { path } : {}),
+    };
+  }
+
+  async grabNadirPng() {
+    const renderer = this.renderer;
+    this.aimPhotoCam();
+    if (typeof renderer.renderAsync === 'function') {
+      await renderer.renderAsync(this.scene, this.photoCam);
+    } else {
+      const r = renderer.render(this.scene, this.photoCam);
+      if (r && typeof r.then === 'function') await r;
+    }
+    if (typeof renderer.waitForGPU === 'function') {
+      try { await renderer.waitForGPU(); } catch { /* ignore */ }
+    }
+    if (typeof requestAnimationFrame === 'function') {
+      await new Promise((res) => requestAnimationFrame(() => requestAnimationFrame(res)));
+    }
+    const canvas = renderer.domElement;
+    return canvas?.toDataURL ? canvas.toDataURL('image/png') : null;
+  }
+
+  /**
+   * True nadir still of the current SOI body from the vessel.
+   * Camera at origin, lookAt the body mesh (planet center). Not the chase cam.
+   */
+  async takePhoto() {
+    if (this._photoBusy) {
+      return this.photoPayload({ ok: false, reason: 'busy', png: null });
+    }
+    const st = this.st;
+    if (!st) return this.photoPayload({ ok: false, reason: 'no-camera', png: null });
+    const gate = canPhoto(st);
+    if (!gate.ok) return this.photoFail(gate.reason);
+
+    this._photoBusy = true;
+    const hidden = this.hideForPhoto();
+    let png = null;
+    try {
+      this.updateScene(0);
+      png = await this.grabNadirPng();
+      const bytes = png && png.includes(',') ? Math.floor((png.split(',')[1] || '').length * 0.75) : 0;
+      if (!png || bytes < 40000) {
+        png = await this.grabNadirPng();
+      }
+    } finally {
+      this.restoreHidden(hidden);
+      try {
+        if (typeof this.renderer.renderAsync === 'function') {
+          await this.renderer.renderAsync(this.scene, this.camera);
+        } else {
+          this.renderer.render(this.scene, this.camera);
+        }
+      } catch { /* restore best-effort */ }
+      this._photoBusy = false;
+    }
+
+    payPhoto(st);
+    const path = photoFilePath();
+    pushAlbum(st, { path, ecSpent: PHOTO_EC });
+    HUD.msg(t('msg.photoTaken'));
+    HUD.setAlbum(albumN(st), st.album[st.album.length - 1]);
+    return this.photoPayload({ ok: true, reason: 'ok', png, path, ecSpent: PHOTO_EC });
+  }
+
   // -------------------------------------------------------------------------
   // per-frame
   // -------------------------------------------------------------------------
 
   frame(dt) {
     if (!this.active) return;
+    if (this._photoBusy) return;
     dt = Math.min(dt, 0.1);
     this.handleHeldKeys(dt);
     if (typeof this.pilot === 'function') {
@@ -1209,6 +1415,7 @@ export class Flight {
     const up = st.pos.clone().normalize();
     const vspeed = st.vel.dot(up);
     HUD.readouts(info, st, vspeed);
+    HUD.setAlbum(albumN(st), st.album?.[st.album.length - 1]);
 
     // situation line
     const sitBody = getLang() === 'en' ? bodyName(st.body).toUpperCase() : bodyName(st.body);
@@ -1309,6 +1516,10 @@ export class Flight {
   resize(w, h) {
     this.camera.aspect = w / h;
     this.camera.updateProjectionMatrix();
+    if (this.photoCam) {
+      this.photoCam.aspect = w / h;
+      this.photoCam.updateProjectionMatrix();
+    }
     this.map?.resize(w, h);
   }
 }
